@@ -1,0 +1,1467 @@
+{
+	"info": {
+		"_postman_id": "bce95ded-c5b7-49ff-abb3-e7d526c246fc",
+		"name": "GLUE-4300-Create-cart-permissions",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Negative",
+			"item": [
+				{
+					"name": "Request access token",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "b75ed699-17ca-4abc-9837-6218ebf5d763",
+								"exec": [
+									"var responseData = pm.response.json().data;",
+									"",
+									"pm.environment.set(\"token\", responseData.attributes.accessToken);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"data\": {\n        \"type\": \"access-tokens\",\n        \"attributes\": {\n            \"username\": \"sonia@spryker.com\",\n            \"password\": \"change123\"\n        }\n    }\n}"
+						},
+						"url": {
+							"raw": "{{url}}/access-tokens",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"access-tokens"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Share not owned cart",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "f506c2b3-2a73-4654-bc5f-11bdcb4df345",
+								"exec": [
+									"var responseData = pm.response.json().errors;",
+									"",
+									"pm.test(\"Status code is 403\", function () {",
+									"    pm.response.to.have.status(403);",
+									"});",
+									"",
+									"pm.test(\"Has correct error code\", function() {",
+									"    pm.expect(responseData[0].code).to.eql(\"2701\");",
+									"});",
+									"",
+									"pm.test(\"Has correct error detail\", function() {",
+									"    pm.expect(responseData[0].detail).to.eql(\"Action is forbidden.\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"data\": {\n        \"type\": \"shared-carts\",\n        \"attributes\": {\n            \"idCompanyUser\": \"8da78283-e629-5667-9f84-e13207a7aef9\",\n            \"idCartPermissionGroup\": 2\n        }\n    }\n}"
+						},
+						"url": {
+							"raw": "{{url}}/carts/f5ed54eb-4970-5d49-9e9d-e3b05eeb306c/shared-carts",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"carts",
+								"f5ed54eb-4970-5d49-9e9d-e3b05eeb306c",
+								"shared-carts"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Share cart to user from another company",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "f506c2b3-2a73-4654-bc5f-11bdcb4df345",
+								"exec": [
+									"var responseData = pm.response.json().errors;",
+									"",
+									"pm.test(\"Status code is 403\", function () {",
+									"    pm.response.to.have.status(403);",
+									"});",
+									"",
+									"pm.test(\"Has correct error code\", function() {",
+									"    pm.expect(responseData[0].code).to.eql(\"2703\");",
+									"});",
+									"",
+									"pm.test(\"Has correct error detail\", function() {",
+									"    pm.expect(responseData[0].detail).to.eql(\"Cart can be shared only with company users from same company.\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"data\": {\n        \"type\": \"shared-carts\",\n        \"attributes\": {\n            \"idCompanyUser\": \"87578ca2-46ea-50ca-8ea5-f4fdba647ea4\",\n            \"idCartPermissionGroup\": 2\n        }\n    }\n}"
+						},
+						"url": {
+							"raw": "{{url}}/carts/0c3ec260-694a-5cec-b78c-d37d32f92ee9/shared-carts",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"carts",
+								"0c3ec260-694a-5cec-b78c-d37d32f92ee9",
+								"shared-carts"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Share cart without access token",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "f506c2b3-2a73-4654-bc5f-11bdcb4df345",
+								"exec": [
+									"var responseData = pm.response.json().errors;",
+									"",
+									"pm.test(\"Status code is 403\", function () {",
+									"    pm.response.to.have.status(403);",
+									"});",
+									"",
+									"pm.test(\"Has correct error code\", function() {",
+									"    pm.expect(responseData[0].code).to.eql(\"002\");",
+									"});",
+									"",
+									"pm.test(\"Has correct error detail\", function() {",
+									"    pm.expect(responseData[0].detail).to.eql(\"Missing access token.\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"data\": {\n        \"type\": \"shared-carts\",\n        \"attributes\": {\n            \"idCompanyUser\": \"8da78283-e629-5667-9f84-e13207a7aef9\",\n            \"idCartPermissionGroup\": 2\n        }\n    }\n}"
+						},
+						"url": {
+							"raw": "{{url}}/carts/0c3ec260-694a-5cec-b78c-d37d32f92ee9/shared-carts",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"carts",
+								"0c3ec260-694a-5cec-b78c-d37d32f92ee9",
+								"shared-carts"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Share cart with incorrect url",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "f506c2b3-2a73-4654-bc5f-11bdcb4df345",
+								"exec": [
+									"var responseData = pm.response.json().errors;",
+									"",
+									"pm.test(\"Status code is 404\", function () {",
+									"    pm.response.to.have.status(404);",
+									"});",
+									"",
+									"pm.test(\"Has correct error detail\", function() {",
+									"    pm.expect(responseData[0].detail).to.eql(\"Not Found\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"data\": {\n        \"type\": \"shared-carts\",\n        \"attributes\": {\n            \"idCompanyUser\": \"8da78283-e629-5667-9f84-e13207a7aef9\",\n            \"idCartPermissionGroup\": 2\n        }\n    }\n}"
+						},
+						"url": {
+							"raw": "{{url}}/cart/0c3ec260-694a-5cec-b78c-d37d32f92ee9/shared-carts",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"cart",
+								"0c3ec260-694a-5cec-b78c-d37d32f92ee9",
+								"shared-carts"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Share cart with empty cart id",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "f506c2b3-2a73-4654-bc5f-11bdcb4df345",
+								"exec": [
+									"var responseData = pm.response.json().errors;",
+									"",
+									"pm.test(\"Status code is 400\", function () {",
+									"    pm.response.to.have.status(400);",
+									"});",
+									"",
+									"pm.test(\"Has correct error code\", function() {",
+									"    pm.expect(responseData[0].code).to.eql(\"104\");",
+									"});",
+									"",
+									"pm.test(\"Has correct error detail\", function() {",
+									"    pm.expect(responseData[0].detail).to.eql(\"Cart uuid is missing.\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"data\": {\n        \"type\": \"shared-carts\",\n        \"attributes\": {\n            \"idCompanyUser\": \"8da78283-e629-5667-9f84-e13207a7aef9\",\n            \"idCartPermissionGroup\": 2\n        }\n    }\n}"
+						},
+						"url": {
+							"raw": "{{url}}/carts//shared-carts",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"carts",
+								"",
+								"shared-carts"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Share cart with empty company user id",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "f506c2b3-2a73-4654-bc5f-11bdcb4df345",
+								"exec": [
+									"var responseData = pm.response.json().errors;",
+									"",
+									"pm.test(\"Status code is 422\", function () {",
+									"    pm.response.to.have.status(422);",
+									"});",
+									"",
+									"pm.test(\"Has correct error code\", function() {",
+									"    pm.expect(responseData[0].code).to.eql(\"901\");",
+									"});",
+									"",
+									"pm.test(\"Has correct error detail\", function() {",
+									"    pm.expect(responseData[0].detail).to.eql(\"idCompanyUser => This value should not be blank.\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"data\": {\n        \"type\": \"shared-carts\",\n        \"attributes\": {\n            \"idCompanyUser\": \"\",\n            \"idCartPermissionGroup\": 2\n        }\n    }\n}"
+						},
+						"url": {
+							"raw": "{{url}}/carts/0c3ec260-694a-5cec-b78c-d37d32f92ee9/shared-carts",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"carts",
+								"0c3ec260-694a-5cec-b78c-d37d32f92ee9",
+								"shared-carts"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Share cart with incorrect cart permission id",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "f506c2b3-2a73-4654-bc5f-11bdcb4df345",
+								"exec": [
+									"var responseData = pm.response.json().errors;",
+									"",
+									"pm.test(\"Status code is 404\", function () {",
+									"    pm.response.to.have.status(404);",
+									"});",
+									"",
+									"pm.test(\"Has correct error detail\", function() {",
+									"    pm.expect(responseData[0].detail).to.eql(\"Not Found\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"data\": {\n        \"type\": \"shared-carts\",\n        \"attributes\": {\n            \"idCompanyUser\": \"8da78283-e629-5667-9f84-e13207a7aef9\",\n            \"idCartPermissionGroup\": 3\n        }\n    }\n}"
+						},
+						"url": {
+							"raw": "{{url}}/carts/0c3ec260-694a-5cec-b78c-d37d32f92ee9/shared-carts",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"carts",
+								"0c3ec260-694a-5cec-b78c-d37d32f92ee9",
+								"shared-carts"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Share cart with incorrect method GET",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "f506c2b3-2a73-4654-bc5f-11bdcb4df345",
+								"exec": [
+									"var responseData = pm.response.json().errors;",
+									"",
+									"pm.test(\"Status code is 404\", function () {",
+									"    pm.response.to.have.status(404);",
+									"});",
+									"",
+									"pm.test(\"Has correct error detail\", function() {",
+									"    pm.expect(responseData[0].detail).to.eql(\"Not Found\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"data\": {\n        \"type\": \"shared-carts\",\n        \"attributes\": {\n            \"idCompanyUser\": \"8da78283-e629-5667-9f84-e13207a7aef9\",\n            \"idCartPermissionGroup\": 1\n        }\n    }\n}"
+						},
+						"url": {
+							"raw": "{{url}}/carts/0c3ec260-694a-5cec-b78c-d37d32f92ee9/shared-carts",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"carts",
+								"0c3ec260-694a-5cec-b78c-d37d32f92ee9",
+								"shared-carts"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Share cart with incorrect method PATCH",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "f506c2b3-2a73-4654-bc5f-11bdcb4df345",
+								"exec": [
+									"var responseData = pm.response.json().errors;",
+									"",
+									"pm.test(\"Status code is 400\", function () {",
+									"    pm.response.to.have.status(400);",
+									"});",
+									"",
+									"pm.test(\"Has correct error detail\", function() {",
+									"    pm.expect(responseData[0].detail).to.eql(\"Resource id is not specified.\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"data\": {\n        \"type\": \"shared-carts\",\n        \"attributes\": {\n            \"idCompanyUser\": \"8da78283-e629-5667-9f84-e13207a7aef9\",\n            \"idCartPermissionGroup\": 1\n        }\n    }\n}"
+						},
+						"url": {
+							"raw": "{{url}}/carts/0c3ec260-694a-5cec-b78c-d37d32f92ee9/shared-carts",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"carts",
+								"0c3ec260-694a-5cec-b78c-d37d32f92ee9",
+								"shared-carts"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Share cart with incorrect method PUT",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "f506c2b3-2a73-4654-bc5f-11bdcb4df345",
+								"exec": [
+									"var responseData = pm.response.json().errors;",
+									"",
+									"pm.test(\"Status code is 404\", function () {",
+									"    pm.response.to.have.status(404);",
+									"});",
+									"",
+									"pm.test(\"Has correct error detail\", function() {",
+									"    pm.expect(responseData[0].detail).to.eql(\"Not Found\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"data\": {\n        \"type\": \"shared-carts\",\n        \"attributes\": {\n            \"idCompanyUser\": \"8da78283-e629-5667-9f84-e13207a7aef9\",\n            \"idCartPermissionGroup\": 1\n        }\n    }\n}"
+						},
+						"url": {
+							"raw": "{{url}}/carts/0c3ec260-694a-5cec-b78c-d37d32f92ee9/shared-carts",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"carts",
+								"0c3ec260-694a-5cec-b78c-d37d32f92ee9",
+								"shared-carts"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Share cart with incorrect method DELETE",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "f506c2b3-2a73-4654-bc5f-11bdcb4df345",
+								"exec": [
+									"var responseData = pm.response.json().errors;",
+									"",
+									"pm.test(\"Status code is 400\", function () {",
+									"    pm.response.to.have.status(400);",
+									"});",
+									"",
+									"pm.test(\"Has correct error detail\", function() {",
+									"    pm.expect(responseData[0].detail).to.eql(\"Resource id is not specified.\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"data\": {\n        \"type\": \"shared-carts\",\n        \"attributes\": {\n            \"idCompanyUser\": \"8da78283-e629-5667-9f84-e13207a7aef9\",\n            \"idCartPermissionGroup\": 1\n        }\n    }\n}"
+						},
+						"url": {
+							"raw": "{{url}}/carts/0c3ec260-694a-5cec-b78c-d37d32f92ee9/shared-carts",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"carts",
+								"0c3ec260-694a-5cec-b78c-d37d32f92ee9",
+								"shared-carts"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Change permissions without id",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "4dfe2f08-e332-4161-815d-6fe6810b5eeb",
+								"exec": [
+									"var responseData = pm.response.json().errors;",
+									"",
+									"pm.test(\"Status code is 400\", function () {",
+									"    pm.response.to.have.status(400);",
+									"});",
+									"",
+									"pm.test(\"Has correct error detail\", function() {",
+									"    pm.expect(responseData[0].detail).to.eql(\"Resource id is not specified.\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"data\": {\n        \"type\": \"shared-carts\",\n        \"attributes\": {\n            \"idCartPermissionGroup\": 2\n        }\n    }\n}"
+						},
+						"url": {
+							"raw": "{{url}}/shared-carts/",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"shared-carts",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Change permissions with incorrect permission group",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "4dfe2f08-e332-4161-815d-6fe6810b5eeb",
+								"exec": [
+									"var responseData = pm.response.json().errors;",
+									"",
+									"pm.test(\"Status code is 400\", function () {",
+									"    pm.response.to.have.status(400);",
+									"});",
+									"",
+									"pm.test(\"Has correct error detail\", function() {",
+									"    pm.expect(responseData[0].detail).to.eql(\"Resource id is not specified.\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"data\": {\n        \"type\": \"shared-carts\",\n        \"attributes\": {\n            \"idCartPermissionGroup\": 3\n        }\n    }\n}"
+						},
+						"url": {
+							"raw": "{{url}}/shared-carts/{{shared-cart-id}}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"shared-carts",
+								"{{shared-cart-id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Change permissions without access token",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "4dfe2f08-e332-4161-815d-6fe6810b5eeb",
+								"exec": [
+									"var responseData = pm.response.json().errors;",
+									"",
+									"pm.test(\"Status code is 403\", function () {",
+									"    pm.response.to.have.status(403);",
+									"});",
+									"",
+									"pm.test(\"Has correct error detail\", function() {",
+									"    pm.expect(responseData[0].detail).to.eql(\"Missing access token.\");",
+									"});",
+									"",
+									"pm.test(\"Has correct error code\", function() {",
+									"    pm.expect(responseData[0].code).to.eql(\"002\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"data\": {\n        \"type\": \"shared-carts\",\n        \"attributes\": {\n            \"idCartPermissionGroup\": 2\n        }\n    }\n}"
+						},
+						"url": {
+							"raw": "{{url}}/shared-carts/{{shared-cart-id}}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"shared-carts",
+								"{{shared-cart-id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Change permissions with incorrect url",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "4dfe2f08-e332-4161-815d-6fe6810b5eeb",
+								"exec": [
+									"var responseData = pm.response.json().errors;",
+									"",
+									"pm.test(\"Status code is 404\", function () {",
+									"    pm.response.to.have.status(404);",
+									"});",
+									"",
+									"pm.test(\"Has correct error detail\", function() {",
+									"    pm.expect(responseData[0].detail).to.eql(\"Not Found\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"data\": {\n        \"type\": \"shared-carts\",\n        \"attributes\": {\n            \"idCartPermissionGroup\": 2\n        }\n    }\n}"
+						},
+						"url": {
+							"raw": "{{url}}/shared-cart/{{shared-cart-id}}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"shared-cart",
+								"{{shared-cart-id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Change permissions with incorrect method GET",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "4dfe2f08-e332-4161-815d-6fe6810b5eeb",
+								"exec": [
+									"var responseData = pm.response.json().errors;",
+									"",
+									"pm.test(\"Status code is 404\", function () {",
+									"    pm.response.to.have.status(404);",
+									"});",
+									"",
+									"pm.test(\"Has correct error detail\", function() {",
+									"    pm.expect(responseData[0].detail).to.eql(\"Not Found\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"data\": {\n        \"type\": \"shared-carts\",\n        \"attributes\": {\n            \"idCartPermissionGroup\": 2\n        }\n    }\n}"
+						},
+						"url": {
+							"raw": "{{url}}/shared-carts/{{shared-cart-id}}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"shared-carts",
+								"{{shared-cart-id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Change permissions with incorrect method POST",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "4dfe2f08-e332-4161-815d-6fe6810b5eeb",
+								"exec": [
+									"var responseData = pm.response.json().errors;",
+									"",
+									"pm.test(\"Status code is 404\", function () {",
+									"    pm.response.to.have.status(404);",
+									"});",
+									"",
+									"pm.test(\"Has correct error detail\", function() {",
+									"    pm.expect(responseData[0].detail).to.eql(\"Not Found\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"data\": {\n        \"type\": \"shared-carts\",\n        \"attributes\": {\n            \"idCartPermissionGroup\": 2\n        }\n    }\n}"
+						},
+						"url": {
+							"raw": "{{url}}/shared-carts/{{shared-cart-id}}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"shared-carts",
+								"{{shared-cart-id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Change permissions with incorrect method PUT",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "4dfe2f08-e332-4161-815d-6fe6810b5eeb",
+								"exec": [
+									"var responseData = pm.response.json().errors;",
+									"",
+									"pm.test(\"Status code is 404\", function () {",
+									"    pm.response.to.have.status(404);",
+									"});",
+									"",
+									"pm.test(\"Has correct error detail\", function() {",
+									"    pm.expect(responseData[0].detail).to.eql(\"Not Found\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"data\": {\n        \"type\": \"shared-carts\",\n        \"attributes\": {\n            \"idCartPermissionGroup\": 2\n        }\n    }\n}"
+						},
+						"url": {
+							"raw": "{{url}}/shared-carts/{{shared-cart-id}}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"shared-carts",
+								"{{shared-cart-id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Change permissions with incorrect method DELETE",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "4dfe2f08-e332-4161-815d-6fe6810b5eeb",
+								"exec": [
+									"var responseData = pm.response.json().errors;",
+									"",
+									"pm.test(\"Status code is 404\", function () {",
+									"    pm.response.to.have.status(404);",
+									"});",
+									"",
+									"pm.test(\"Has correct error code\", function() {",
+									"    pm.expect(responseData[0].code).to.eql(\"2705\");",
+									"});",
+									"",
+									"pm.test(\"Has correct error detail\", function() {",
+									"    pm.expect(responseData[0].detail).to.eql(\"Shared cart not found.\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"data\": {\n        \"type\": \"shared-carts\",\n        \"attributes\": {\n            \"idCartPermissionGroup\": 2\n        }\n    }\n}"
+						},
+						"url": {
+							"raw": "{{url}}/shared-carts/{{shared-cart-id}}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"shared-carts",
+								"{{shared-cart-id}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Request access token (helper)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "b75ed699-17ca-4abc-9837-6218ebf5d763",
+						"exec": [
+							"var responseData = pm.response.json().data;",
+							"",
+							"pm.environment.set(\"token\", responseData.attributes.accessToken);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"data\": {\n        \"type\": \"access-tokens\",\n        \"attributes\": {\n            \"username\": \"sonia@spryker.com\",\n            \"password\": \"change123\"\n        }\n    }\n}"
+				},
+				"url": {
+					"raw": "{{url}}/access-tokens",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"access-tokens"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Share cart",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "f506c2b3-2a73-4654-bc5f-11bdcb4df345",
+						"exec": [
+							"var responseData = pm.response.json().data;",
+							"",
+							"pm.environment.set(\"shared-cart-id\", responseData.id);",
+							"",
+							"selfLink = pm.variables.get(\"url\") + \"/shared-carts/efc5c57e-0600-599c-b5e2-70ec214e0c9d\";",
+							"",
+							"pm.test(\"Status code is 201\", function () {",
+							"    pm.response.to.have.status(201);",
+							"});",
+							"",
+							"pm.test(\"Has correct type\", function() {",
+							"    pm.expect(responseData.type).to.eql(\"shared-carts\");",
+							"});",
+							"",
+							"pm.test(\"Has id returned\", function() {",
+							"    pm.expect(responseData.id).not.eql(null);",
+							"    pm.expect(responseData.id).to.be.a(\"string\");",
+							"});",
+							"",
+							"pm.test(\"Has correct attributes\", function() {",
+							"    pm.expect(responseData.attributes.idCompanyUser).to.be.a(\"string\");",
+							"    pm.expect(responseData.attributes.idCartPermissionGroup).to.eql(2);",
+							"});",
+							"",
+							"pm.test(\"Has self link\", function() {",
+							"    pm.expect(responseData.links.self).to.eql(selfLink);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"data\": {\n        \"type\": \"shared-carts\",\n        \"attributes\": {\n            \"idCompanyUser\": \"8da78283-e629-5667-9f84-e13207a7aef9\",\n            \"idCartPermissionGroup\": 2\n        }\n    }\n}"
+				},
+				"url": {
+					"raw": "{{url}}/carts/0c3ec260-694a-5cec-b78c-d37d32f92ee9/shared-carts",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"carts",
+						"0c3ec260-694a-5cec-b78c-d37d32f92ee9",
+						"shared-carts"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Change permissions",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "4dfe2f08-e332-4161-815d-6fe6810b5eeb",
+						"exec": [
+							"var responseData = pm.response.json().data;",
+							"",
+							"selfLink = pm.variables.get(\"url\") + \"/shared-carts/\" + \"efc5c57e-0600-599c-b5e2-70ec214e0c9d\";",
+							"",
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Has correct type\", function() {",
+							"    pm.expect(responseData.type).to.eql(\"shared-carts\");",
+							"});",
+							"",
+							"pm.test(\"Has id returned\", function() {",
+							"    pm.expect(responseData.id).not.eql(null);",
+							"    pm.expect(responseData.id).to.be.a(\"string\");",
+							"});",
+							"",
+							"pm.test(\"Has correct attributes\", function() {",
+							"    pm.expect(responseData.attributes.idCompanyUser).to.be.a(\"string\");",
+							"    pm.expect(responseData.attributes.idCartPermissionGroup).to.eql(1);",
+							"});",
+							"",
+							"pm.test(\"Has self link\", function() {",
+							"    pm.expect(responseData.links.self).to.eql(selfLink);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"data\": {\n        \"type\": \"shared-carts\",\n        \"attributes\": {\n            \"idCartPermissionGroup\": 1\n        }\n    }\n}"
+				},
+				"url": {
+					"raw": "{{url}}/shared-carts/{{shared-cart-id}}",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"shared-carts",
+						"{{shared-cart-id}}"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "08d753e1-841d-4c9a-93ca-2c1b91ff0b81",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "ad30ed04-f61c-498e-91c4-5497454ddd91",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"id": "56b91ac9-b7c5-4c2d-9dfb-65564fdcc918",
+			"key": "cart-uuid",
+			"value": "0c3ec260-694a-5cec-b78c-d37d32f92ee9",
+			"type": "string",
+			"disabled": true
+		},
+		{
+			"id": "90a495a6-bef6-4c12-a879-27d548e82f67",
+			"key": "company-user-uuid",
+			"value": "3882cdba-a8b3-5f0b-95c9-e19b3350fec8",
+			"type": "string",
+			"disabled": true
+		},
+		{
+			"id": "61277129-8946-44f5-a51e-94314c8ac17c",
+			"key": "shared-cart-id",
+			"value": "",
+			"type": "string"
+		}
+	]
+}

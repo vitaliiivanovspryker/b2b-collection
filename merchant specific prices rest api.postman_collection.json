@@ -1,0 +1,4812 @@
+{
+	"info": {
+		"_postman_id": "2c0c3851-4ef9-4439-b446-0b93d7f38d0f",
+		"name": "merchant specific prices rest api",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Search for a product by SKU",
+			"item": [
+				{
+					"name": "without merchant prices",
+					"item": [
+						{
+							"name": "Search a product - search by abstract sku - product available Copy",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "224ee700-ea9e-44d7-9762-ed30f47a1e87",
+										"exec": [
+											"let jsonData = pm.response.json();",
+											"",
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test(\"Has correct type returned\", function() {",
+											"    pm.expect(jsonData.data).to.be.an('array');",
+											"    jsonData.data.forEach(function (data) {",
+											"        pm.expect(data.type).to.eql(\"catalog-search\");",
+											"    });",
+											"});",
+											"",
+											"pm.test(\"Has correct id returned\", function() {",
+											"    jsonData.data.forEach(function (data) {",
+											"        pm.expect(data.id).to.be.null;",
+											"    });",
+											"});",
+											"",
+											"pm.test(\"Has correct sorting returned\", function() {",
+											"    jsonData.data.forEach(function (data) {",
+											"        pm.expect(data.attributes.sort).is.an('object')",
+											"            .that.have.property('sortParamNames')",
+											"            .that.is.an('array')",
+											"            .that.have.members([",
+											"                'rating',",
+											"                'name_asc',",
+											"                'name_desc',",
+											"                'price_asc',",
+											"                'price_desc'",
+											"            ]);",
+											"    });",
+											"});",
+											"",
+											"pm.test(\"Has correct localized sorting returned\", function() {",
+											"    jsonData.data.forEach(function (data) {",
+											"        pm.expect(data.attributes.sort).is.an('object')",
+											"        .that.have.property('sortParamLocalizedNames')",
+											"        .that.is.an('object');",
+											"        let expectedKeys = [",
+											"            'rating',",
+											"            'name_asc',",
+											"            'name_desc',",
+											"            'price_asc',",
+											"            'price_desc'",
+											"        ];",
+											"        expectedKeys.each(function(key) {",
+											"            pm.expect(data.attributes.sort.sortParamLocalizedNames).to.have.own.property(key);",
+											"        });",
+											"    });",
+											"});",
+											"",
+											"pm.test(\"Has correct pagination returned\", function() {",
+											"    jsonData.data.forEach(function (data) {",
+											"        let paginationObj = data.attributes.pagination;",
+											"        pm.expect(paginationObj).to.be.an('object');",
+											"        pm.expect(paginationObj).to.have.property('numFound').that.is.a('number');",
+											"        pm.expect(paginationObj).to.have.property('currentPage').that.is.a('number');",
+											"        pm.expect(paginationObj).to.have.property('maxPage').that.is.a('number');",
+											"        pm.expect(paginationObj).to.have.property('currentItemsPerPage', parseInt(pm.variables.get('ipp_default')));",
+											"        pm.expect(paginationObj).to.have.property('config').that.is.an('object');",
+											"        pm.expect(paginationObj.config).to.have.a.property('parameterName', 'page');",
+											"        pm.expect(paginationObj.config).to.have.a.property('itemsPerPageParameterName', 'ipp');",
+											"        pm.expect(paginationObj.config).to.have.a.property('defaultItemsPerPage', parseInt(pm.variables.get('ipp_default')));",
+											"        pm.expect(paginationObj.config).to.have.a.property('validItemsPerPageOptions')",
+											"            .that.is.an('array').that.have.members([12, 24, 36]);",
+											"    });",
+											"});",
+											"",
+											"",
+											"pm.test(\"Has correct product returned\", function() {",
+											"    jsonData.data.forEach(function (data) {",
+											"        pm.expect(data.attributes).to.have.property('abstractProducts')",
+											"            .that.is.an(\"array\")",
+											"            .that.is.lengthOf(1);",
+											"        let productsObj = _.first(data.attributes.abstractProducts);",
+											"        pm.expect(productsObj).to.have.property('images').that.is.an('array');",
+											"        pm.expect(productsObj).to.have.property('price').that.is.a('number');",
+											"        pm.expect(productsObj).to.have.property('abstractName').that.is.a('string');",
+											"        pm.expect(productsObj).to.have.property('prices').that.is.an('array');",
+											"        pm.expect(productsObj).to.have.property('abstractSku').that.is.equal(pm.variables.get('abstract_sku1'));",
+											"    });",
+											"});",
+											"",
+											"pm.test(\"Has correct relationships\", function() {",
+											"    jsonData.data.forEach(function (data) {",
+											"        pm.expect(data).to.have.property('relationships').that.is.an(\"object\");",
+											"        let relationshipsObj = data.relationships;",
+											"        pm.expect(Object.keys(relationshipsObj).length).to.be.equal(1);",
+											"        pm.expect(relationshipsObj).to.have.property('abstract-products').that.is.an('object');",
+											"    });",
+											"});",
+											"",
+											"pm.test(\"Has correct pagination config returned\", function() {",
+											"    jsonData.data.forEach(function (data) {",
+											"        pm.expect(data.attributes.pagination.config.parameterName).to.eql(\"page\");",
+											"        pm.expect(data.attributes.pagination.config.itemsPerPageParameterName).to.eql(\"ipp\");",
+											"        pm.expect(data.attributes.pagination.config.defaultItemsPerPage).to.eql(parseInt(pm.variables.get('ipp_default')));",
+											"    });",
+											"});",
+											"",
+											"pm.test(\"Has correct self link\", function() {",
+											"    pm.expect(jsonData.links.self).to.eql(pm.variables.get(\"url\") + \"/catalog-search?q=\" + pm.variables.get('abstract_sku1'));",
+											"});",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/vnd.api+json"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/vnd.api+json"
+									},
+									{
+										"key": "Accept-Language",
+										"value": "de-DE, de;q=0.9",
+										"disabled": true
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{url}}/catalog-search?q={{abstract_sku1}}",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"catalog-search"
+									],
+									"query": [
+										{
+											"key": "q",
+											"value": "{{abstract_sku1}}"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Request access token for customer Copy",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "71697741-b089-45dc-9995-43714c41e10c",
+										"exec": [
+											"var responseData = pm.response.json().data;",
+											"",
+											"pm.environment.set(\"token\", responseData.attributes.accessToken);",
+											"pm.environment.set(\"test_uuid\", responseData.attributes.idCompanyUser);",
+											"pm.test(\"Status code is 201\", function () {",
+											"    pm.response.to.have.status(201);",
+											"});",
+											"",
+											"pm.test(\"Has correct type\", function() {",
+											"    pm.expect(responseData.type).to.eql(\"access-tokens\");",
+											"});",
+											"",
+											"pm.test(\"Has idCompanyUser not null\", function() {",
+											"    pm.expect(responseData.attributes.idCompanyUser).not.eql(null);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"data\": {\n        \"type\": \"access-tokens\",\n        \"attributes\": {\n            \"username\": \"spencor.hopkin@spryker.com\",\n            \"password\": \"change123\"\n        }\n    }\n}"
+								},
+								"url": {
+									"raw": "{{url}}/access-tokens",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"access-tokens"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Request access token for company user Copy",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "71697741-b089-45dc-9995-43714c41e10c",
+										"exec": [
+											"var responseData = pm.response.json().data;",
+											"",
+											"pm.test(\"Status code is 201\", function () {",
+											"    pm.response.to.have.status(201);",
+											"});",
+											"",
+											"pm.test(\"Has correct type\", function() {",
+											"    pm.expect(responseData.type).to.eql(\"company-user-access-tokens\");",
+											"});",
+											"",
+											"pm.test(\"Has idCompanyUser not null\", function() {",
+											"    pm.expect(responseData.attributes.idCompanyUser).not.eql(null);",
+											"",
+											"});",
+											""
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"id": "42c5f293-cd43-4fd4-83ca-01801196de7d",
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"data\": {\n        \"type\": \"company-user-access-tokens\",\n        \"attributes\": {\n            \"idCompanyUser\": \"{{test_uuid}}\"\n        }\n    }\n}"
+								},
+								"url": {
+									"raw": "{{url}}/company-user-access-tokens",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"company-user-access-tokens"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Search a product - search by abstract sku - product available Copy",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "224ee700-ea9e-44d7-9762-ed30f47a1e87",
+										"exec": [
+											"let jsonData = pm.response.json();",
+											"",
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test(\"Has correct type returned\", function() {",
+											"    pm.expect(jsonData.data).to.be.an('array');",
+											"    jsonData.data.forEach(function (data) {",
+											"        pm.expect(data.type).to.eql(\"catalog-search\");",
+											"    });",
+											"});",
+											"",
+											"pm.test(\"Has correct id returned\", function() {",
+											"    jsonData.data.forEach(function (data) {",
+											"        pm.expect(data.id).to.be.null;",
+											"    });",
+											"});",
+											"",
+											"pm.test(\"Has correct sorting returned\", function() {",
+											"    jsonData.data.forEach(function (data) {",
+											"        pm.expect(data.attributes.sort).is.an('object')",
+											"            .that.have.property('sortParamNames')",
+											"            .that.is.an('array')",
+											"            .that.have.members([",
+											"                'rating',",
+											"                'name_asc',",
+											"                'name_desc',",
+											"                'price_asc',",
+											"                'price_desc'",
+											"            ]);",
+											"    });",
+											"});",
+											"",
+											"pm.test(\"Has correct localized sorting returned\", function() {",
+											"    jsonData.data.forEach(function (data) {",
+											"        pm.expect(data.attributes.sort).is.an('object')",
+											"        .that.have.property('sortParamLocalizedNames')",
+											"        .that.is.an('object');",
+											"        let expectedKeys = [",
+											"            'rating',",
+											"            'name_asc',",
+											"            'name_desc',",
+											"            'price_asc',",
+											"            'price_desc'",
+											"        ];",
+											"        expectedKeys.each(function(key) {",
+											"            pm.expect(data.attributes.sort.sortParamLocalizedNames).to.have.own.property(key);",
+											"        });",
+											"    });",
+											"});",
+											"",
+											"pm.test(\"Has correct pagination returned\", function() {",
+											"    jsonData.data.forEach(function (data) {",
+											"        let paginationObj = data.attributes.pagination;",
+											"        pm.expect(paginationObj).to.be.an('object');",
+											"        pm.expect(paginationObj).to.have.property('numFound').that.is.a('number');",
+											"        pm.expect(paginationObj).to.have.property('currentPage').that.is.a('number');",
+											"        pm.expect(paginationObj).to.have.property('maxPage').that.is.a('number');",
+											"        pm.expect(paginationObj).to.have.property('currentItemsPerPage', parseInt(pm.variables.get('ipp_default')));",
+											"        pm.expect(paginationObj).to.have.property('config').that.is.an('object');",
+											"        pm.expect(paginationObj.config).to.have.a.property('parameterName', 'page');",
+											"        pm.expect(paginationObj.config).to.have.a.property('itemsPerPageParameterName', 'ipp');",
+											"        pm.expect(paginationObj.config).to.have.a.property('defaultItemsPerPage', parseInt(pm.variables.get('ipp_default')));",
+											"        pm.expect(paginationObj.config).to.have.a.property('validItemsPerPageOptions')",
+											"            .that.is.an('array').that.have.members([12, 24, 36]);",
+											"    });",
+											"});",
+											"",
+											"",
+											"pm.test(\"Has correct product returned\", function() {",
+											"    jsonData.data.forEach(function (data) {",
+											"        pm.expect(data.attributes).to.have.property('abstractProducts')",
+											"            .that.is.an(\"array\")",
+											"            .that.is.lengthOf(1);",
+											"        let productsObj = _.first(data.attributes.abstractProducts);",
+											"        pm.expect(productsObj).to.have.property('images').that.is.an('array');",
+											"        pm.expect(productsObj).to.have.property('price').that.is.a('number');",
+											"        pm.expect(productsObj).to.have.property('abstractName').that.is.a('string');",
+											"        pm.expect(productsObj).to.have.property('prices').that.is.an('array');",
+											"        pm.expect(productsObj).to.have.property('abstractSku').that.is.equal(pm.variables.get('abstract_sku2'));",
+											"    });",
+											"});",
+											"",
+											"pm.test(\"Has correct relationships\", function() {",
+											"    jsonData.data.forEach(function (data) {",
+											"        pm.expect(data).to.have.property('relationships').that.is.an(\"object\");",
+											"        let relationshipsObj = data.relationships;",
+											"        pm.expect(Object.keys(relationshipsObj).length).to.be.equal(1);",
+											"        pm.expect(relationshipsObj).to.have.property('abstract-products').that.is.an('object');",
+											"    });",
+											"});",
+											"",
+											"pm.test(\"Has correct pagination config returned\", function() {",
+											"    jsonData.data.forEach(function (data) {",
+											"        pm.expect(data.attributes.pagination.config.parameterName).to.eql(\"page\");",
+											"        pm.expect(data.attributes.pagination.config.itemsPerPageParameterName).to.eql(\"ipp\");",
+											"        pm.expect(data.attributes.pagination.config.defaultItemsPerPage).to.eql(parseInt(pm.variables.get('ipp_default')));",
+											"    });",
+											"});",
+											"",
+											"pm.test(\"Has correct self link\", function() {",
+											"    pm.expect(jsonData.links.self).to.eql(pm.variables.get(\"url\") + \"/catalog-search?q=\" + pm.variables.get('abstract_sku2'));",
+											"});",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/vnd.api+json"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/vnd.api+json"
+									},
+									{
+										"key": "Accept-Language",
+										"value": "de-DE, de;q=0.9",
+										"disabled": true
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{url}}/catalog-search?q={{abstract_sku2}}",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"catalog-search"
+									],
+									"query": [
+										{
+											"key": "q",
+											"value": "{{abstract_sku2}}"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Search suggestion a product - search by concrete sku - product available Copy",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "5f9279ec-df11-404b-8187-35542c758ab2",
+										"exec": [
+											"let jsonData = pm.response.json();",
+											"let resourceType = 'catalog-search-suggestions';",
+											"",
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test(\"Has correct type returned\", function() {",
+											"    pm.expect(jsonData.data).to.be.an('array');",
+											"    jsonData.data.forEach(function (data) {",
+											"        pm.expect(data.type).to.eql(resourceType);",
+											"    });",
+											"});",
+											"",
+											"pm.test(\"Has correct id returned\", function() {",
+											"    jsonData.data.forEach(function (data) {",
+											"        pm.expect(data.id).to.be.null;",
+											"    });",
+											"});",
+											"",
+											"pm.test(\"Has correct completion returned\", function() {",
+											"    jsonData.data.forEach(function (data) {",
+											"        pm.expect(data.attributes).to.have.property('completion').that.is.an('array').that.is.not.empty;",
+											"    });",
+											"});",
+											"",
+											"pm.test(\"Has correct product returned\", function() {",
+											"    jsonData.data.forEach(function (data) {",
+											"        pm.expect(data.attributes).to.have.property('abstractProducts')",
+											"            .that.is.an(\"array\")",
+											"            .that.is.lengthOf(1);",
+											"        let product = data.attributes.abstractProducts[0];",
+											"        pm.expect(product).to.be.an('object');",
+											"        pm.expect(product).to.have.property('abstractSku', pm.variables.get('abstract_sku2'));",
+											"        pm.expect(product).to.have.property('abstractName').that.is.a('string');",
+											"        pm.expect(product).to.have.property('price').that.is.a('number');",
+											"        pm.expect(product).to.have.property('images').that.is.a('array');",
+											"        product.images.forEach(function (image) {",
+											"            pm.expect(image).to.have.property('externalUrlSmall').that.is.a('string');",
+											"            pm.expect(image).to.have.property('externalUrlLarge').that.is.a('string');",
+											"        });",
+											"    });",
+											"});",
+											"",
+											"pm.test(\"Has correct categories returned\", function() {",
+											"    jsonData.data.forEach(function (data) {",
+											"        pm.expect(data.attributes).to.have.property('categories').that.is.an('array');",
+											"    });",
+											"});",
+											"",
+											"pm.test(\"Has correct cmsPages returned\", function() {",
+											"    jsonData.data.forEach(function (data) {",
+											"        pm.expect(data.attributes).to.have.property('cmsPages').that.is.an('array');",
+											"    });",
+											"});",
+											"",
+											"pm.test(\"Has correct relationships\", function() {",
+											"    jsonData.data.forEach(function (data) {",
+											"        pm.expect(data).to.have.property('relationships').that.is.an(\"object\");",
+											"        let relationshipsObj = data.relationships;",
+											"        pm.expect(Object.keys(relationshipsObj).length).to.be.equal(1);",
+											"        pm.expect(relationshipsObj).to.have.property('abstract-products').that.is.an('object');",
+											"    });",
+											"});",
+											"",
+											"pm.test(\"Has correct included returned\", function() {",
+											"    jsonData.data.forEach(function (data) {",
+											"        pm.expect(jsonData).to.have.property('included').that.is.an('array');",
+											"        ",
+											"        let expectedResourceTypes = [",
+											"            'abstract-product-image-sets',",
+											"            'abstract-product-availabilities',",
+											"            'abstract-product-prices',",
+											"            'category-nodes',",
+											"            'product-tax-sets',",
+											"            'product-labels',",
+											"            'abstract-products'",
+											"        ];",
+											"        let resourceTypes = getIncludedResourceNames(jsonData.included);",
+											"        ",
+											"        pm.expect(resourceTypes).to.have.members(expectedResourceTypes);",
+											"    });",
+											"});",
+											"",
+											"pm.test(\"Has correct self link\", function() {",
+											"    pm.expect(jsonData.links.self).to.eql(pm.variables.get(\"url\") + \"/\" + resourceType + \"?q=051_29567823\");",
+											"});",
+											"",
+											"function getIncludedResourceNames(included) {",
+											"    let resourceTypes = [];",
+											"    included.forEach(function (resource) {",
+											"        pm.expect(resource).to.be.an('object')",
+											"            .that.have.property('type')",
+											"            .that.is.a('string');",
+											"        if (!resourceTypes.includes(resource.type)) {",
+											"            resourceTypes.push(resource.type);",
+											"        }",
+											"    });",
+											"    ",
+											"    return resourceTypes;",
+											"}",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/vnd.api+json"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/vnd.api+json"
+									},
+									{
+										"key": "Accept-Language",
+										"value": "de-DE, de;q=0.9"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{url}}/catalog-search-suggestions?q=051_29567823",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"catalog-search-suggestions"
+									],
+									"query": [
+										{
+											"key": "q",
+											"value": "051_29567823"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Request product's prices - by abstract sku Copy",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "1bb37dd1-807b-4994-918f-1adc6bc86804",
+										"exec": [
+											"const resourceName = \"abstract-product-prices\";",
+											"",
+											"let jsonData = pm.response.json(),",
+											"    selfLink = pm.variables.get(\"url\") + \"/abstract-products/\" + pm.variables.get(\"abstract_sku2\") + \"/\" + resourceName;",
+											"",
+											"pm.test(\"Status code is 200\", function() {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test(\"Has correct type returned\", function() {",
+											"    pm.expect(jsonData.data[0].type).to.eql(resourceName);",
+											"});",
+											"",
+											"pm.test(\"Has correct id returned\", function() {",
+											"    pm.expect(jsonData.data[0].id).to.eql(pm.variables.get(\"abstract_sku2\"));",
+											"});",
+											"",
+											"pm.test(\"Has price returned\", function() {",
+											"    pm.expect(jsonData.data[0].attributes.price).to.eql(12322);",
+											"});",
+											"",
+											"pm.test(\"Has price default grss returned\", function() {",
+											"    let prices = jsonData.data[0].attributes.prices;",
+											"    ",
+											"    pm.expect(prices[0].priceTypeName).to.eql(\"DEFAULT\");",
+											"    pm.expect(prices[0].netAmount).to.eql(null);",
+											"    pm.expect(prices[0].grossAmount).to.eql(12322);",
+											"});",
+											"",
+											"pm.test(\"Has self 1 link\", function() {",
+											"    pm.expect(jsonData.data[0].links.self).to.eql(selfLink);",
+											"});",
+											"",
+											"pm.test(\"Has self 2 link\", function() {",
+											"    pm.expect(jsonData.links.self).to.eql(selfLink);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{url}}/abstract-products/{{abstract_sku2}}/abstract-product-prices",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"abstract-products",
+										"{{abstract_sku2}}",
+										"abstract-product-prices"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Requst product's prices - by concrete sku Copy",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "b74e709f-c0db-4547-9e5d-f2853132b0aa",
+										"exec": [
+											"var jsonData = pm.response.json();",
+											"var resourceName = \"concrete-product-prices\";",
+											"",
+											"pm.test(\"Status code is 200\", function() {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test(\"Has correct type returned\", function() {",
+											"    pm.expect(jsonData.data[0].type).to.eql(resourceName);",
+											"});",
+											"",
+											"pm.test(\"Has correct id returned\", function() {",
+											"    pm.expect(jsonData.data[0].id).to.eql(pm.variables.get(\"concrete_sku\"));",
+											"});",
+											"",
+											"pm.test(\"Has price returned\", function() {",
+											"    pm.expect(jsonData.data[0].attributes.price).to.eql(12000);",
+											"});",
+											"",
+											"pm.test(\"Has price default grss returned\", function() {",
+											"    pm.expect(jsonData.data[0].attributes.prices[0].priceTypeName).to.eql(\"DEFAULT\");",
+											"    pm.expect(jsonData.data[0].attributes.prices[0].netAmount).to.eql(null);",
+											"    pm.expect(jsonData.data[0].attributes.prices[0].grossAmount).to.eql(12000);",
+											"});",
+											"",
+											"pm.test(\"Has self 1 link\", function() {",
+											"    pm.expect(jsonData.data[0].links.self).to.eql(pm.variables.get(\"url\") + \"/concrete-products/\" + pm.variables.get(\"concrete_sku\") + \"/\" + resourceName); ",
+											"});",
+											"",
+											"pm.test(\"Has self 2 link\", function() {",
+											"    pm.expect(jsonData.links.self).to.eql(pm.variables.get(\"url\") + \"/concrete-products/\" + pm.variables.get(\"concrete_sku\") + \"/\" + resourceName); ",
+											"});",
+											"",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/vnd.api+json"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Accept-Language",
+										"value": "de-DE, en;q=0.9"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{url}}/concrete-products/{{concrete_sku}}/concrete-product-prices",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"concrete-products",
+										"{{concrete_sku}}",
+										"concrete-product-prices"
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"_postman_isSubFolder": true
+				},
+				{
+					"name": "With merchant prices lower than default",
+					"item": [
+						{
+							"name": "Search a product - search by abstract sku - product available",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "224ee700-ea9e-44d7-9762-ed30f47a1e87",
+										"exec": [
+											"let jsonData = pm.response.json();",
+											"",
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test(\"Has correct type returned\", function() {",
+											"    pm.expect(jsonData.data).to.be.an('array');",
+											"    jsonData.data.forEach(function (data) {",
+											"        pm.expect(data.type).to.eql(\"catalog-search\");",
+											"    });",
+											"});",
+											"",
+											"pm.test(\"Has correct id returned\", function() {",
+											"    jsonData.data.forEach(function (data) {",
+											"        pm.expect(data.id).to.be.null;",
+											"    });",
+											"});",
+											"",
+											"pm.test(\"Has correct sorting returned\", function() {",
+											"    jsonData.data.forEach(function (data) {",
+											"        pm.expect(data.attributes.sort).is.an('object')",
+											"            .that.have.property('sortParamNames')",
+											"            .that.is.an('array')",
+											"            .that.have.members([",
+											"                'rating',",
+											"                'name_asc',",
+											"                'name_desc',",
+											"                'price_asc',",
+											"                'price_desc'",
+											"            ]);",
+											"    });",
+											"});",
+											"",
+											"pm.test(\"Has correct localized sorting returned\", function() {",
+											"    jsonData.data.forEach(function (data) {",
+											"        pm.expect(data.attributes.sort).is.an('object')",
+											"        .that.have.property('sortParamLocalizedNames')",
+											"        .that.is.an('object');",
+											"        let expectedKeys = [",
+											"            'rating',",
+											"            'name_asc',",
+											"            'name_desc',",
+											"            'price_asc',",
+											"            'price_desc'",
+											"        ];",
+											"        expectedKeys.each(function(key) {",
+											"            pm.expect(data.attributes.sort.sortParamLocalizedNames).to.have.own.property(key);",
+											"        });",
+											"    });",
+											"});",
+											"",
+											"pm.test(\"Has correct pagination returned\", function() {",
+											"    jsonData.data.forEach(function (data) {",
+											"        let paginationObj = data.attributes.pagination;",
+											"        pm.expect(paginationObj).to.be.an('object');",
+											"        pm.expect(paginationObj).to.have.property('numFound').that.is.a('number');",
+											"        pm.expect(paginationObj).to.have.property('currentPage').that.is.a('number');",
+											"        pm.expect(paginationObj).to.have.property('maxPage').that.is.a('number');",
+											"        pm.expect(paginationObj).to.have.property('currentItemsPerPage', parseInt(pm.variables.get('ipp_default')));",
+											"        pm.expect(paginationObj).to.have.property('config').that.is.an('object');",
+											"        pm.expect(paginationObj.config).to.have.a.property('parameterName', 'page');",
+											"        pm.expect(paginationObj.config).to.have.a.property('itemsPerPageParameterName', 'ipp');",
+											"        pm.expect(paginationObj.config).to.have.a.property('defaultItemsPerPage', parseInt(pm.variables.get('ipp_default')));",
+											"        pm.expect(paginationObj.config).to.have.a.property('validItemsPerPageOptions')",
+											"            .that.is.an('array').that.have.members([12, 24, 36]);",
+											"    });",
+											"});",
+											"",
+											"",
+											"pm.test(\"Has correct product returned\", function() {",
+											"    jsonData.data.forEach(function (data) {",
+											"        pm.expect(data.attributes).to.have.property('abstractProducts')",
+											"            .that.is.an(\"array\")",
+											"            .that.is.lengthOf(1);",
+											"        let productsObj = _.first(data.attributes.abstractProducts);",
+											"        pm.expect(productsObj).to.have.property('images').that.is.an('array');",
+											"        pm.expect(productsObj).to.have.property('price').that.is.a('number');",
+											"        pm.expect(productsObj).to.have.property('abstractName').that.is.a('string');",
+											"        pm.expect(productsObj).to.have.property('prices').that.is.an('array');",
+											"        pm.expect(productsObj).to.have.property('abstractSku').that.is.equal(pm.variables.get('abstract_sku1'));",
+											"    });",
+											"});",
+											"",
+											"pm.test(\"Has correct relationships\", function() {",
+											"    jsonData.data.forEach(function (data) {",
+											"        pm.expect(data).to.have.property('relationships').that.is.an(\"object\");",
+											"        let relationshipsObj = data.relationships;",
+											"        pm.expect(Object.keys(relationshipsObj).length).to.be.equal(1);",
+											"        pm.expect(relationshipsObj).to.have.property('abstract-products').that.is.an('object');",
+											"    });",
+											"});",
+											"",
+											"pm.test(\"Has correct pagination config returned\", function() {",
+											"    jsonData.data.forEach(function (data) {",
+											"        pm.expect(data.attributes.pagination.config.parameterName).to.eql(\"page\");",
+											"        pm.expect(data.attributes.pagination.config.itemsPerPageParameterName).to.eql(\"ipp\");",
+											"        pm.expect(data.attributes.pagination.config.defaultItemsPerPage).to.eql(parseInt(pm.variables.get('ipp_default')));",
+											"    });",
+											"});",
+											"",
+											"pm.test(\"Has correct self link\", function() {",
+											"    pm.expect(jsonData.links.self).to.eql(pm.variables.get(\"url\") + \"/catalog-search?q=\" + pm.variables.get('abstract_sku1'));",
+											"});",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/vnd.api+json"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/vnd.api+json"
+									},
+									{
+										"key": "Accept-Language",
+										"value": "de-DE, de;q=0.9",
+										"disabled": true
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{url}}/catalog-search?q=001",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"catalog-search"
+									],
+									"query": [
+										{
+											"key": "q",
+											"value": "001"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Request access token for customer",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "71697741-b089-45dc-9995-43714c41e10c",
+										"exec": [
+											"var responseData = pm.response.json().data;",
+											"",
+											"pm.environment.set(\"token\", responseData.attributes.accessToken);",
+											"pm.environment.set(\"test_uuid\", responseData.attributes.idCompanyUser);",
+											"pm.test(\"Status code is 201\", function () {",
+											"    pm.response.to.have.status(201);",
+											"});",
+											"",
+											"pm.test(\"Has correct type\", function() {",
+											"    pm.expect(responseData.type).to.eql(\"access-tokens\");",
+											"});",
+											"",
+											"pm.test(\"Has idCompanyUser not null\", function() {",
+											"    pm.expect(responseData.attributes.idCompanyUser).not.eql(null);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"data\": {\n        \"type\": \"access-tokens\",\n        \"attributes\": {\n            \"username\": \"spencor.hopkin@spryker.com\",\n            \"password\": \"change123\"\n        }\n    }\n}"
+								},
+								"url": {
+									"raw": "{{url}}/access-tokens",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"access-tokens"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Request access token for company user",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "71697741-b089-45dc-9995-43714c41e10c",
+										"exec": [
+											"var responseData = pm.response.json().data;",
+											"",
+											"pm.test(\"Status code is 201\", function () {",
+											"    pm.response.to.have.status(201);",
+											"});",
+											"",
+											"pm.test(\"Has correct type\", function() {",
+											"    pm.expect(responseData.type).to.eql(\"company-user-access-tokens\");",
+											"});",
+											"",
+											"pm.test(\"Has idCompanyUser not null\", function() {",
+											"    pm.expect(responseData.attributes.idCompanyUser).not.eql(null);",
+											"",
+											"});",
+											""
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"id": "42c5f293-cd43-4fd4-83ca-01801196de7d",
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"data\": {\n        \"type\": \"company-user-access-tokens\",\n        \"attributes\": {\n            \"idCompanyUser\": \"{{test_uuid}}\"\n        }\n    }\n}"
+								},
+								"url": {
+									"raw": "{{url}}/company-user-access-tokens",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"company-user-access-tokens"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Search a product - search by abstract sku - product available",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "224ee700-ea9e-44d7-9762-ed30f47a1e87",
+										"exec": [
+											"let jsonData = pm.response.json();",
+											"",
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test(\"Has correct type returned\", function() {",
+											"    pm.expect(jsonData.data).to.be.an('array');",
+											"    jsonData.data.forEach(function (data) {",
+											"        pm.expect(data.type).to.eql(\"catalog-search\");",
+											"    });",
+											"});",
+											"",
+											"pm.test(\"Has correct id returned\", function() {",
+											"    jsonData.data.forEach(function (data) {",
+											"        pm.expect(data.id).to.be.null;",
+											"    });",
+											"});",
+											"",
+											"pm.test(\"Has correct sorting returned\", function() {",
+											"    jsonData.data.forEach(function (data) {",
+											"        pm.expect(data.attributes.sort).is.an('object')",
+											"            .that.have.property('sortParamNames')",
+											"            .that.is.an('array')",
+											"            .that.have.members([",
+											"                'rating',",
+											"                'name_asc',",
+											"                'name_desc',",
+											"                'price_asc',",
+											"                'price_desc'",
+											"            ]);",
+											"    });",
+											"});",
+											"",
+											"pm.test(\"Has correct localized sorting returned\", function() {",
+											"    jsonData.data.forEach(function (data) {",
+											"        pm.expect(data.attributes.sort).is.an('object')",
+											"        .that.have.property('sortParamLocalizedNames')",
+											"        .that.is.an('object');",
+											"        let expectedKeys = [",
+											"            'rating',",
+											"            'name_asc',",
+											"            'name_desc',",
+											"            'price_asc',",
+											"            'price_desc'",
+											"        ];",
+											"        expectedKeys.each(function(key) {",
+											"            pm.expect(data.attributes.sort.sortParamLocalizedNames).to.have.own.property(key);",
+											"        });",
+											"    });",
+											"});",
+											"",
+											"pm.test(\"Has correct pagination returned\", function() {",
+											"    jsonData.data.forEach(function (data) {",
+											"        let paginationObj = data.attributes.pagination;",
+											"        pm.expect(paginationObj).to.be.an('object');",
+											"        pm.expect(paginationObj).to.have.property('numFound').that.is.a('number');",
+											"        pm.expect(paginationObj).to.have.property('currentPage').that.is.a('number');",
+											"        pm.expect(paginationObj).to.have.property('maxPage').that.is.a('number');",
+											"        pm.expect(paginationObj).to.have.property('currentItemsPerPage', parseInt(pm.variables.get('ipp_default')));",
+											"        pm.expect(paginationObj).to.have.property('config').that.is.an('object');",
+											"        pm.expect(paginationObj.config).to.have.a.property('parameterName', 'page');",
+											"        pm.expect(paginationObj.config).to.have.a.property('itemsPerPageParameterName', 'ipp');",
+											"        pm.expect(paginationObj.config).to.have.a.property('defaultItemsPerPage', parseInt(pm.variables.get('ipp_default')));",
+											"        pm.expect(paginationObj.config).to.have.a.property('validItemsPerPageOptions')",
+											"            .that.is.an('array').that.have.members([12, 24, 36]);",
+											"    });",
+											"});",
+											"",
+											"",
+											"pm.test(\"Has correct product returned\", function() {",
+											"    jsonData.data.forEach(function (data) {",
+											"        pm.expect(data.attributes).to.have.property('abstractProducts')",
+											"            .that.is.an(\"array\")",
+											"            .that.is.lengthOf(1);",
+											"        let productsObj = _.first(data.attributes.abstractProducts);",
+											"        pm.expect(productsObj).to.have.property('images').that.is.an('array');",
+											"        pm.expect(productsObj).to.have.property('price').that.is.a('number');",
+											"        pm.expect(productsObj).to.have.property('abstractName').that.is.a('string');",
+											"        pm.expect(productsObj).to.have.property('prices').that.is.an('array');",
+											"        pm.expect(productsObj).to.have.property('abstractSku').that.is.equal(pm.variables.get('abstract_sku1'));",
+											"    });",
+											"});",
+											"",
+											"pm.test(\"Has correct relationships\", function() {",
+											"    jsonData.data.forEach(function (data) {",
+											"        pm.expect(data).to.have.property('relationships').that.is.an(\"object\");",
+											"        let relationshipsObj = data.relationships;",
+											"        pm.expect(Object.keys(relationshipsObj).length).to.be.equal(1);",
+											"        pm.expect(relationshipsObj).to.have.property('abstract-products').that.is.an('object');",
+											"    });",
+											"});",
+											"",
+											"pm.test(\"Has correct pagination config returned\", function() {",
+											"    jsonData.data.forEach(function (data) {",
+											"        pm.expect(data.attributes.pagination.config.parameterName).to.eql(\"page\");",
+											"        pm.expect(data.attributes.pagination.config.itemsPerPageParameterName).to.eql(\"ipp\");",
+											"        pm.expect(data.attributes.pagination.config.defaultItemsPerPage).to.eql(parseInt(pm.variables.get('ipp_default')));",
+											"    });",
+											"});",
+											"",
+											"pm.test(\"Has correct self link\", function() {",
+											"    pm.expect(jsonData.links.self).to.eql(pm.variables.get(\"url\") + \"/catalog-search?q=\" + pm.variables.get('abstract_sku1'));",
+											"});",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/vnd.api+json"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/vnd.api+json"
+									},
+									{
+										"key": "Accept-Language",
+										"value": "de-DE, de;q=0.9",
+										"disabled": true
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{url}}/catalog-search?q=001",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"catalog-search"
+									],
+									"query": [
+										{
+											"key": "q",
+											"value": "001"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Search a product - search by concrete sku - product available",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "224ee700-ea9e-44d7-9762-ed30f47a1e87",
+										"exec": [
+											"let jsonData = pm.response.json();",
+											"",
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test(\"Has correct type returned\", function() {",
+											"    pm.expect(jsonData.data).to.be.an('array');",
+											"    jsonData.data.forEach(function (data) {",
+											"        pm.expect(data.type).to.eql(\"catalog-search\");",
+											"    });",
+											"});",
+											"",
+											"pm.test(\"Has correct id returned\", function() {",
+											"    jsonData.data.forEach(function (data) {",
+											"        pm.expect(data.id).to.be.null;",
+											"    });",
+											"});",
+											"",
+											"pm.test(\"Has correct sorting returned\", function() {",
+											"    jsonData.data.forEach(function (data) {",
+											"        pm.expect(data.attributes.sort).is.an('object')",
+											"            .that.have.property('sortParamNames')",
+											"            .that.is.an('array')",
+											"            .that.have.members([",
+											"                'rating',",
+											"                'name_asc',",
+											"                'name_desc',",
+											"                'price_asc',",
+											"                'price_desc'",
+											"            ]);",
+											"    });",
+											"});",
+											"",
+											"pm.test(\"Has correct localized sorting returned\", function() {",
+											"    jsonData.data.forEach(function (data) {",
+											"        pm.expect(data.attributes.sort).is.an('object')",
+											"        .that.have.property('sortParamLocalizedNames')",
+											"        .that.is.an('object');",
+											"        let expectedKeys = [",
+											"            'rating',",
+											"            'name_asc',",
+											"            'name_desc',",
+											"            'price_asc',",
+											"            'price_desc'",
+											"        ];",
+											"        expectedKeys.each(function(key) {",
+											"            pm.expect(data.attributes.sort.sortParamLocalizedNames).to.have.own.property(key);",
+											"        });",
+											"    });",
+											"});",
+											"",
+											"pm.test(\"Has correct pagination returned\", function() {",
+											"    jsonData.data.forEach(function (data) {",
+											"        let paginationObj = data.attributes.pagination;",
+											"        pm.expect(paginationObj).to.be.an('object');",
+											"        pm.expect(paginationObj).to.have.property('numFound').that.is.a('number');",
+											"        pm.expect(paginationObj).to.have.property('currentPage').that.is.a('number');",
+											"        pm.expect(paginationObj).to.have.property('maxPage').that.is.a('number');",
+											"        pm.expect(paginationObj).to.have.property('currentItemsPerPage', parseInt(pm.variables.get('ipp_default')));",
+											"        pm.expect(paginationObj).to.have.property('config').that.is.an('object');",
+											"        pm.expect(paginationObj.config).to.have.a.property('parameterName', 'page');",
+											"        pm.expect(paginationObj.config).to.have.a.property('itemsPerPageParameterName', 'ipp');",
+											"        pm.expect(paginationObj.config).to.have.a.property('defaultItemsPerPage', parseInt(pm.variables.get('ipp_default')));",
+											"        pm.expect(paginationObj.config).to.have.a.property('validItemsPerPageOptions')",
+											"            .that.is.an('array').that.have.members([12, 24, 36]);",
+											"    });",
+											"});",
+											"",
+											"pm.test(\"Has correct product returned\", function() {",
+											"    jsonData.data.forEach(function (data) {",
+											"        pm.expect(data.attributes).to.have.property('abstractProducts')",
+											"            .that.is.an(\"array\")",
+											"            .that.is.lengthOf(1);",
+											"        let productsObj = _.first(data.attributes.abstractProducts);",
+											"        pm.expect(productsObj).to.have.property('images').that.is.an('array');",
+											"        pm.expect(productsObj).to.have.property('price').that.is.a('number');",
+											"        pm.expect(productsObj).to.have.property('abstractName').that.is.a('string');",
+											"        pm.expect(productsObj).to.have.property('prices').that.is.an('array');",
+											"        pm.expect(productsObj).to.have.property('abstractSku').that.is.equal(pm.variables.get('abstract_sku1'));",
+											"    });",
+											"});",
+											"",
+											"pm.test(\"Has correct relationships\", function() {",
+											"    jsonData.data.forEach(function (data) {",
+											"        pm.expect(data).to.have.property('relationships').that.is.an(\"object\");",
+											"        let relationshipsObj = data.relationships;",
+											"        pm.expect(Object.keys(relationshipsObj).length).to.be.equal(1);",
+											"        pm.expect(relationshipsObj).to.have.property('abstract-products').that.is.an('object');",
+											"    });",
+											"});",
+											"",
+											"pm.test(\"Has correct pagination config returned\", function() {",
+											"    jsonData.data.forEach(function (data) {",
+											"        pm.expect(data.attributes.pagination.config.parameterName).to.eql(\"page\");",
+											"        pm.expect(data.attributes.pagination.config.itemsPerPageParameterName).to.eql(\"ipp\");",
+											"        pm.expect(data.attributes.pagination.config.defaultItemsPerPage).to.eql(parseInt(pm.variables.get('ipp_default')));",
+											"    });",
+											"});",
+											"",
+											"pm.test(\"Has correct self link\", function() {",
+											"    pm.expect(jsonData.links.self).to.eql(pm.variables.get(\"url\") + \"/catalog-search?q=\" + pm.variables.get('concrete_sku1'));",
+											"});",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/vnd.api+json"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/vnd.api+json"
+									},
+									{
+										"key": "Accept-Language",
+										"value": "de-DE, de;q=0.9",
+										"disabled": true
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{url}}/catalog-search?q=001_25904006",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"catalog-search"
+									],
+									"query": [
+										{
+											"key": "q",
+											"value": "001_25904006"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Search a product - search by concrete sku - product available",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "224ee700-ea9e-44d7-9762-ed30f47a1e87",
+										"exec": [
+											"let jsonData = pm.response.json();",
+											"",
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test(\"Has correct type returned\", function() {",
+											"    pm.expect(jsonData.data).to.be.an('array');",
+											"    jsonData.data.forEach(function (data) {",
+											"        pm.expect(data.type).to.eql(\"catalog-search\");",
+											"    });",
+											"});",
+											"",
+											"pm.test(\"Has correct id returned\", function() {",
+											"    jsonData.data.forEach(function (data) {",
+											"        pm.expect(data.id).to.be.null;",
+											"    });",
+											"});",
+											"",
+											"pm.test(\"Has correct sorting returned\", function() {",
+											"    jsonData.data.forEach(function (data) {",
+											"        pm.expect(data.attributes.sort).is.an('object')",
+											"            .that.have.property('sortParamNames')",
+											"            .that.is.an('array')",
+											"            .that.have.members([",
+											"                'rating',",
+											"                'name_asc',",
+											"                'name_desc',",
+											"                'price_asc',",
+											"                'price_desc'",
+											"            ]);",
+											"    });",
+											"});",
+											"",
+											"pm.test(\"Has correct localized sorting returned\", function() {",
+											"    jsonData.data.forEach(function (data) {",
+											"        pm.expect(data.attributes.sort).is.an('object')",
+											"        .that.have.property('sortParamLocalizedNames')",
+											"        .that.is.an('object');",
+											"        let expectedKeys = [",
+											"            'rating',",
+											"            'name_asc',",
+											"            'name_desc',",
+											"            'price_asc',",
+											"            'price_desc'",
+											"        ];",
+											"        expectedKeys.each(function(key) {",
+											"            pm.expect(data.attributes.sort.sortParamLocalizedNames).to.have.own.property(key);",
+											"        });",
+											"    });",
+											"});",
+											"",
+											"pm.test(\"Has correct pagination returned\", function() {",
+											"    jsonData.data.forEach(function (data) {",
+											"        let paginationObj = data.attributes.pagination;",
+											"        pm.expect(paginationObj).to.be.an('object');",
+											"        pm.expect(paginationObj).to.have.property('numFound').that.is.a('number');",
+											"        pm.expect(paginationObj).to.have.property('currentPage').that.is.a('number');",
+											"        pm.expect(paginationObj).to.have.property('maxPage').that.is.a('number');",
+											"        pm.expect(paginationObj).to.have.property('currentItemsPerPage', parseInt(pm.variables.get('ipp_default')));",
+											"        pm.expect(paginationObj).to.have.property('config').that.is.an('object');",
+											"        pm.expect(paginationObj.config).to.have.a.property('parameterName', 'page');",
+											"        pm.expect(paginationObj.config).to.have.a.property('itemsPerPageParameterName', 'ipp');",
+											"        pm.expect(paginationObj.config).to.have.a.property('defaultItemsPerPage', parseInt(pm.variables.get('ipp_default')));",
+											"        pm.expect(paginationObj.config).to.have.a.property('validItemsPerPageOptions')",
+											"            .that.is.an('array').that.have.members([12, 24, 36]);",
+											"    });",
+											"});",
+											"",
+											"pm.test(\"Has correct product returned\", function() {",
+											"    jsonData.data.forEach(function (data) {",
+											"        pm.expect(data.attributes).to.have.property('abstractProducts')",
+											"            .that.is.an(\"array\")",
+											"            .that.is.lengthOf(1);",
+											"        let productsObj = _.first(data.attributes.abstractProducts);",
+											"        pm.expect(productsObj).to.have.property('images').that.is.an('array');",
+											"        pm.expect(productsObj).to.have.property('price').that.is.a('number');",
+											"        pm.expect(productsObj).to.have.property('abstractName').that.is.a('string');",
+											"        pm.expect(productsObj).to.have.property('prices').that.is.an('array');",
+											"        pm.expect(productsObj).to.have.property('abstractSku').that.is.equal(pm.variables.get('abstract_sku1'));",
+											"    });",
+											"});",
+											"",
+											"pm.test(\"Has correct relationships\", function() {",
+											"    jsonData.data.forEach(function (data) {",
+											"        pm.expect(data).to.have.property('relationships').that.is.an(\"object\");",
+											"        let relationshipsObj = data.relationships;",
+											"        pm.expect(Object.keys(relationshipsObj).length).to.be.equal(1);",
+											"        pm.expect(relationshipsObj).to.have.property('abstract-products').that.is.an('object');",
+											"    });",
+											"});",
+											"",
+											"pm.test(\"Has correct pagination config returned\", function() {",
+											"    jsonData.data.forEach(function (data) {",
+											"        pm.expect(data.attributes.pagination.config.parameterName).to.eql(\"page\");",
+											"        pm.expect(data.attributes.pagination.config.itemsPerPageParameterName).to.eql(\"ipp\");",
+											"        pm.expect(data.attributes.pagination.config.defaultItemsPerPage).to.eql(parseInt(pm.variables.get('ipp_default')));",
+											"    });",
+											"});",
+											"",
+											"pm.test(\"Has correct self link\", function() {",
+											"    pm.expect(jsonData.links.self).to.eql(pm.variables.get(\"url\") + \"/catalog-search?q=\" + pm.variables.get('concrete_sku2'));",
+											"});",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/vnd.api+json"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/vnd.api+json"
+									},
+									{
+										"key": "Accept-Language",
+										"value": "de-DE, de;q=0.9",
+										"disabled": true
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{url}}/catalog-search?q={{concrete_sku2}}",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"catalog-search"
+									],
+									"query": [
+										{
+											"key": "q",
+											"value": "{{concrete_sku2}}"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Search a product - empty search criteria",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "9f9e41fe-77ae-4092-9820-c650a43c5ea5",
+										"exec": [
+											"let jsonData = pm.response.json();",
+											"",
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test(\"Has correct type returned\", function() {",
+											"    pm.expect(jsonData.data).to.be.an('array');",
+											"    jsonData.data.forEach(function (data) {",
+											"        pm.expect(data.type).to.eql(\"catalog-search\");",
+											"    });",
+											"});",
+											"",
+											"pm.test(\"Has correct id returned\", function() {",
+											"    jsonData.data.forEach(function (data) {",
+											"        pm.expect(data.id).to.be.null;",
+											"    });",
+											"});",
+											"",
+											"pm.test(\"Has correct sorting returned\", function() {",
+											"    jsonData.data.forEach(function (data) {",
+											"        pm.expect(data.attributes.sort).is.an('object')",
+											"            .that.have.property('sortParamNames')",
+											"            .that.is.an('array')",
+											"            .that.have.members([",
+											"                'rating',",
+											"                'name_asc',",
+											"                'name_desc',",
+											"                'price_asc',",
+											"                'price_desc'",
+											"            ]);",
+											"    });",
+											"});",
+											"",
+											"pm.test(\"Has correct localized sorting returned\", function() {",
+											"    jsonData.data.forEach(function (data) {",
+											"        pm.expect(data.attributes.sort).is.an('object')",
+											"            .that.have.property('sortParamLocalizedNames')",
+											"            .that.is.an('object');",
+											"        let expectedKeys = [",
+											"            'rating',",
+											"            'name_asc',",
+											"            'name_desc',",
+											"            'price_asc',",
+											"            'price_desc'",
+											"        ];",
+											"        expectedKeys.each(function(key) {",
+											"            pm.expect(data.attributes.sort.sortParamLocalizedNames).to.have.own.property(key);",
+											"        });",
+											"    });",
+											"});",
+											"",
+											"pm.test(\"Has correct pagination returned\", function() {",
+											"    jsonData.data.forEach(function (data) {",
+											"        let paginationObj = data.attributes.pagination;",
+											"        pm.expect(paginationObj).to.be.an('object');",
+											"        pm.expect(paginationObj).to.have.property('numFound').that.is.a('number');",
+											"        pm.expect(paginationObj).to.have.property('currentPage').that.is.a('number');",
+											"        pm.expect(paginationObj).to.have.property('maxPage').that.is.a('number');",
+											"        pm.expect(paginationObj).to.have.property('currentItemsPerPage', parseInt(pm.variables.get('ipp_default')));",
+											"        pm.expect(paginationObj).to.have.property('config').that.is.an('object');",
+											"        pm.expect(paginationObj.config).to.have.a.property('parameterName', 'page');",
+											"        pm.expect(paginationObj.config).to.have.a.property('itemsPerPageParameterName', 'ipp');",
+											"        pm.expect(paginationObj.config).to.have.a.property('defaultItemsPerPage', parseInt(pm.variables.get('ipp_default')));",
+											"        pm.expect(paginationObj.config).to.have.a.property('validItemsPerPageOptions')",
+											"            .that.is.an('array').that.have.members([12, 24, 36]);",
+											"    });",
+											"});",
+											"",
+											"pm.test(\"Has correct product returned\", function() {",
+											"    jsonData.data.forEach(function (data) {",
+											"        pm.expect(data.attributes).to.have.property('abstractProducts')",
+											"            .that.is.an(\"array\")",
+											"            .that.is.lengthOf(parseInt(pm.variables.get('ipp_default')));",
+											"    });",
+											"});",
+											"",
+											"pm.test(\"Has correct relationships\", function() {",
+											"    jsonData.data.forEach(function (data) {",
+											"        pm.expect(data).to.have.property('relationships').that.is.an(\"object\");",
+											"        let relationshipsObj = data.relationships;",
+											"        pm.expect(Object.keys(relationshipsObj).length).to.be.equal(1);",
+											"        pm.expect(relationshipsObj).to.have.property('abstract-products').that.is.an('object');",
+											"    });",
+											"});",
+											"",
+											"pm.test(\"Has correct pagination config returned\", function() {",
+											"    jsonData.data.forEach(function (data) {",
+											"        pm.expect(data.attributes.pagination.config.parameterName).to.eql(\"page\");",
+											"        pm.expect(data.attributes.pagination.config.itemsPerPageParameterName).to.eql(\"ipp\");",
+											"        pm.expect(data.attributes.pagination.config.defaultItemsPerPage).to.eql(parseInt(pm.variables.get('ipp_default')));",
+											"    });",
+											"});",
+											"",
+											"pm.test(\"Has correct self link\", function() {",
+											"    pm.expect(jsonData.links.self).to.eql(pm.variables.get(\"url\") + \"/catalog-search?q=\");",
+											"});",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/vnd.api+json"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/vnd.api+json"
+									},
+									{
+										"key": "Accept-Language",
+										"value": "de-DE, de;q=0.9",
+										"disabled": true
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{url}}/catalog-search?q=",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"catalog-search"
+									],
+									"query": [
+										{
+											"key": "q",
+											"value": ""
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Search a product - wrong query",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "224ee700-ea9e-44d7-9762-ed30f47a1e87",
+										"exec": [
+											"let jsonData = pm.response.json();",
+											"",
+											"pm.test(\"Status code is 404\", function () {",
+											"    pm.response.to.have.status(404);",
+											"});",
+											"",
+											"pm.test(\"Error status is 404\", function() {",
+											"    pm.expect(jsonData.errors[0].status).to.eql(404);",
+											"});",
+											"",
+											"pm.test(\"Correct details message\", function(){",
+											"    pm.expect(jsonData.errors[0].detail).to.eql(\"Not Found\");",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/vnd.api+json",
+										"disabled": true
+									},
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Accept-Language",
+										"value": "de-DE, de;q=0.9",
+										"disabled": true
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{url}}/catalogsearch?q=",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"catalogsearch"
+									],
+									"query": [
+										{
+											"key": "q",
+											"value": ""
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Search suggestion a product - search by concrete sku - product available",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "5f9279ec-df11-404b-8187-35542c758ab2",
+										"exec": [
+											"let jsonData = pm.response.json();",
+											"let resourceType = 'catalog-search-suggestions';",
+											"",
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test(\"Has correct type returned\", function() {",
+											"    pm.expect(jsonData.data).to.be.an('array');",
+											"    jsonData.data.forEach(function (data) {",
+											"        pm.expect(data.type).to.eql(resourceType);",
+											"    });",
+											"});",
+											"",
+											"pm.test(\"Has correct id returned\", function() {",
+											"    jsonData.data.forEach(function (data) {",
+											"        pm.expect(data.id).to.be.null;",
+											"    });",
+											"});",
+											"",
+											"pm.test(\"Has correct completion returned\", function() {",
+											"    jsonData.data.forEach(function (data) {",
+											"        pm.expect(data.attributes).to.have.property('completion').that.is.an('array').that.is.empty;",
+											"    });",
+											"});",
+											"",
+											"pm.test(\"Has correct product returned\", function() {",
+											"    jsonData.data.forEach(function (data) {",
+											"        pm.expect(data.attributes).to.have.property('abstractProducts')",
+											"            .that.is.an(\"array\")",
+											"            .that.is.lengthOf(1);",
+											"        let product = data.attributes.abstractProducts[0];",
+											"        pm.expect(product).to.be.an('object');",
+											"        pm.expect(product).to.have.property('abstractSku', pm.variables.get('abstract_sku1'));",
+											"        pm.expect(product).to.have.property('abstractName').that.is.a('string');",
+											"        pm.expect(product).to.have.property('price').that.is.a('number');",
+											"        pm.expect(product).to.have.property('images').that.is.a('array');",
+											"        product.images.forEach(function (image) {",
+											"            pm.expect(image).to.have.property('externalUrlSmall').that.is.a('string');",
+											"            pm.expect(image).to.have.property('externalUrlLarge').that.is.a('string');",
+											"        });",
+											"    });",
+											"});",
+											"",
+											"pm.test(\"Has correct categories returned\", function() {",
+											"    jsonData.data.forEach(function (data) {",
+											"        pm.expect(data.attributes).to.have.property('categories').that.is.an('array');",
+											"    });",
+											"});",
+											"",
+											"pm.test(\"Has correct cmsPages returned\", function() {",
+											"    jsonData.data.forEach(function (data) {",
+											"        pm.expect(data.attributes).to.have.property('cmsPages').that.is.an('array');",
+											"    });",
+											"});",
+											"",
+											"pm.test(\"Has correct relationships\", function() {",
+											"    jsonData.data.forEach(function (data) {",
+											"        pm.expect(data).to.have.property('relationships').that.is.an(\"object\");",
+											"        let relationshipsObj = data.relationships;",
+											"        pm.expect(Object.keys(relationshipsObj).length).to.be.equal(1);",
+											"        pm.expect(relationshipsObj).to.have.property('abstract-products').that.is.an('object');",
+											"    });",
+											"});",
+											"",
+											"pm.test(\"Has correct included returned\", function() {",
+											"    jsonData.data.forEach(function (data) {",
+											"        pm.expect(jsonData).to.have.property('included').that.is.an('array');",
+											"        ",
+											"        let expectedResourceTypes = [",
+											"            'abstract-product-image-sets',",
+											"            'abstract-product-availabilities',",
+											"            'abstract-product-prices',",
+											"            'category-nodes',",
+											"            'product-tax-sets',",
+											"            'abstract-products'",
+											"        ];",
+											"        let resourceTypes = getIncludedResourceNames(jsonData.included);",
+											"        ",
+											"        pm.expect(resourceTypes).to.have.members(expectedResourceTypes);",
+											"    });",
+											"});",
+											"",
+											"pm.test(\"Has correct self link\", function() {",
+											"    pm.expect(jsonData.links.self).to.eql(pm.variables.get(\"url\") + \"/\" + resourceType + \"?q=\" + pm.variables.get('abstract_sku1'));",
+											"});",
+											"",
+											"function getIncludedResourceNames(included) {",
+											"    let resourceTypes = [];",
+											"    included.forEach(function (resource) {",
+											"        pm.expect(resource).to.be.an('object')",
+											"            .that.have.property('type')",
+											"            .that.is.a('string');",
+											"        if (!resourceTypes.includes(resource.type)) {",
+											"            resourceTypes.push(resource.type);",
+											"        }",
+											"    });",
+											"    ",
+											"    return resourceTypes;",
+											"}",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/vnd.api+json"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/vnd.api+json"
+									},
+									{
+										"key": "Accept-Language",
+										"value": "de-DE, de;q=0.9"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{url}}/catalog-search-suggestions?q=001_25904006",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"catalog-search-suggestions"
+									],
+									"query": [
+										{
+											"key": "q",
+											"value": "001_25904006"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Request abstract product by abstract sku - product available",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "c75c0ee2-b7df-45da-86b4-788faaf3a54e",
+										"exec": [
+											"let jsonData = pm.response.json(),",
+											"    entityData = jsonData.data,",
+											"    included = jsonData.included,",
+											"    abstractSku = pm.variables.get(\"abstract_sku_with_1product\"),",
+											"    abstractSkuTaxSetUuid = pm.variables.get(\"abstract_sku_with_1product_tax_set_uuid\"),",
+											"    selfLink = pm.variables.get(\"url\") + \"/abstract-products/\" + abstractSku;",
+											"",
+											"const resourceName = \"abstract-products\";",
+											"",
+											"pm.test(\"Status code is 200\", function() {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test(\"Has correct type returned\", function() {",
+											"    pm.expect(entityData.type).to.eql(resourceName);",
+											"});",
+											"",
+											"pm.test(\"Has correct id returned\", function() {",
+											"    pm.expect(entityData.id).to.eql(abstractSku);",
+											"});",
+											"",
+											"pm.test(\"Has abstract description returned\", function() {",
+											"    pm.expect(entityData.attributes.sku).to.eql(abstractSku);",
+											"    pm.expect(entityData.attributes.name).to.be.eql(\"Toshiba CAMILEO S20\");",
+											"    pm.expect(entityData.attributes.description).to.be.a(\"string\");",
+											"});",
+											"",
+											"pm.test(\"Has attribute variants returned\", function() {",
+											"    pm.expect(entityData.attributes.attributeMap).have.property('attribute_variants');",
+											"});",
+											"",
+											"pm.test(\"Has super attributes returned\", function() {",
+											"    pm.expect(entityData.attributes.attributeMap).to.have.property('super_attributes');",
+											"});",
+											"",
+											"pm.test(\"Has product concrete ids returned\", function() {",
+											"    pm.expect(entityData.attributes.attributeMap).to.have.property('product_concrete_ids');",
+											"    pm.expect(entityData.attributes.attributeMap.product_concrete_ids).to.contain(\"209_12554247\");",
+											"});",
+											"",
+											"pm.test(\"Has self link\", function() {",
+											"    pm.expect(entityData.links.self).to.eql(selfLink);",
+											"});",
+											"",
+											"pm.test(\"Has relationships concrete-products returned\", function() {",
+											"    pm.expect(entityData.relationships[\"concrete-products\"].data[0].type).to.eql(\"concrete-products\");",
+											"    pm.expect(entityData.relationships[\"concrete-products\"].data[0].id).to.eql(\"209_12554247\");",
+											"});",
+											"",
+											"pm.test(\"Has relationships abstract-product-image-sets returned\", function() {",
+											"    pm.expect(entityData.relationships[\"abstract-product-image-sets\"].data[0].type).to.eql(\"abstract-product-image-sets\");",
+											"    pm.expect(entityData.relationships[\"abstract-product-image-sets\"].data[0].id).to.eql(abstractSku);",
+											"});",
+											"",
+											"pm.test(\"Has relationships abstract-product-availabilities returned\", function() {",
+											"    pm.expect(entityData.relationships[\"abstract-product-availabilities\"].data[0].type).to.eql(\"abstract-product-availabilities\");",
+											"    pm.expect(entityData.relationships[\"abstract-product-availabilities\"].data[0].id).to.eql(abstractSku);",
+											"});",
+											"",
+											"pm.test(\"Has relationships tax-sets returned\", function() {",
+											"    pm.expect(entityData.relationships[\"product-tax-sets\"].data[0].type).to.eql(\"product-tax-sets\");",
+											"    pm.expect(entityData.relationships[\"product-tax-sets\"].data[0].id).to.eql(abstractSkuTaxSetUuid);",
+											"});",
+											"",
+											"pm.test(\"Has relationships abstract-product-prices returned\", function() {",
+											"    pm.expect(entityData.relationships[\"abstract-product-prices\"].data[0].type).to.eql(\"abstract-product-prices\");",
+											"    pm.expect(entityData.relationships[\"abstract-product-prices\"].data[0].id).to.eql(abstractSku);",
+											"});",
+											"",
+											"pm.test(\"Has included section\", function() {",
+											"    let expectedIncludedTypes = [",
+											"            \"concrete-product-image-sets\",",
+											"            \"concrete-product-availabilities\",",
+											"            \"concrete-product-prices\",",
+											"            \"concrete-products\",",
+											"            \"abstract-product-image-sets\",",
+											"            \"abstract-product-availabilities\",",
+											"            \"product-tax-sets\"",
+											"        ],",
+											"        includedTypes = _.pluck(included, \"type\");",
+											"",
+											"    pm.expect(includedTypes).to.include.members(expectedIncludedTypes);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/vnd.api+json"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/vnd.api+json"
+									},
+									{
+										"key": "Accept-Language",
+										"value": "de-DE, en;q=0.9"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{url}}/abstract-products/001",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"abstract-products",
+										"001"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Request product by concrete sku - product available",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "fb11d609-4f92-4689-abf7-0eab79a604a5",
+										"exec": [
+											"var jsonData = pm.response.json();",
+											"var resourceName = \"concrete-products\";",
+											"",
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test(\"Has correct type returned\", function() {",
+											"    pm.expect(jsonData.data.type).to.eql(resourceName);",
+											"});",
+											"",
+											"pm.test(\"Has correct id returned\", function() {",
+											"    pm.expect(jsonData.data.id).to.eql(pm.variables.get(\"concrete_sku\"));",
+											"});",
+											"",
+											"pm.test(\"Has description of concrete-products type returned\", function() {",
+											"    pm.expect(jsonData.data.attributes.sku).to.be.eql(pm.variables.get(\"concrete_sku\"));",
+											"    pm.expect(jsonData.data.attributes.name).to.be.eql(\"Samsung Galaxy Tab Active 8.0 8 GB\");",
+											"    pm.expect(jsonData.data.attributes.description).to.be.a(\"string\");",
+											"});",
+											"",
+											"pm.test(\"Has attributes of concrete-products type returned\", function() {",
+											"    pm.expect(jsonData.data.attributes.attributes.storage_media).to.be.eql(\"flash\");",
+											"    pm.expect(jsonData.data.attributes.attributes.processor_frequency).to.be.eql(\"1.2 GHz\");",
+											"    pm.expect(jsonData.data.attributes.attributes.display_diagonal).to.be.eql(\"20.3 cm\");",
+											"    pm.expect(jsonData.data.attributes.attributes.aspect_ratio).to.be.eql(\"16:09\");",
+											"    pm.expect(jsonData.data.attributes.attributes.brand).to.be.eql(\"Samsung\");",
+											"    pm.expect(jsonData.data.attributes.attributes.internal_storage_capacity).to.be.eql(\"8 GB\");",
+											"});",
+											"",
+											"pm.test(\"Has super Attributes Definition of concrete-products type returned\", function() {",
+											"    pm.expect(jsonData.data.attributes.superAttributesDefinition).to.contain(\"storage_media\", \"processor_frequency\", \"internal_storage_capacity\");",
+											"});",
+											"",
+											"pm.test(\"Has meta data returned\", function() {",
+											"    pm.expect(jsonData.data.attributes.metaTitle).to.be.eql(\"Samsung Galaxy Tab Active 8.0 8 GB\");",
+											"    pm.expect(jsonData.data.attributes.metaKeywords).to.eql(\"Samsung,Communication Electronics\");",
+											"    pm.expect(jsonData.data.attributes.metaDescription).to.be.a(\"string\");",
+											"});",
+											"",
+											"pm.test(\"Has concrete-products self link\", function() {",
+											"    pm.expect(jsonData.data.links.self).to.eql(pm.variables.get(\"url\") + \"/concrete-products/\" + pm.variables.get(\"concrete_sku\")); ",
+											"}); ",
+											"",
+											"pm.test(\"Has relationships concrete-product-image-sets type returned\", function() {",
+											"    pm.expect(jsonData.data.relationships[\"concrete-product-image-sets\"].data[0].type).to.be.eql(\"concrete-product-image-sets\");",
+											"    pm.expect(jsonData.data.relationships[\"concrete-product-image-sets\"].data[0].id).to.be.eql(pm.variables.get(\"concrete_sku\"));",
+											"});",
+											"",
+											"pm.test(\"Has relationships concrete-product-availabilities type returned\", function() {",
+											"    pm.expect(jsonData.data.relationships[\"concrete-product-availabilities\"].data[0].type).to.be.eql(\"concrete-product-availabilities\");",
+											"    pm.expect(jsonData.data.relationships[\"concrete-product-availabilities\"].data[0].id).to.be.eql(pm.variables.get(\"concrete_sku\"));",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/vnd.api+json"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/vnd.api+json"
+									},
+									{
+										"key": "Accept-Language",
+										"value": "de-DE, en;q=0.9"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{url}}/concrete-products/001_25904006",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"concrete-products",
+										"001_25904006"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Request product's prices - by abstract sku",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "1bb37dd1-807b-4994-918f-1adc6bc86804",
+										"exec": [
+											"const resourceName = \"abstract-product-prices\";",
+											"",
+											"let jsonData = pm.response.json(),",
+											"    selfLink = pm.variables.get(\"url\") + \"/abstract-products/\" + pm.variables.get(\"abstract_sku_with_3product\") + \"/\" + resourceName;",
+											"",
+											"pm.test(\"Status code is 200\", function() {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test(\"Has correct type returned\", function() {",
+											"    pm.expect(jsonData.data[0].type).to.eql(resourceName);",
+											"});",
+											"",
+											"pm.test(\"Has correct id returned\", function() {",
+											"    pm.expect(jsonData.data[0].id).to.eql(pm.variables.get(\"abstract_sku_with_3product\"));",
+											"});",
+											"",
+											"pm.test(\"Has price returned\", function() {",
+											"    pm.expect(jsonData.data[0].attributes.price).to.eql(42502);",
+											"});",
+											"",
+											"pm.test(\"Has price default grss returned\", function() {",
+											"    let prices = jsonData.data[0].attributes.prices;",
+											"    ",
+											"    pm.expect(prices[0].priceTypeName).to.eql(\"DEFAULT\");",
+											"    pm.expect(prices[0].netAmount).to.eql(null);",
+											"    pm.expect(prices[0].grossAmount).to.eql(42502);",
+											"});",
+											"",
+											"pm.test(\"Has self 1 link\", function() {",
+											"    pm.expect(jsonData.data[0].links.self).to.eql(selfLink);",
+											"});",
+											"",
+											"pm.test(\"Has self 2 link\", function() {",
+											"    pm.expect(jsonData.links.self).to.eql(selfLink);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{url}}/abstract-products/001/abstract-product-prices",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"abstract-products",
+										"001",
+										"abstract-product-prices"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Requst product's prices - by concrete sku",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "b74e709f-c0db-4547-9e5d-f2853132b0aa",
+										"exec": [
+											"var jsonData = pm.response.json();",
+											"var resourceName = \"concrete-product-prices\";",
+											"",
+											"pm.test(\"Status code is 200\", function() {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test(\"Has correct type returned\", function() {",
+											"    pm.expect(jsonData.data[0].type).to.eql(resourceName);",
+											"});",
+											"",
+											"pm.test(\"Has correct id returned\", function() {",
+											"    pm.expect(jsonData.data[0].id).to.eql(pm.variables.get(\"concrete_sku\"));",
+											"});",
+											"",
+											"pm.test(\"Has price returned\", function() {",
+											"    pm.expect(jsonData.data[0].attributes.price).to.eql(42502);",
+											"});",
+											"",
+											"pm.test(\"Has price default grss returned\", function() {",
+											"    pm.expect(jsonData.data[0].attributes.prices[0].priceTypeName).to.eql(\"DEFAULT\");",
+											"    pm.expect(jsonData.data[0].attributes.prices[0].netAmount).to.eql(null);",
+											"    pm.expect(jsonData.data[0].attributes.prices[0].grossAmount).to.eql(42502);",
+											"});",
+											"",
+											"pm.test(\"Has self 1 link\", function() {",
+											"    pm.expect(jsonData.data[0].links.self).to.eql(pm.variables.get(\"url\") + \"/concrete-products/\" + pm.variables.get(\"concrete_sku\") + \"/\" + resourceName); ",
+											"});",
+											"",
+											"pm.test(\"Has self 2 link\", function() {",
+											"    pm.expect(jsonData.links.self).to.eql(pm.variables.get(\"url\") + \"/concrete-products/\" + pm.variables.get(\"concrete_sku\") + \"/\" + resourceName); ",
+											"});",
+											"",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/vnd.api+json"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Accept-Language",
+										"value": "de-DE, en;q=0.9"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{url}}/concrete-products/001_25904006/concrete-product-prices",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"concrete-products",
+										"001_25904006",
+										"concrete-product-prices"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Request price resource - only Default prices",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "79ad535f-1b55-42b8-9dcf-721068ab2eb8",
+										"exec": [
+											"const resourceName = \"concrete-product-prices\";",
+											"",
+											"let jsonData = pm.response.json(),",
+											"    selfLink = pm.variables.get(\"url\") + \"/concrete-products/\" + pm.variables.get(\"concrete_sku\") + \"/\" + resourceName,",
+											"    queryString = \"?currency=CHF\";",
+											"",
+											"pm.test(\"Status code is 200\", function() {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test(\"Has correct type returned\", function() {",
+											"    pm.expect(jsonData.data[0].type).to.eql(resourceName);",
+											"});",
+											"",
+											"pm.test(\"Has correct id returned\", function() {",
+											"    pm.expect(jsonData.data[0].id).to.eql(pm.variables.get(\"concrete_sku\"));",
+											"});",
+											"",
+											"pm.test(\"Has price returned\", function() {",
+											"    pm.expect(jsonData.data[0].attributes.price).to.eql(48877);",
+											"});",
+											"",
+											"pm.test(\"Has price default gross returned\", function() {",
+											"    let price = _.first(jsonData.data[0].attributes.prices);",
+											"",
+											"    pm.expect(price.priceTypeName).to.eql(\"DEFAULT\");",
+											"    pm.expect(price.netAmount).to.eql(null);",
+											"    pm.expect(price.grossAmount).to.eql(48877);",
+											"});",
+											"",
+											"pm.test(\"ORIGINAL prices are not listed\", function() {",
+											"    let originalPrice = _.find(jsonData.data[0].attributes.prices, {",
+											"        \"priceTypeName\": \"ORIGINAL\"",
+											"    });",
+											"",
+											"    pm.expect(originalPrice).to.not.be;",
+											"});",
+											"",
+											"pm.test(\"Has self 1 link\", function() {",
+											"    pm.expect(jsonData.data[0].links.self).to.eql(selfLink);",
+											"});",
+											"",
+											"pm.test(\"Has self 2 link\", function() {",
+											"    pm.expect(jsonData.links.self).to.eql(selfLink + queryString);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/vnd.api+json"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Accept-Language",
+										"value": "de-DE, en;q=0.9"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{url}}/concrete-products/001_25904006/concrete-product-prices?currency=CHF",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"concrete-products",
+										"001_25904006",
+										"concrete-product-prices"
+									],
+									"query": [
+										{
+											"key": "currency",
+											"value": "CHF"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Request price resource - only Original prices",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "105ac924-48d3-49d1-81d4-3d36e48a5665",
+										"exec": [
+											"const resourceName = \"concrete-product-prices\";",
+											"",
+											"let jsonData = pm.response.json(),",
+											"    selfLink = pm.variables.get(\"url\") + \"/concrete-products/\" + pm.variables.get(\"concreteSkuNoImageSets\") + \"/\" + resourceName;",
+											"",
+											"pm.test(\"Status code is 200\", function() {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test(\"Has correct type returned\", function() {",
+											"    pm.expect(jsonData.data[0].type).to.eql(resourceName);",
+											"});",
+											"",
+											"pm.test(\"Has correct id returned\", function() {",
+											"    pm.expect(jsonData.data[0].id).to.eql(pm.variables.get(\"concreteSkuNoImageSets\"));",
+											"});",
+											"",
+											"pm.test(\"Has price returned\", function() {",
+											"    pm.expect(jsonData.data[0].attributes.price).to.eql(225);",
+											"});",
+											"",
+											"pm.test(\"Has orginal price returned\", function() {",
+											"    let originalPrice = _.find(jsonData.data[0].attributes.prices, {",
+											"        \"priceTypeName\": \"ORIGINAL\"",
+											"    });",
+											"",
+											"    pm.expect(originalPrice.priceTypeName).to.eql(\"ORIGINAL\");",
+											"    pm.expect(originalPrice.netAmount).to.eql(255);",
+											"    pm.expect(originalPrice.grossAmount).to.eql(225);",
+											"});",
+											"",
+											"pm.test(\"Has no default price returned\", function() {",
+											"    let defaultPrice = _.find(jsonData.data[0].attributes.prices, {",
+											"        \"priceTypeName\": \"DEFAULT\"",
+											"    });",
+											"",
+											"    pm.expect(defaultPrice.priceTypeName).to.not.be(defaultPrice);",
+											"});",
+											"",
+											"pm.test(\"Has self 1 link\", function() {",
+											"    pm.expect(jsonData.data[0].links.self).to.eql(selfLink);",
+											"});",
+											"",
+											"pm.test(\"Has self 2 link\", function() {",
+											"    pm.expect(jsonData.links.self).to.eql(selfLink);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/vnd.api+json"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Accept-Language",
+										"value": "de-DE, en;q=0.9"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{url}}/concrete-products/001_25904006/concrete-product-prices",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"concrete-products",
+										"001_25904006",
+										"concrete-product-prices"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Request price resource - only Net prices",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "105ac924-48d3-49d1-81d4-3d36e48a5665",
+										"exec": [
+											"const resourceName = \"concrete-product-prices\";",
+											"",
+											"let jsonData = pm.response.json(),",
+											"    selfLink = pm.variables.get(\"url\") + \"/concrete-products/\" + pm.variables.get(\"concreteSkuHas2ImageSets\") + \"/\" + resourceName;",
+											"",
+											"pm.test(\"Status code is 200\", function() {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test(\"Has correct type returned\", function() {",
+											"    pm.expect(jsonData.data[0].type).to.eql(resourceName);",
+											"});",
+											"",
+											"pm.test(\"Has correct id returned\", function() {",
+											"    pm.expect(jsonData.data[0].id).to.eql(pm.variables.get(\"concreteSkuHas2ImageSets\"));",
+											"});",
+											"",
+											"pm.test(\"Has price returned\", function() {",
+											"    pm.expect(jsonData.data[0].attributes.price).to.eql(225);",
+											"});",
+											"",
+											"",
+											"pm.test(\"Has default net price returned\", function() {",
+											"    let originalPrice = _.find(jsonData.data[0].attributes.prices, {",
+											"        \"priceTypeName\": \"DEFAULT\"",
+											"    });",
+											"",
+											"    pm.expect(originalPrice.priceTypeName).to.eql(\"DEFAULT\");",
+											"    pm.expect(originalPrice.netAmount).to.eql(225);",
+											"});",
+											"",
+											"pm.test(\"Has no origin gross price returned\", function() {",
+											"    let defaultPrice = _.find(jsonData.data[0].attributes.prices, {",
+											"        \"priceTypeName\": \"ORIGIN\"",
+											"    });",
+											"",
+											"    pm.expect(defaultPrice).to.not.be;",
+											"});",
+											"",
+											"",
+											"pm.test(\"Has self 1 link\", function() {",
+											"    pm.expect(jsonData.data[0].links.self).to.eql(selfLink);",
+											"});",
+											"",
+											"pm.test(\"Has self 2 link\", function() {",
+											"    pm.expect(jsonData.links.self).to.eql(selfLink + '?priceMode=NET_MODE');",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/vnd.api+json"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Accept-Language",
+										"value": "de-DE, en;q=0.9"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{url}}/concrete-products/001_25904006/concrete-product-prices?priceMode=NET_MODE",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"concrete-products",
+										"001_25904006",
+										"concrete-product-prices"
+									],
+									"query": [
+										{
+											"key": "priceMode",
+											"value": "NET_MODE"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Requst product's prices - inherite prices",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "b74e709f-c0db-4547-9e5d-f2853132b0aa",
+										"exec": [
+											"var jsonData = pm.response.json();",
+											"var resourceName = \"concrete-product-prices\";",
+											"",
+											"pm.test(\"Status code is 200\", function() {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test(\"Has correct type returned\", function() {",
+											"    pm.expect(jsonData.data[0].type).to.eql(resourceName);",
+											"});",
+											"",
+											"pm.test(\"Has correct id returned\", function() {",
+											"    pm.expect(jsonData.data[0].id).to.eql(pm.variables.get(\"concrete_sku\"));",
+											"});",
+											"",
+											"pm.test(\"Has price returned\", function() {",
+											"    pm.expect(jsonData.data[0].attributes.price).to.eql(42502);",
+											"});",
+											"",
+											"pm.test(\"Has price default grss returned\", function() {",
+											"    pm.expect(jsonData.data[0].attributes.prices[0].priceTypeName).to.eql(\"DEFAULT\");",
+											"    pm.expect(jsonData.data[0].attributes.prices[0].netAmount).to.eql(null);",
+											"    pm.expect(jsonData.data[0].attributes.prices[0].grossAmount).to.eql(42502);",
+											"});",
+											"",
+											"pm.test(\"Has self 1 link\", function() {",
+											"    pm.expect(jsonData.data[0].links.self).to.eql(pm.variables.get(\"url\") + \"/concrete-products/\" + pm.variables.get(\"concrete_sku\") + \"/\" + resourceName); ",
+											"});",
+											"",
+											"pm.test(\"Has self 2 link\", function() {",
+											"    pm.expect(jsonData.links.self).to.eql(pm.variables.get(\"url\") + \"/concrete-products/\" + pm.variables.get(\"concrete_sku\") + \"/\" + resourceName); ",
+											"});",
+											"",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/vnd.api+json"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Accept-Language",
+										"value": "de-DE, en;q=0.9"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{url}}/concrete-products/002_25904004/concrete-product-prices",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"concrete-products",
+										"002_25904004",
+										"concrete-product-prices"
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"_postman_isSubFolder": true
+				},
+				{
+					"name": "With merchant prices higher than default",
+					"item": [
+						{
+							"name": "Search a product - search by abstract sku - product available",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "224ee700-ea9e-44d7-9762-ed30f47a1e87",
+										"exec": [
+											"let jsonData = pm.response.json();",
+											"",
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test(\"Has correct type returned\", function() {",
+											"    pm.expect(jsonData.data).to.be.an('array');",
+											"    jsonData.data.forEach(function (data) {",
+											"        pm.expect(data.type).to.eql(\"catalog-search\");",
+											"    });",
+											"});",
+											"",
+											"pm.test(\"Has correct id returned\", function() {",
+											"    jsonData.data.forEach(function (data) {",
+											"        pm.expect(data.id).to.be.null;",
+											"    });",
+											"});",
+											"",
+											"pm.test(\"Has correct sorting returned\", function() {",
+											"    jsonData.data.forEach(function (data) {",
+											"        pm.expect(data.attributes.sort).is.an('object')",
+											"            .that.have.property('sortParamNames')",
+											"            .that.is.an('array')",
+											"            .that.have.members([",
+											"                'rating',",
+											"                'name_asc',",
+											"                'name_desc',",
+											"                'price_asc',",
+											"                'price_desc'",
+											"            ]);",
+											"    });",
+											"});",
+											"",
+											"pm.test(\"Has correct localized sorting returned\", function() {",
+											"    jsonData.data.forEach(function (data) {",
+											"        pm.expect(data.attributes.sort).is.an('object')",
+											"        .that.have.property('sortParamLocalizedNames')",
+											"        .that.is.an('object');",
+											"        let expectedKeys = [",
+											"            'rating',",
+											"            'name_asc',",
+											"            'name_desc',",
+											"            'price_asc',",
+											"            'price_desc'",
+											"        ];",
+											"        expectedKeys.each(function(key) {",
+											"            pm.expect(data.attributes.sort.sortParamLocalizedNames).to.have.own.property(key);",
+											"        });",
+											"    });",
+											"});",
+											"",
+											"pm.test(\"Has correct pagination returned\", function() {",
+											"    jsonData.data.forEach(function (data) {",
+											"        let paginationObj = data.attributes.pagination;",
+											"        pm.expect(paginationObj).to.be.an('object');",
+											"        pm.expect(paginationObj).to.have.property('numFound').that.is.a('number');",
+											"        pm.expect(paginationObj).to.have.property('currentPage').that.is.a('number');",
+											"        pm.expect(paginationObj).to.have.property('maxPage').that.is.a('number');",
+											"        pm.expect(paginationObj).to.have.property('currentItemsPerPage', parseInt(pm.variables.get('ipp_default')));",
+											"        pm.expect(paginationObj).to.have.property('config').that.is.an('object');",
+											"        pm.expect(paginationObj.config).to.have.a.property('parameterName', 'page');",
+											"        pm.expect(paginationObj.config).to.have.a.property('itemsPerPageParameterName', 'ipp');",
+											"        pm.expect(paginationObj.config).to.have.a.property('defaultItemsPerPage', parseInt(pm.variables.get('ipp_default')));",
+											"        pm.expect(paginationObj.config).to.have.a.property('validItemsPerPageOptions')",
+											"            .that.is.an('array').that.have.members([12, 24, 36]);",
+											"    });",
+											"});",
+											"",
+											"",
+											"pm.test(\"Has correct product returned\", function() {",
+											"    jsonData.data.forEach(function (data) {",
+											"        pm.expect(data.attributes).to.have.property('abstractProducts')",
+											"            .that.is.an(\"array\")",
+											"            .that.is.lengthOf(1);",
+											"        let productsObj = _.first(data.attributes.abstractProducts);",
+											"        pm.expect(productsObj).to.have.property('images').that.is.an('array');",
+											"        pm.expect(productsObj).to.have.property('price').that.is.a('number');",
+											"        pm.expect(productsObj).to.have.property('abstractName').that.is.a('string');",
+											"        pm.expect(productsObj).to.have.property('prices').that.is.an('array');",
+											"        pm.expect(productsObj).to.have.property('abstractSku').that.is.equal(pm.variables.get('abstract_sku1'));",
+											"    });",
+											"});",
+											"",
+											"pm.test(\"Has correct relationships\", function() {",
+											"    jsonData.data.forEach(function (data) {",
+											"        pm.expect(data).to.have.property('relationships').that.is.an(\"object\");",
+											"        let relationshipsObj = data.relationships;",
+											"        pm.expect(Object.keys(relationshipsObj).length).to.be.equal(1);",
+											"        pm.expect(relationshipsObj).to.have.property('abstract-products').that.is.an('object');",
+											"    });",
+											"});",
+											"",
+											"pm.test(\"Has correct pagination config returned\", function() {",
+											"    jsonData.data.forEach(function (data) {",
+											"        pm.expect(data.attributes.pagination.config.parameterName).to.eql(\"page\");",
+											"        pm.expect(data.attributes.pagination.config.itemsPerPageParameterName).to.eql(\"ipp\");",
+											"        pm.expect(data.attributes.pagination.config.defaultItemsPerPage).to.eql(parseInt(pm.variables.get('ipp_default')));",
+											"    });",
+											"});",
+											"",
+											"pm.test(\"Has correct self link\", function() {",
+											"    pm.expect(jsonData.links.self).to.eql(pm.variables.get(\"url\") + \"/catalog-search?q=\" + pm.variables.get('abstract_sku1'));",
+											"});",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/vnd.api+json"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/vnd.api+json"
+									},
+									{
+										"key": "Accept-Language",
+										"value": "de-DE, de;q=0.9",
+										"disabled": true
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{url}}/catalog-search?q=091",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"catalog-search"
+									],
+									"query": [
+										{
+											"key": "q",
+											"value": "091"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Request access token for customer",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "71697741-b089-45dc-9995-43714c41e10c",
+										"exec": [
+											"var responseData = pm.response.json().data;",
+											"",
+											"pm.environment.set(\"token\", responseData.attributes.accessToken);",
+											"pm.environment.set(\"test_uuid\", responseData.attributes.idCompanyUser);",
+											"pm.test(\"Status code is 201\", function () {",
+											"    pm.response.to.have.status(201);",
+											"});",
+											"",
+											"pm.test(\"Has correct type\", function() {",
+											"    pm.expect(responseData.type).to.eql(\"access-tokens\");",
+											"});",
+											"",
+											"pm.test(\"Has idCompanyUser not null\", function() {",
+											"    pm.expect(responseData.attributes.idCompanyUser).not.eql(null);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"data\": {\n        \"type\": \"access-tokens\",\n        \"attributes\": {\n            \"username\": \"spencor.hopkin@spryker.com\",\n            \"password\": \"change123\"\n        }\n    }\n}"
+								},
+								"url": {
+									"raw": "{{url}}/access-tokens",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"access-tokens"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Request access token for company user",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "71697741-b089-45dc-9995-43714c41e10c",
+										"exec": [
+											"var responseData = pm.response.json().data;",
+											"",
+											"pm.test(\"Status code is 201\", function () {",
+											"    pm.response.to.have.status(201);",
+											"});",
+											"",
+											"pm.test(\"Has correct type\", function() {",
+											"    pm.expect(responseData.type).to.eql(\"company-user-access-tokens\");",
+											"});",
+											"",
+											"pm.test(\"Has idCompanyUser not null\", function() {",
+											"    pm.expect(responseData.attributes.idCompanyUser).not.eql(null);",
+											"",
+											"});",
+											""
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"id": "42c5f293-cd43-4fd4-83ca-01801196de7d",
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"data\": {\n        \"type\": \"company-user-access-tokens\",\n        \"attributes\": {\n            \"idCompanyUser\": \"{{test_uuid}}\"\n        }\n    }\n}"
+								},
+								"url": {
+									"raw": "{{url}}/company-user-access-tokens",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"company-user-access-tokens"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Search a product - search by abstract sku - product available",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "224ee700-ea9e-44d7-9762-ed30f47a1e87",
+										"exec": [
+											"let jsonData = pm.response.json();",
+											"",
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test(\"Has correct type returned\", function() {",
+											"    pm.expect(jsonData.data).to.be.an('array');",
+											"    jsonData.data.forEach(function (data) {",
+											"        pm.expect(data.type).to.eql(\"catalog-search\");",
+											"    });",
+											"});",
+											"",
+											"pm.test(\"Has correct id returned\", function() {",
+											"    jsonData.data.forEach(function (data) {",
+											"        pm.expect(data.id).to.be.null;",
+											"    });",
+											"});",
+											"",
+											"pm.test(\"Has correct sorting returned\", function() {",
+											"    jsonData.data.forEach(function (data) {",
+											"        pm.expect(data.attributes.sort).is.an('object')",
+											"            .that.have.property('sortParamNames')",
+											"            .that.is.an('array')",
+											"            .that.have.members([",
+											"                'rating',",
+											"                'name_asc',",
+											"                'name_desc',",
+											"                'price_asc',",
+											"                'price_desc'",
+											"            ]);",
+											"    });",
+											"});",
+											"",
+											"pm.test(\"Has correct localized sorting returned\", function() {",
+											"    jsonData.data.forEach(function (data) {",
+											"        pm.expect(data.attributes.sort).is.an('object')",
+											"        .that.have.property('sortParamLocalizedNames')",
+											"        .that.is.an('object');",
+											"        let expectedKeys = [",
+											"            'rating',",
+											"            'name_asc',",
+											"            'name_desc',",
+											"            'price_asc',",
+											"            'price_desc'",
+											"        ];",
+											"        expectedKeys.each(function(key) {",
+											"            pm.expect(data.attributes.sort.sortParamLocalizedNames).to.have.own.property(key);",
+											"        });",
+											"    });",
+											"});",
+											"",
+											"pm.test(\"Has correct pagination returned\", function() {",
+											"    jsonData.data.forEach(function (data) {",
+											"        let paginationObj = data.attributes.pagination;",
+											"        pm.expect(paginationObj).to.be.an('object');",
+											"        pm.expect(paginationObj).to.have.property('numFound').that.is.a('number');",
+											"        pm.expect(paginationObj).to.have.property('currentPage').that.is.a('number');",
+											"        pm.expect(paginationObj).to.have.property('maxPage').that.is.a('number');",
+											"        pm.expect(paginationObj).to.have.property('currentItemsPerPage', parseInt(pm.variables.get('ipp_default')));",
+											"        pm.expect(paginationObj).to.have.property('config').that.is.an('object');",
+											"        pm.expect(paginationObj.config).to.have.a.property('parameterName', 'page');",
+											"        pm.expect(paginationObj.config).to.have.a.property('itemsPerPageParameterName', 'ipp');",
+											"        pm.expect(paginationObj.config).to.have.a.property('defaultItemsPerPage', parseInt(pm.variables.get('ipp_default')));",
+											"        pm.expect(paginationObj.config).to.have.a.property('validItemsPerPageOptions')",
+											"            .that.is.an('array').that.have.members([12, 24, 36]);",
+											"    });",
+											"});",
+											"",
+											"",
+											"pm.test(\"Has correct product returned\", function() {",
+											"    jsonData.data.forEach(function (data) {",
+											"        pm.expect(data.attributes).to.have.property('abstractProducts')",
+											"            .that.is.an(\"array\")",
+											"            .that.is.lengthOf(1);",
+											"        let productsObj = _.first(data.attributes.abstractProducts);",
+											"        pm.expect(productsObj).to.have.property('images').that.is.an('array');",
+											"        pm.expect(productsObj).to.have.property('price').that.is.a('number');",
+											"        pm.expect(productsObj).to.have.property('abstractName').that.is.a('string');",
+											"        pm.expect(productsObj).to.have.property('prices').that.is.an('array');",
+											"        pm.expect(productsObj).to.have.property('abstractSku').that.is.equal(pm.variables.get('abstract_sku1'));",
+											"    });",
+											"});",
+											"",
+											"pm.test(\"Has correct relationships\", function() {",
+											"    jsonData.data.forEach(function (data) {",
+											"        pm.expect(data).to.have.property('relationships').that.is.an(\"object\");",
+											"        let relationshipsObj = data.relationships;",
+											"        pm.expect(Object.keys(relationshipsObj).length).to.be.equal(1);",
+											"        pm.expect(relationshipsObj).to.have.property('abstract-products').that.is.an('object');",
+											"    });",
+											"});",
+											"",
+											"pm.test(\"Has correct pagination config returned\", function() {",
+											"    jsonData.data.forEach(function (data) {",
+											"        pm.expect(data.attributes.pagination.config.parameterName).to.eql(\"page\");",
+											"        pm.expect(data.attributes.pagination.config.itemsPerPageParameterName).to.eql(\"ipp\");",
+											"        pm.expect(data.attributes.pagination.config.defaultItemsPerPage).to.eql(parseInt(pm.variables.get('ipp_default')));",
+											"    });",
+											"});",
+											"",
+											"pm.test(\"Has correct self link\", function() {",
+											"    pm.expect(jsonData.links.self).to.eql(pm.variables.get(\"url\") + \"/catalog-search?q=\" + pm.variables.get('abstract_sku1'));",
+											"});",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/vnd.api+json"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/vnd.api+json"
+									},
+									{
+										"key": "Accept-Language",
+										"value": "de-DE, de;q=0.9",
+										"disabled": true
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{url}}/catalog-search?q=091",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"catalog-search"
+									],
+									"query": [
+										{
+											"key": "q",
+											"value": "091"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Search a product - search by concrete sku - product available",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "224ee700-ea9e-44d7-9762-ed30f47a1e87",
+										"exec": [
+											"let jsonData = pm.response.json();",
+											"",
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test(\"Has correct type returned\", function() {",
+											"    pm.expect(jsonData.data).to.be.an('array');",
+											"    jsonData.data.forEach(function (data) {",
+											"        pm.expect(data.type).to.eql(\"catalog-search\");",
+											"    });",
+											"});",
+											"",
+											"pm.test(\"Has correct id returned\", function() {",
+											"    jsonData.data.forEach(function (data) {",
+											"        pm.expect(data.id).to.be.null;",
+											"    });",
+											"});",
+											"",
+											"pm.test(\"Has correct sorting returned\", function() {",
+											"    jsonData.data.forEach(function (data) {",
+											"        pm.expect(data.attributes.sort).is.an('object')",
+											"            .that.have.property('sortParamNames')",
+											"            .that.is.an('array')",
+											"            .that.have.members([",
+											"                'rating',",
+											"                'name_asc',",
+											"                'name_desc',",
+											"                'price_asc',",
+											"                'price_desc'",
+											"            ]);",
+											"    });",
+											"});",
+											"",
+											"pm.test(\"Has correct localized sorting returned\", function() {",
+											"    jsonData.data.forEach(function (data) {",
+											"        pm.expect(data.attributes.sort).is.an('object')",
+											"        .that.have.property('sortParamLocalizedNames')",
+											"        .that.is.an('object');",
+											"        let expectedKeys = [",
+											"            'rating',",
+											"            'name_asc',",
+											"            'name_desc',",
+											"            'price_asc',",
+											"            'price_desc'",
+											"        ];",
+											"        expectedKeys.each(function(key) {",
+											"            pm.expect(data.attributes.sort.sortParamLocalizedNames).to.have.own.property(key);",
+											"        });",
+											"    });",
+											"});",
+											"",
+											"pm.test(\"Has correct pagination returned\", function() {",
+											"    jsonData.data.forEach(function (data) {",
+											"        let paginationObj = data.attributes.pagination;",
+											"        pm.expect(paginationObj).to.be.an('object');",
+											"        pm.expect(paginationObj).to.have.property('numFound').that.is.a('number');",
+											"        pm.expect(paginationObj).to.have.property('currentPage').that.is.a('number');",
+											"        pm.expect(paginationObj).to.have.property('maxPage').that.is.a('number');",
+											"        pm.expect(paginationObj).to.have.property('currentItemsPerPage', parseInt(pm.variables.get('ipp_default')));",
+											"        pm.expect(paginationObj).to.have.property('config').that.is.an('object');",
+											"        pm.expect(paginationObj.config).to.have.a.property('parameterName', 'page');",
+											"        pm.expect(paginationObj.config).to.have.a.property('itemsPerPageParameterName', 'ipp');",
+											"        pm.expect(paginationObj.config).to.have.a.property('defaultItemsPerPage', parseInt(pm.variables.get('ipp_default')));",
+											"        pm.expect(paginationObj.config).to.have.a.property('validItemsPerPageOptions')",
+											"            .that.is.an('array').that.have.members([12, 24, 36]);",
+											"    });",
+											"});",
+											"",
+											"pm.test(\"Has correct product returned\", function() {",
+											"    jsonData.data.forEach(function (data) {",
+											"        pm.expect(data.attributes).to.have.property('abstractProducts')",
+											"            .that.is.an(\"array\")",
+											"            .that.is.lengthOf(1);",
+											"        let productsObj = _.first(data.attributes.abstractProducts);",
+											"        pm.expect(productsObj).to.have.property('images').that.is.an('array');",
+											"        pm.expect(productsObj).to.have.property('price').that.is.a('number');",
+											"        pm.expect(productsObj).to.have.property('abstractName').that.is.a('string');",
+											"        pm.expect(productsObj).to.have.property('prices').that.is.an('array');",
+											"        pm.expect(productsObj).to.have.property('abstractSku').that.is.equal(pm.variables.get('abstract_sku1'));",
+											"    });",
+											"});",
+											"",
+											"pm.test(\"Has correct relationships\", function() {",
+											"    jsonData.data.forEach(function (data) {",
+											"        pm.expect(data).to.have.property('relationships').that.is.an(\"object\");",
+											"        let relationshipsObj = data.relationships;",
+											"        pm.expect(Object.keys(relationshipsObj).length).to.be.equal(1);",
+											"        pm.expect(relationshipsObj).to.have.property('abstract-products').that.is.an('object');",
+											"    });",
+											"});",
+											"",
+											"pm.test(\"Has correct pagination config returned\", function() {",
+											"    jsonData.data.forEach(function (data) {",
+											"        pm.expect(data.attributes.pagination.config.parameterName).to.eql(\"page\");",
+											"        pm.expect(data.attributes.pagination.config.itemsPerPageParameterName).to.eql(\"ipp\");",
+											"        pm.expect(data.attributes.pagination.config.defaultItemsPerPage).to.eql(parseInt(pm.variables.get('ipp_default')));",
+											"    });",
+											"});",
+											"",
+											"pm.test(\"Has correct self link\", function() {",
+											"    pm.expect(jsonData.links.self).to.eql(pm.variables.get(\"url\") + \"/catalog-search?q=\" + pm.variables.get('concrete_sku1'));",
+											"});",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/vnd.api+json"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/vnd.api+json"
+									},
+									{
+										"key": "Accept-Language",
+										"value": "de-DE, de;q=0.9",
+										"disabled": true
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{url}}/catalog-search?q=091_25873091",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"catalog-search"
+									],
+									"query": [
+										{
+											"key": "q",
+											"value": "091_25873091"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Search a product - search by concrete sku - product available",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "224ee700-ea9e-44d7-9762-ed30f47a1e87",
+										"exec": [
+											"let jsonData = pm.response.json();",
+											"",
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test(\"Has correct type returned\", function() {",
+											"    pm.expect(jsonData.data).to.be.an('array');",
+											"    jsonData.data.forEach(function (data) {",
+											"        pm.expect(data.type).to.eql(\"catalog-search\");",
+											"    });",
+											"});",
+											"",
+											"pm.test(\"Has correct id returned\", function() {",
+											"    jsonData.data.forEach(function (data) {",
+											"        pm.expect(data.id).to.be.null;",
+											"    });",
+											"});",
+											"",
+											"pm.test(\"Has correct sorting returned\", function() {",
+											"    jsonData.data.forEach(function (data) {",
+											"        pm.expect(data.attributes.sort).is.an('object')",
+											"            .that.have.property('sortParamNames')",
+											"            .that.is.an('array')",
+											"            .that.have.members([",
+											"                'rating',",
+											"                'name_asc',",
+											"                'name_desc',",
+											"                'price_asc',",
+											"                'price_desc'",
+											"            ]);",
+											"    });",
+											"});",
+											"",
+											"pm.test(\"Has correct localized sorting returned\", function() {",
+											"    jsonData.data.forEach(function (data) {",
+											"        pm.expect(data.attributes.sort).is.an('object')",
+											"        .that.have.property('sortParamLocalizedNames')",
+											"        .that.is.an('object');",
+											"        let expectedKeys = [",
+											"            'rating',",
+											"            'name_asc',",
+											"            'name_desc',",
+											"            'price_asc',",
+											"            'price_desc'",
+											"        ];",
+											"        expectedKeys.each(function(key) {",
+											"            pm.expect(data.attributes.sort.sortParamLocalizedNames).to.have.own.property(key);",
+											"        });",
+											"    });",
+											"});",
+											"",
+											"pm.test(\"Has correct pagination returned\", function() {",
+											"    jsonData.data.forEach(function (data) {",
+											"        let paginationObj = data.attributes.pagination;",
+											"        pm.expect(paginationObj).to.be.an('object');",
+											"        pm.expect(paginationObj).to.have.property('numFound').that.is.a('number');",
+											"        pm.expect(paginationObj).to.have.property('currentPage').that.is.a('number');",
+											"        pm.expect(paginationObj).to.have.property('maxPage').that.is.a('number');",
+											"        pm.expect(paginationObj).to.have.property('currentItemsPerPage', parseInt(pm.variables.get('ipp_default')));",
+											"        pm.expect(paginationObj).to.have.property('config').that.is.an('object');",
+											"        pm.expect(paginationObj.config).to.have.a.property('parameterName', 'page');",
+											"        pm.expect(paginationObj.config).to.have.a.property('itemsPerPageParameterName', 'ipp');",
+											"        pm.expect(paginationObj.config).to.have.a.property('defaultItemsPerPage', parseInt(pm.variables.get('ipp_default')));",
+											"        pm.expect(paginationObj.config).to.have.a.property('validItemsPerPageOptions')",
+											"            .that.is.an('array').that.have.members([12, 24, 36]);",
+											"    });",
+											"});",
+											"",
+											"pm.test(\"Has correct product returned\", function() {",
+											"    jsonData.data.forEach(function (data) {",
+											"        pm.expect(data.attributes).to.have.property('abstractProducts')",
+											"            .that.is.an(\"array\")",
+											"            .that.is.lengthOf(1);",
+											"        let productsObj = _.first(data.attributes.abstractProducts);",
+											"        pm.expect(productsObj).to.have.property('images').that.is.an('array');",
+											"        pm.expect(productsObj).to.have.property('price').that.is.a('number');",
+											"        pm.expect(productsObj).to.have.property('abstractName').that.is.a('string');",
+											"        pm.expect(productsObj).to.have.property('prices').that.is.an('array');",
+											"        pm.expect(productsObj).to.have.property('abstractSku').that.is.equal(pm.variables.get('abstract_sku1'));",
+											"    });",
+											"});",
+											"",
+											"pm.test(\"Has correct relationships\", function() {",
+											"    jsonData.data.forEach(function (data) {",
+											"        pm.expect(data).to.have.property('relationships').that.is.an(\"object\");",
+											"        let relationshipsObj = data.relationships;",
+											"        pm.expect(Object.keys(relationshipsObj).length).to.be.equal(1);",
+											"        pm.expect(relationshipsObj).to.have.property('abstract-products').that.is.an('object');",
+											"    });",
+											"});",
+											"",
+											"pm.test(\"Has correct pagination config returned\", function() {",
+											"    jsonData.data.forEach(function (data) {",
+											"        pm.expect(data.attributes.pagination.config.parameterName).to.eql(\"page\");",
+											"        pm.expect(data.attributes.pagination.config.itemsPerPageParameterName).to.eql(\"ipp\");",
+											"        pm.expect(data.attributes.pagination.config.defaultItemsPerPage).to.eql(parseInt(pm.variables.get('ipp_default')));",
+											"    });",
+											"});",
+											"",
+											"pm.test(\"Has correct self link\", function() {",
+											"    pm.expect(jsonData.links.self).to.eql(pm.variables.get(\"url\") + \"/catalog-search?q=\" + pm.variables.get('concrete_sku2'));",
+											"});",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/vnd.api+json"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/vnd.api+json"
+									},
+									{
+										"key": "Accept-Language",
+										"value": "de-DE, de;q=0.9",
+										"disabled": true
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{url}}/catalog-search?q={{concrete_sku2}}",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"catalog-search"
+									],
+									"query": [
+										{
+											"key": "q",
+											"value": "{{concrete_sku2}}"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Search a product - empty search criteria",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "9f9e41fe-77ae-4092-9820-c650a43c5ea5",
+										"exec": [
+											"let jsonData = pm.response.json();",
+											"",
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test(\"Has correct type returned\", function() {",
+											"    pm.expect(jsonData.data).to.be.an('array');",
+											"    jsonData.data.forEach(function (data) {",
+											"        pm.expect(data.type).to.eql(\"catalog-search\");",
+											"    });",
+											"});",
+											"",
+											"pm.test(\"Has correct id returned\", function() {",
+											"    jsonData.data.forEach(function (data) {",
+											"        pm.expect(data.id).to.be.null;",
+											"    });",
+											"});",
+											"",
+											"pm.test(\"Has correct sorting returned\", function() {",
+											"    jsonData.data.forEach(function (data) {",
+											"        pm.expect(data.attributes.sort).is.an('object')",
+											"            .that.have.property('sortParamNames')",
+											"            .that.is.an('array')",
+											"            .that.have.members([",
+											"                'rating',",
+											"                'name_asc',",
+											"                'name_desc',",
+											"                'price_asc',",
+											"                'price_desc'",
+											"            ]);",
+											"    });",
+											"});",
+											"",
+											"pm.test(\"Has correct localized sorting returned\", function() {",
+											"    jsonData.data.forEach(function (data) {",
+											"        pm.expect(data.attributes.sort).is.an('object')",
+											"            .that.have.property('sortParamLocalizedNames')",
+											"            .that.is.an('object');",
+											"        let expectedKeys = [",
+											"            'rating',",
+											"            'name_asc',",
+											"            'name_desc',",
+											"            'price_asc',",
+											"            'price_desc'",
+											"        ];",
+											"        expectedKeys.each(function(key) {",
+											"            pm.expect(data.attributes.sort.sortParamLocalizedNames).to.have.own.property(key);",
+											"        });",
+											"    });",
+											"});",
+											"",
+											"pm.test(\"Has correct pagination returned\", function() {",
+											"    jsonData.data.forEach(function (data) {",
+											"        let paginationObj = data.attributes.pagination;",
+											"        pm.expect(paginationObj).to.be.an('object');",
+											"        pm.expect(paginationObj).to.have.property('numFound').that.is.a('number');",
+											"        pm.expect(paginationObj).to.have.property('currentPage').that.is.a('number');",
+											"        pm.expect(paginationObj).to.have.property('maxPage').that.is.a('number');",
+											"        pm.expect(paginationObj).to.have.property('currentItemsPerPage', parseInt(pm.variables.get('ipp_default')));",
+											"        pm.expect(paginationObj).to.have.property('config').that.is.an('object');",
+											"        pm.expect(paginationObj.config).to.have.a.property('parameterName', 'page');",
+											"        pm.expect(paginationObj.config).to.have.a.property('itemsPerPageParameterName', 'ipp');",
+											"        pm.expect(paginationObj.config).to.have.a.property('defaultItemsPerPage', parseInt(pm.variables.get('ipp_default')));",
+											"        pm.expect(paginationObj.config).to.have.a.property('validItemsPerPageOptions')",
+											"            .that.is.an('array').that.have.members([12, 24, 36]);",
+											"    });",
+											"});",
+											"",
+											"pm.test(\"Has correct product returned\", function() {",
+											"    jsonData.data.forEach(function (data) {",
+											"        pm.expect(data.attributes).to.have.property('abstractProducts')",
+											"            .that.is.an(\"array\")",
+											"            .that.is.lengthOf(parseInt(pm.variables.get('ipp_default')));",
+											"    });",
+											"});",
+											"",
+											"pm.test(\"Has correct relationships\", function() {",
+											"    jsonData.data.forEach(function (data) {",
+											"        pm.expect(data).to.have.property('relationships').that.is.an(\"object\");",
+											"        let relationshipsObj = data.relationships;",
+											"        pm.expect(Object.keys(relationshipsObj).length).to.be.equal(1);",
+											"        pm.expect(relationshipsObj).to.have.property('abstract-products').that.is.an('object');",
+											"    });",
+											"});",
+											"",
+											"pm.test(\"Has correct pagination config returned\", function() {",
+											"    jsonData.data.forEach(function (data) {",
+											"        pm.expect(data.attributes.pagination.config.parameterName).to.eql(\"page\");",
+											"        pm.expect(data.attributes.pagination.config.itemsPerPageParameterName).to.eql(\"ipp\");",
+											"        pm.expect(data.attributes.pagination.config.defaultItemsPerPage).to.eql(parseInt(pm.variables.get('ipp_default')));",
+											"    });",
+											"});",
+											"",
+											"pm.test(\"Has correct self link\", function() {",
+											"    pm.expect(jsonData.links.self).to.eql(pm.variables.get(\"url\") + \"/catalog-search?q=\");",
+											"});",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/vnd.api+json"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/vnd.api+json"
+									},
+									{
+										"key": "Accept-Language",
+										"value": "de-DE, de;q=0.9",
+										"disabled": true
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{url}}/catalog-search?q=",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"catalog-search"
+									],
+									"query": [
+										{
+											"key": "q",
+											"value": ""
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Search a product - wrong query",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "224ee700-ea9e-44d7-9762-ed30f47a1e87",
+										"exec": [
+											"let jsonData = pm.response.json();",
+											"",
+											"pm.test(\"Status code is 404\", function () {",
+											"    pm.response.to.have.status(404);",
+											"});",
+											"",
+											"pm.test(\"Error status is 404\", function() {",
+											"    pm.expect(jsonData.errors[0].status).to.eql(404);",
+											"});",
+											"",
+											"pm.test(\"Correct details message\", function(){",
+											"    pm.expect(jsonData.errors[0].detail).to.eql(\"Not Found\");",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/vnd.api+json",
+										"disabled": true
+									},
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Accept-Language",
+										"value": "de-DE, de;q=0.9",
+										"disabled": true
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{url}}/catalogsearch?q=",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"catalogsearch"
+									],
+									"query": [
+										{
+											"key": "q",
+											"value": ""
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Search suggestion a product - search by concrete sku - product available",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "5f9279ec-df11-404b-8187-35542c758ab2",
+										"exec": [
+											"let jsonData = pm.response.json();",
+											"let resourceType = 'catalog-search-suggestions';",
+											"",
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test(\"Has correct type returned\", function() {",
+											"    pm.expect(jsonData.data).to.be.an('array');",
+											"    jsonData.data.forEach(function (data) {",
+											"        pm.expect(data.type).to.eql(resourceType);",
+											"    });",
+											"});",
+											"",
+											"pm.test(\"Has correct id returned\", function() {",
+											"    jsonData.data.forEach(function (data) {",
+											"        pm.expect(data.id).to.be.null;",
+											"    });",
+											"});",
+											"",
+											"pm.test(\"Has correct completion returned\", function() {",
+											"    jsonData.data.forEach(function (data) {",
+											"        pm.expect(data.attributes).to.have.property('completion').that.is.an('array').that.is.empty;",
+											"    });",
+											"});",
+											"",
+											"pm.test(\"Has correct product returned\", function() {",
+											"    jsonData.data.forEach(function (data) {",
+											"        pm.expect(data.attributes).to.have.property('abstractProducts')",
+											"            .that.is.an(\"array\")",
+											"            .that.is.lengthOf(1);",
+											"        let product = data.attributes.abstractProducts[0];",
+											"        pm.expect(product).to.be.an('object');",
+											"        pm.expect(product).to.have.property('abstractSku', pm.variables.get('abstract_sku1'));",
+											"        pm.expect(product).to.have.property('abstractName').that.is.a('string');",
+											"        pm.expect(product).to.have.property('price').that.is.a('number');",
+											"        pm.expect(product).to.have.property('images').that.is.a('array');",
+											"        product.images.forEach(function (image) {",
+											"            pm.expect(image).to.have.property('externalUrlSmall').that.is.a('string');",
+											"            pm.expect(image).to.have.property('externalUrlLarge').that.is.a('string');",
+											"        });",
+											"    });",
+											"});",
+											"",
+											"pm.test(\"Has correct categories returned\", function() {",
+											"    jsonData.data.forEach(function (data) {",
+											"        pm.expect(data.attributes).to.have.property('categories').that.is.an('array');",
+											"    });",
+											"});",
+											"",
+											"pm.test(\"Has correct cmsPages returned\", function() {",
+											"    jsonData.data.forEach(function (data) {",
+											"        pm.expect(data.attributes).to.have.property('cmsPages').that.is.an('array');",
+											"    });",
+											"});",
+											"",
+											"pm.test(\"Has correct relationships\", function() {",
+											"    jsonData.data.forEach(function (data) {",
+											"        pm.expect(data).to.have.property('relationships').that.is.an(\"object\");",
+											"        let relationshipsObj = data.relationships;",
+											"        pm.expect(Object.keys(relationshipsObj).length).to.be.equal(1);",
+											"        pm.expect(relationshipsObj).to.have.property('abstract-products').that.is.an('object');",
+											"    });",
+											"});",
+											"",
+											"pm.test(\"Has correct included returned\", function() {",
+											"    jsonData.data.forEach(function (data) {",
+											"        pm.expect(jsonData).to.have.property('included').that.is.an('array');",
+											"        ",
+											"        let expectedResourceTypes = [",
+											"            'abstract-product-image-sets',",
+											"            'abstract-product-availabilities',",
+											"            'abstract-product-prices',",
+											"            'category-nodes',",
+											"            'product-tax-sets',",
+											"            'abstract-products'",
+											"        ];",
+											"        let resourceTypes = getIncludedResourceNames(jsonData.included);",
+											"        ",
+											"        pm.expect(resourceTypes).to.have.members(expectedResourceTypes);",
+											"    });",
+											"});",
+											"",
+											"pm.test(\"Has correct self link\", function() {",
+											"    pm.expect(jsonData.links.self).to.eql(pm.variables.get(\"url\") + \"/\" + resourceType + \"?q=\" + pm.variables.get('abstract_sku1'));",
+											"});",
+											"",
+											"function getIncludedResourceNames(included) {",
+											"    let resourceTypes = [];",
+											"    included.forEach(function (resource) {",
+											"        pm.expect(resource).to.be.an('object')",
+											"            .that.have.property('type')",
+											"            .that.is.a('string');",
+											"        if (!resourceTypes.includes(resource.type)) {",
+											"            resourceTypes.push(resource.type);",
+											"        }",
+											"    });",
+											"    ",
+											"    return resourceTypes;",
+											"}",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/vnd.api+json"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/vnd.api+json"
+									},
+									{
+										"key": "Accept-Language",
+										"value": "de-DE, de;q=0.9"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{url}}/catalog-search-suggestions?q=091_25873091",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"catalog-search-suggestions"
+									],
+									"query": [
+										{
+											"key": "q",
+											"value": "091_25873091"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Request abstract product by abstract sku - product available",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "c75c0ee2-b7df-45da-86b4-788faaf3a54e",
+										"exec": [
+											"let jsonData = pm.response.json(),",
+											"    entityData = jsonData.data,",
+											"    included = jsonData.included,",
+											"    abstractSku = pm.variables.get(\"abstract_sku_with_1product\"),",
+											"    abstractSkuTaxSetUuid = pm.variables.get(\"abstract_sku_with_1product_tax_set_uuid\"),",
+											"    selfLink = pm.variables.get(\"url\") + \"/abstract-products/\" + abstractSku;",
+											"",
+											"const resourceName = \"abstract-products\";",
+											"",
+											"pm.test(\"Status code is 200\", function() {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test(\"Has correct type returned\", function() {",
+											"    pm.expect(entityData.type).to.eql(resourceName);",
+											"});",
+											"",
+											"pm.test(\"Has correct id returned\", function() {",
+											"    pm.expect(entityData.id).to.eql(abstractSku);",
+											"});",
+											"",
+											"pm.test(\"Has abstract description returned\", function() {",
+											"    pm.expect(entityData.attributes.sku).to.eql(abstractSku);",
+											"    pm.expect(entityData.attributes.name).to.be.eql(\"Toshiba CAMILEO S20\");",
+											"    pm.expect(entityData.attributes.description).to.be.a(\"string\");",
+											"});",
+											"",
+											"pm.test(\"Has attribute variants returned\", function() {",
+											"    pm.expect(entityData.attributes.attributeMap).have.property('attribute_variants');",
+											"});",
+											"",
+											"pm.test(\"Has super attributes returned\", function() {",
+											"    pm.expect(entityData.attributes.attributeMap).to.have.property('super_attributes');",
+											"});",
+											"",
+											"pm.test(\"Has product concrete ids returned\", function() {",
+											"    pm.expect(entityData.attributes.attributeMap).to.have.property('product_concrete_ids');",
+											"    pm.expect(entityData.attributes.attributeMap.product_concrete_ids).to.contain(\"209_12554247\");",
+											"});",
+											"",
+											"pm.test(\"Has self link\", function() {",
+											"    pm.expect(entityData.links.self).to.eql(selfLink);",
+											"});",
+											"",
+											"pm.test(\"Has relationships concrete-products returned\", function() {",
+											"    pm.expect(entityData.relationships[\"concrete-products\"].data[0].type).to.eql(\"concrete-products\");",
+											"    pm.expect(entityData.relationships[\"concrete-products\"].data[0].id).to.eql(\"209_12554247\");",
+											"});",
+											"",
+											"pm.test(\"Has relationships abstract-product-image-sets returned\", function() {",
+											"    pm.expect(entityData.relationships[\"abstract-product-image-sets\"].data[0].type).to.eql(\"abstract-product-image-sets\");",
+											"    pm.expect(entityData.relationships[\"abstract-product-image-sets\"].data[0].id).to.eql(abstractSku);",
+											"});",
+											"",
+											"pm.test(\"Has relationships abstract-product-availabilities returned\", function() {",
+											"    pm.expect(entityData.relationships[\"abstract-product-availabilities\"].data[0].type).to.eql(\"abstract-product-availabilities\");",
+											"    pm.expect(entityData.relationships[\"abstract-product-availabilities\"].data[0].id).to.eql(abstractSku);",
+											"});",
+											"",
+											"pm.test(\"Has relationships tax-sets returned\", function() {",
+											"    pm.expect(entityData.relationships[\"product-tax-sets\"].data[0].type).to.eql(\"product-tax-sets\");",
+											"    pm.expect(entityData.relationships[\"product-tax-sets\"].data[0].id).to.eql(abstractSkuTaxSetUuid);",
+											"});",
+											"",
+											"pm.test(\"Has relationships abstract-product-prices returned\", function() {",
+											"    pm.expect(entityData.relationships[\"abstract-product-prices\"].data[0].type).to.eql(\"abstract-product-prices\");",
+											"    pm.expect(entityData.relationships[\"abstract-product-prices\"].data[0].id).to.eql(abstractSku);",
+											"});",
+											"",
+											"pm.test(\"Has included section\", function() {",
+											"    let expectedIncludedTypes = [",
+											"            \"concrete-product-image-sets\",",
+											"            \"concrete-product-availabilities\",",
+											"            \"concrete-product-prices\",",
+											"            \"concrete-products\",",
+											"            \"abstract-product-image-sets\",",
+											"            \"abstract-product-availabilities\",",
+											"            \"product-tax-sets\"",
+											"        ],",
+											"        includedTypes = _.pluck(included, \"type\");",
+											"",
+											"    pm.expect(includedTypes).to.include.members(expectedIncludedTypes);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/vnd.api+json"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/vnd.api+json"
+									},
+									{
+										"key": "Accept-Language",
+										"value": "de-DE, en;q=0.9"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{url}}/abstract-products/091",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"abstract-products",
+										"091"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Request product by concrete sku - product available",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "fb11d609-4f92-4689-abf7-0eab79a604a5",
+										"exec": [
+											"var jsonData = pm.response.json();",
+											"var resourceName = \"concrete-products\";",
+											"",
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test(\"Has correct type returned\", function() {",
+											"    pm.expect(jsonData.data.type).to.eql(resourceName);",
+											"});",
+											"",
+											"pm.test(\"Has correct id returned\", function() {",
+											"    pm.expect(jsonData.data.id).to.eql(pm.variables.get(\"concrete_sku\"));",
+											"});",
+											"",
+											"pm.test(\"Has description of concrete-products type returned\", function() {",
+											"    pm.expect(jsonData.data.attributes.sku).to.be.eql(pm.variables.get(\"concrete_sku\"));",
+											"    pm.expect(jsonData.data.attributes.name).to.be.eql(\"Samsung Galaxy Tab Active 8.0 8 GB\");",
+											"    pm.expect(jsonData.data.attributes.description).to.be.a(\"string\");",
+											"});",
+											"",
+											"pm.test(\"Has attributes of concrete-products type returned\", function() {",
+											"    pm.expect(jsonData.data.attributes.attributes.storage_media).to.be.eql(\"flash\");",
+											"    pm.expect(jsonData.data.attributes.attributes.processor_frequency).to.be.eql(\"1.2 GHz\");",
+											"    pm.expect(jsonData.data.attributes.attributes.display_diagonal).to.be.eql(\"20.3 cm\");",
+											"    pm.expect(jsonData.data.attributes.attributes.aspect_ratio).to.be.eql(\"16:09\");",
+											"    pm.expect(jsonData.data.attributes.attributes.brand).to.be.eql(\"Samsung\");",
+											"    pm.expect(jsonData.data.attributes.attributes.internal_storage_capacity).to.be.eql(\"8 GB\");",
+											"});",
+											"",
+											"pm.test(\"Has super Attributes Definition of concrete-products type returned\", function() {",
+											"    pm.expect(jsonData.data.attributes.superAttributesDefinition).to.contain(\"storage_media\", \"processor_frequency\", \"internal_storage_capacity\");",
+											"});",
+											"",
+											"pm.test(\"Has meta data returned\", function() {",
+											"    pm.expect(jsonData.data.attributes.metaTitle).to.be.eql(\"Samsung Galaxy Tab Active 8.0 8 GB\");",
+											"    pm.expect(jsonData.data.attributes.metaKeywords).to.eql(\"Samsung,Communication Electronics\");",
+											"    pm.expect(jsonData.data.attributes.metaDescription).to.be.a(\"string\");",
+											"});",
+											"",
+											"pm.test(\"Has concrete-products self link\", function() {",
+											"    pm.expect(jsonData.data.links.self).to.eql(pm.variables.get(\"url\") + \"/concrete-products/\" + pm.variables.get(\"concrete_sku\")); ",
+											"}); ",
+											"",
+											"pm.test(\"Has relationships concrete-product-image-sets type returned\", function() {",
+											"    pm.expect(jsonData.data.relationships[\"concrete-product-image-sets\"].data[0].type).to.be.eql(\"concrete-product-image-sets\");",
+											"    pm.expect(jsonData.data.relationships[\"concrete-product-image-sets\"].data[0].id).to.be.eql(pm.variables.get(\"concrete_sku\"));",
+											"});",
+											"",
+											"pm.test(\"Has relationships concrete-product-availabilities type returned\", function() {",
+											"    pm.expect(jsonData.data.relationships[\"concrete-product-availabilities\"].data[0].type).to.be.eql(\"concrete-product-availabilities\");",
+											"    pm.expect(jsonData.data.relationships[\"concrete-product-availabilities\"].data[0].id).to.be.eql(pm.variables.get(\"concrete_sku\"));",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/vnd.api+json"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/vnd.api+json"
+									},
+									{
+										"key": "Accept-Language",
+										"value": "de-DE, en;q=0.9"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{url}}/concrete-products/091_25873091",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"concrete-products",
+										"091_25873091"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Request product's prices - by abstract sku",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "1bb37dd1-807b-4994-918f-1adc6bc86804",
+										"exec": [
+											"const resourceName = \"abstract-product-prices\";",
+											"",
+											"let jsonData = pm.response.json(),",
+											"    selfLink = pm.variables.get(\"url\") + \"/abstract-products/\" + pm.variables.get(\"abstract_sku_with_3product\") + \"/\" + resourceName;",
+											"",
+											"pm.test(\"Status code is 200\", function() {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test(\"Has correct type returned\", function() {",
+											"    pm.expect(jsonData.data[0].type).to.eql(resourceName);",
+											"});",
+											"",
+											"pm.test(\"Has correct id returned\", function() {",
+											"    pm.expect(jsonData.data[0].id).to.eql(pm.variables.get(\"abstract_sku_with_3product\"));",
+											"});",
+											"",
+											"pm.test(\"Has price returned\", function() {",
+											"    pm.expect(jsonData.data[0].attributes.price).to.eql(42502);",
+											"});",
+											"",
+											"pm.test(\"Has price default grss returned\", function() {",
+											"    let prices = jsonData.data[0].attributes.prices;",
+											"    ",
+											"    pm.expect(prices[0].priceTypeName).to.eql(\"DEFAULT\");",
+											"    pm.expect(prices[0].netAmount).to.eql(null);",
+											"    pm.expect(prices[0].grossAmount).to.eql(42502);",
+											"});",
+											"",
+											"pm.test(\"Has self 1 link\", function() {",
+											"    pm.expect(jsonData.data[0].links.self).to.eql(selfLink);",
+											"});",
+											"",
+											"pm.test(\"Has self 2 link\", function() {",
+											"    pm.expect(jsonData.links.self).to.eql(selfLink);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{url}}/abstract-products/091/abstract-product-prices",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"abstract-products",
+										"091",
+										"abstract-product-prices"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Requst product's prices - by concrete sku",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "b74e709f-c0db-4547-9e5d-f2853132b0aa",
+										"exec": [
+											"var jsonData = pm.response.json();",
+											"var resourceName = \"concrete-product-prices\";",
+											"",
+											"pm.test(\"Status code is 200\", function() {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test(\"Has correct type returned\", function() {",
+											"    pm.expect(jsonData.data[0].type).to.eql(resourceName);",
+											"});",
+											"",
+											"pm.test(\"Has correct id returned\", function() {",
+											"    pm.expect(jsonData.data[0].id).to.eql(pm.variables.get(\"concrete_sku\"));",
+											"});",
+											"",
+											"pm.test(\"Has price returned\", function() {",
+											"    pm.expect(jsonData.data[0].attributes.price).to.eql(42502);",
+											"});",
+											"",
+											"pm.test(\"Has price default grss returned\", function() {",
+											"    pm.expect(jsonData.data[0].attributes.prices[0].priceTypeName).to.eql(\"DEFAULT\");",
+											"    pm.expect(jsonData.data[0].attributes.prices[0].netAmount).to.eql(null);",
+											"    pm.expect(jsonData.data[0].attributes.prices[0].grossAmount).to.eql(42502);",
+											"});",
+											"",
+											"pm.test(\"Has self 1 link\", function() {",
+											"    pm.expect(jsonData.data[0].links.self).to.eql(pm.variables.get(\"url\") + \"/concrete-products/\" + pm.variables.get(\"concrete_sku\") + \"/\" + resourceName); ",
+											"});",
+											"",
+											"pm.test(\"Has self 2 link\", function() {",
+											"    pm.expect(jsonData.links.self).to.eql(pm.variables.get(\"url\") + \"/concrete-products/\" + pm.variables.get(\"concrete_sku\") + \"/\" + resourceName); ",
+											"});",
+											"",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/vnd.api+json"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Accept-Language",
+										"value": "de-DE, en;q=0.9"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{url}}/concrete-products/091_25873091/concrete-product-prices",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"concrete-products",
+										"091_25873091",
+										"concrete-product-prices"
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"_postman_isSubFolder": true
+				}
+			],
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "f58d3af6-3b43-45c4-afd5-6acbdddd719f",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "14564ad4-1ccd-473b-9e0b-2b87778e1695",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "3.1.0 Get authorized customer's cart",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "57faca8f-f7df-49cc-9ae4-607c1b136cca",
+						"exec": [
+							"var data = pm.response.json();",
+							"pm.environment.set(\"cart_uuid\", data.data[0].id);",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/vnd.api+json"
+					},
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					},
+					{
+						"key": "Accept-Language",
+						"value": "de-DE, en;q=0.9"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{url}}/carts",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"carts"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "3.1.2 Add an item to customer's cart",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "6f6d4590-e2f8-48c9-bebd-7a25a40dd7cc",
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/vnd.api+json"
+					},
+					{
+						"key": "Accept-Language",
+						"value": "de-DE, en;q=0.9,*;q=0.5"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"data\": {\n        \"type\": \"items\",\n        \"attributes\": {\n            \"sku\": \"001_25904006\",\n            \"quantity\": 2\n        }\n    }\n}"
+				},
+				"url": {
+					"raw": "{{url}}/carts/{{cart_uuid}}/items",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"carts",
+						"{{cart_uuid}}",
+						"items"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "eeb25d8c-6fd2-4d7d-9c84-8592cecacb65",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "d72ab2c9-581c-4216-a346-6339e32c49c9",
+				"type": "text/javascript",
+				"exec": [
+					"let jsonData = pm.response.json();",
+					"if (jsonData.data) {",
+					"    pm.test.skip(\"Don't have a resource self link\", function() {",
+					"        jsonData.data.forEach(function (data) {",
+					"            pm.expect(data).to.not.have.property('links');",
+					"        });",
+					"    });",
+					"}",
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"id": "461c3f0b-990c-41b1-8dbc-e6442fd400c5",
+			"key": "abstract_sku1",
+			"value": "001",
+			"type": "string"
+		},
+		{
+			"id": "6550a255-db6a-4ba6-9e2c-f71ae6b9f347",
+			"key": "not_existing_sku",
+			"value": "000",
+			"type": "string"
+		},
+		{
+			"id": "d03bf20b-fee6-4c7d-b55a-660ebe02615e",
+			"key": "concrete_sku1",
+			"value": "058_24245592",
+			"type": "string"
+		},
+		{
+			"id": "ac8bea6e-d44c-4a7f-a07d-050bbf75ef08",
+			"key": "concrete_sku2",
+			"value": "058_26175504",
+			"type": "string"
+		},
+		{
+			"id": "dd9bd025-8481-44a9-a0f7-e60338dab2fc",
+			"key": "name_abstract_sku1",
+			"value": "Acer Liquid Jade",
+			"type": "string"
+		},
+		{
+			"id": "b698b169-9b7a-452a-8d85-95d6846a3334",
+			"key": "brand_name1",
+			"value": "Sony",
+			"type": "string"
+		},
+		{
+			"id": "543c1304-df08-4b01-b205-869fe50907d0",
+			"key": "brand_name2",
+			"value": "Canon",
+			"type": "string"
+		},
+		{
+			"id": "f0ad61d4-eb05-4236-9998-e605a2c68e9e",
+			"key": "color1",
+			"value": "Blue",
+			"type": "string"
+		},
+		{
+			"id": "4890251e-c2ea-44e7-b0a2-1134c5216423",
+			"key": "color2",
+			"value": "Red",
+			"type": "string"
+		},
+		{
+			"id": "fb4fac8e-0af9-40fe-b29c-e4b96fdaf7bd",
+			"key": "product_sku_bn1_c1",
+			"value": "197",
+			"type": "string"
+		},
+		{
+			"id": "9179af95-8e91-4aef-b444-25f91bee9976",
+			"key": "product_sku_bn2_c2",
+			"value": "032",
+			"type": "string"
+		},
+		{
+			"id": "ba1386cc-17e5-4090-8e72-e19f17bccef4",
+			"key": "product_sku_bn1_c2",
+			"value": "027",
+			"type": "string"
+		},
+		{
+			"id": "4c0d13b1-0d87-4423-9218-b0ce05dfc9e7",
+			"key": "min_price",
+			"value": "99.99",
+			"type": "string"
+		},
+		{
+			"id": "ada9149e-7098-4a78-9740-6bb3a53a64e3",
+			"key": "max_price",
+			"value": "150",
+			"type": "string"
+		},
+		{
+			"id": "0463ef5c-de3c-4a49-a6b5-438bf49077ca",
+			"key": "label1",
+			"value": "Standard Label",
+			"type": "string"
+		},
+		{
+			"id": "c9710708-9125-4a8e-8c16-6e3be6529374",
+			"key": "label2",
+			"value": "SALE %",
+			"type": "string"
+		},
+		{
+			"id": "2e0eceff-163e-4e23-a9bc-3562130b4ebf",
+			"key": "label1_id",
+			"value": "3",
+			"type": "string"
+		},
+		{
+			"id": "77f7290f-8cec-49a0-be23-29b42c408929",
+			"key": "product_label1_sku",
+			"value": "009",
+			"type": "string"
+		},
+		{
+			"id": "9609d472-c691-4b1c-8e26-c819ddba9031",
+			"key": "product_label2_sku",
+			"value": "015",
+			"type": "string"
+		},
+		{
+			"id": "63dda7da-052f-4f1a-a8c2-11fc1aaa55b7",
+			"key": "product_label12_sku",
+			"value": "006",
+			"type": "string"
+		},
+		{
+			"id": "24d13cfb-fc1f-4df6-87c8-ad9ce507dbd7",
+			"key": "product_no_label_sku",
+			"value": "023",
+			"type": "string"
+		},
+		{
+			"id": "7c2a98df-5983-475f-b811-8d8767484750",
+			"key": "product_no_color",
+			"value": "177",
+			"type": "string"
+		},
+		{
+			"id": "d59aefd2-0745-42d1-89b4-1a759032a9a2",
+			"key": "weight1",
+			"value": "45 g",
+			"type": "string"
+		},
+		{
+			"id": "b2ae4dbf-6c14-4f52-b03a-ac13d00cfe0b",
+			"key": "weight2",
+			"value": "18 g",
+			"type": "string"
+		},
+		{
+			"id": "61ed28a7-2ccc-4199-89e1-9e5139867047",
+			"key": "storage_capacity1",
+			"value": "32 GB",
+			"type": "string"
+		},
+		{
+			"id": "20bf9f6f-89fb-472d-96dd-f0b1144e52ae",
+			"key": "storage_capacity2",
+			"value": "64 GB",
+			"type": "string"
+		},
+		{
+			"id": "5623337a-82c2-463a-9b53-5f3a43b31584",
+			"key": "rating1",
+			"value": "4",
+			"type": "string"
+		},
+		{
+			"id": "551dd821-3029-4e79-a20b-a0381fde12cf",
+			"key": "rating2",
+			"value": "10",
+			"type": "string"
+		},
+		{
+			"id": "60201aad-1949-44de-9f29-7302a8d63f03",
+			"key": "rating3",
+			"value": "3.5",
+			"type": "string"
+		},
+		{
+			"id": "07ab51be-45ec-4592-b436-b4c013d9717b",
+			"key": "category1",
+			"value": "6",
+			"type": "string"
+		},
+		{
+			"id": "8ff61f17-0d18-4d13-b1cf-cbef445e987f",
+			"key": "category2",
+			"value": "5",
+			"type": "string"
+		},
+		{
+			"id": "536e4713-3870-4de4-b443-23e18d2cdb74",
+			"key": "page1",
+			"value": "3",
+			"type": "string"
+		},
+		{
+			"id": "5eb51843-3668-48be-94a5-38fedbac09c7",
+			"key": "page2",
+			"value": "3000",
+			"type": "string"
+		},
+		{
+			"id": "434efd78-159b-4276-b469-d1853af74727",
+			"key": "ipp1",
+			"value": "24",
+			"type": "string"
+		},
+		{
+			"id": "85014a7a-ac68-4a34-8759-3611162b9b9a",
+			"key": "ipp_default",
+			"value": "12",
+			"type": "string"
+		},
+		{
+			"id": "e1d291f4-fe22-443b-b8bb-057aac99bc27",
+			"key": "page_offset1",
+			"value": "24",
+			"type": "string"
+		},
+		{
+			"id": "908da93b-968e-4a4a-b3c5-b13a7dc8ad43",
+			"key": "sort_order_asc",
+			"value": "asc",
+			"type": "string"
+		},
+		{
+			"id": "57fd1025-e553-411a-b704-3061dc1fb7f0",
+			"key": "sort_order_desc",
+			"value": "desc",
+			"type": "string"
+		},
+		{
+			"id": "10401401-c5ab-4534-b954-cef3d76c477b",
+			"key": "sort_name_asc",
+			"value": "name_asc",
+			"type": "string"
+		},
+		{
+			"id": "251e73f6-9686-421e-a1ab-978d02735835",
+			"key": "sort_name_desc",
+			"value": "name_desc",
+			"type": "string"
+		},
+		{
+			"id": "d2da1610-43d5-4fe6-ba3f-6936450f7b2f",
+			"key": "sort_price_asc",
+			"value": "price_asc",
+			"type": "string"
+		},
+		{
+			"id": "965cb139-b515-473f-822d-f6f7a985edcd",
+			"key": "sort_price_desc",
+			"value": "price_desc",
+			"type": "string"
+		},
+		{
+			"id": "f68d7e38-ffdd-4522-b1d1-e42883fc3116",
+			"key": "sort_rating",
+			"value": "rating",
+			"type": "string"
+		},
+		{
+			"id": "6ca40481-49ed-479c-ad3d-8d5c8066d28a",
+			"key": "currency_eur",
+			"value": "EUR",
+			"type": "string"
+		},
+		{
+			"id": "67dcf1a2-7ed0-43ae-a2a0-b7b8dae4eca7",
+			"key": "currency_chf",
+			"value": "CHF",
+			"type": "string"
+		},
+		{
+			"id": "b8ad9838-1414-43c0-8631-2ae2b37fe755",
+			"key": "currency_jpy",
+			"value": "JPY",
+			"type": "string"
+		},
+		{
+			"id": "d9173098-e8be-48b6-9425-ae586cfad819",
+			"key": "category_name1",
+			"value": "Smartphones",
+			"type": "string"
+		},
+		{
+			"id": "3a3afacd-d569-441f-80a5-b4c2d40ae0e5",
+			"key": "abstract_sku2",
+			"value": "051",
+			"type": "string"
+		},
+		{
+			"id": "a8dcfd6e-2622-483f-9c43-276b17c47dd7",
+			"key": "concrete_sku",
+			"value": "051_29567823",
+			"type": "string"
+		}
+	]
+}

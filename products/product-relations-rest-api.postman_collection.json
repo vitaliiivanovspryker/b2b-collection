@@ -1,0 +1,2128 @@
+{
+	"info": {
+		"_postman_id": "6ab74091-944a-4538-a6b4-92850a586908",
+		"name": "product-relations-rest-api",
+		"description": "Several products exist in the system:\n\nAbstract product abstract {abstractSKU1} with a product relation of type \"related-products\". Product relation has two products {relatedSKU1} and {relatedSKU2}.\n\nAnother product abstract {abstractSKU2} with a product relation of type \"related-products\". Product relation has product {relatedSKU1} and deactivated product {relatedSKU3}.\n\nThird product abstract {abstractSKU3} has no relation.\n\nFourth product abstract {abstractSKU4} has no relation of type \"related-products\", but has one of type \"up-selling\".\n\nFifth product abstract {abstractSKU5} has many (e.g. more than 20) products in \"related-products\" relation.\n",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Get a list of related products (product detail page)",
+			"item": [
+				{
+					"name": "Get a list of related products by abstract sku - many related products",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "f7a3e79f-fa61-48b3-bfdc-30eb26193091",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"var jsonData = pm.response.json();",
+									"",
+									"pm.test(\"Has correct id/sku returned\", function () {",
+									"    pm.expect(jsonData.data[0].id).to.eql(\"042\");",
+									"    pm.expect(jsonData.data[0].attributes.sku).to.eql(\"042\");",
+									"    pm.expect(jsonData.data[1].id).to.eql(\"043\");",
+									"    pm.expect(jsonData.data[1].attributes.sku).to.eql(\"043\");",
+									"    pm.expect(jsonData.data[2].id).to.eql(\"044\");",
+									"    pm.expect(jsonData.data[2].attributes.sku).to.eql(\"044\");",
+									"    pm.expect(jsonData.data[3].id).to.eql(\"045\");",
+									"    pm.expect(jsonData.data[3].attributes.sku).to.eql(\"045\");",
+									"    pm.expect(jsonData.data[4].id).to.eql(\"046\");",
+									"    pm.expect(jsonData.data[4].attributes.sku).to.eql(\"046\");",
+									"    pm.expect(jsonData.data[5].id).to.eql(\"047\");",
+									"    pm.expect(jsonData.data[5].attributes.sku).to.eql(\"047\");",
+									"    pm.expect(jsonData.data[6].id).to.eql(\"048\");",
+									"    pm.expect(jsonData.data[6].attributes.sku).to.eql(\"048\");",
+									"    pm.expect(jsonData.data[7].id).to.eql(\"049\");",
+									"    pm.expect(jsonData.data[7].attributes.sku).to.eql(\"049\");",
+									"    pm.expect(jsonData.data[8].id).to.eql(\"050\");",
+									"    pm.expect(jsonData.data[8].attributes.sku).to.eql(\"050\");",
+									"    pm.expect(jsonData.data[9].id).to.eql(\"051\");",
+									"    pm.expect(jsonData.data[9].attributes.sku).to.eql(\"051\");",
+									"    pm.expect(jsonData.data[10].id).to.eql(\"052\");",
+									"    pm.expect(jsonData.data[10].attributes.sku).to.eql(\"052\");",
+									"    pm.expect(jsonData.data[11].id).to.eql(\"053\");",
+									"    pm.expect(jsonData.data[11].attributes.sku).to.eql(\"053\");",
+									"});",
+									"",
+									"pm.test(\"Has correct list of attributes returned\", function() {",
+									"    pm.expect(jsonData.data[0].attributes).to.include.keys('sku', 'name', 'description', 'attributes', 'superAttributesDefinition', 'superAttributes', 'attributeMap', 'metaTitle', 'metaKeywords', 'metaDescription', 'attributeNames');",
+									"});",
+									"",
+									"pm.test(\"Has correct selflink to the related product\", function() {",
+									"    pm.expect(jsonData.data[0].links.self).to.eql(pm.environment.get(\"url\") + \"/abstract-products/042\");",
+									"    pm.expect(jsonData.data[1].links.self).to.eql(pm.environment.get(\"url\") + \"/abstract-products/043\");",
+									"    pm.expect(jsonData.data[2].links.self).to.eql(pm.environment.get(\"url\") + \"/abstract-products/044\");",
+									"    pm.expect(jsonData.data[3].links.self).to.eql(pm.environment.get(\"url\") + \"/abstract-products/045\");",
+									"    pm.expect(jsonData.data[4].links.self).to.eql(pm.environment.get(\"url\") + \"/abstract-products/046\");",
+									"    pm.expect(jsonData.data[5].links.self).to.eql(pm.environment.get(\"url\") + \"/abstract-products/047\");",
+									"    pm.expect(jsonData.data[6].links.self).to.eql(pm.environment.get(\"url\") + \"/abstract-products/048\");",
+									"});",
+									"",
+									"pm.test(\"Has correct selflink\", function() {",
+									"    pm.expect(jsonData.links.self).to.eql(pm.environment.get(\"url\") + \"/abstract-products/\" + pm.variables.get(\"abstractSKU5\") + \"/related-products\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/abstract-products/{{abstractSKU5}}/related-products",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"abstract-products",
+								"{{abstractSKU5}}",
+								"related-products"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get a list of related products by abstract sku - relation doesn't exist",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "f7a3e79f-fa61-48b3-bfdc-30eb26193091",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"var jsonData = pm.response.json();",
+									"",
+									"pm.test(\"Has empty data array\", function() {",
+									"    pm.expect(jsonData.data).to.be.empty;",
+									"});",
+									"",
+									"pm.test(\"Has correct selflink\", function() {",
+									"    pm.expect(jsonData.links.self).to.eql(pm.environment.get(\"url\") + \"/abstract-products/017/related-products\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/abstract-products/017/related-products",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"abstract-products",
+								"017",
+								"related-products"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "f0275c3d-b16a-47bf-af7b-8fa73b2dc682",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "77e39cb9-8bd0-4369-96b2-ff7b7feca2c9",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "Negative. Get a list of related products.",
+			"item": [
+				{
+					"name": "Negative. Get a product - wrong method POST",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "f7a3e79f-fa61-48b3-bfdc-30eb26193091",
+								"exec": [
+									"pm.test(\"Status code is 404\", function() {",
+									"    pm.response.to.have.status(404);",
+									"});",
+									"",
+									"pm.test(\"Has correct detail returned\", function() {",
+									"    var jsonData = pm.response.json(),",
+									"        error = _.first(jsonData.errors);",
+									"",
+									"    pm.expect(error.detail).to.eql(\"Not Found\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/abstract-products/{{abstractSKU1}}/related-products",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"abstract-products",
+								"{{abstractSKU1}}",
+								"related-products"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Negative. Get a list of related products by abstract sku - no relation exists",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "f7a3e79f-fa61-48b3-bfdc-30eb26193091",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"var jsonData = pm.response.json();",
+									"",
+									"pm.test(\"Has empty data array\", function() {",
+									"    pm.expect(jsonData.data).to.be.empty;",
+									"});",
+									"",
+									"pm.test(\"Has correct selflink\", function() {",
+									"    pm.expect(jsonData.links.self).to.eql(pm.environment.get(\"url\") + \"/abstract-products/011/related-products\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/abstract-products/{{abstractSKU3}}/related-products",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"abstract-products",
+								"{{abstractSKU3}}",
+								"related-products"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Negative. Get a list of related products - search by abstract sku - product doesn't exist",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "f7a3e79f-fa61-48b3-bfdc-30eb26193091",
+								"exec": [
+									"pm.test(\"Status code is 404\", function() {",
+									"    pm.response.to.have.status(404);",
+									"});",
+									"",
+									"pm.test(\"Has correct detail returned\", function() {",
+									"    var jsonData = pm.response.json(),",
+									"        error = _.first(jsonData.errors);",
+									"",
+									"    pm.expect(error.detail).to.eql(\"Abstract product is not found.\");",
+									"});",
+									"",
+									"pm.test(\"Has correct status returned\", function() {",
+									"    var jsonData = pm.response.json(),",
+									"        error = _.first(jsonData.errors);",
+									"",
+									"    pm.expect(error.status).to.eql(404);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/abstract-products/{{notExistingSKUValue}}/related-products",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"abstract-products",
+								"{{notExistingSKUValue}}",
+								"related-products"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Negative. Get a list of related products by concrete sku",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "f7a3e79f-fa61-48b3-bfdc-30eb26193091",
+								"exec": [
+									"pm.test(\"Status code is 404\", function() {",
+									"    pm.response.to.have.status(404);",
+									"});",
+									"",
+									"pm.test(\"Has correct detail returned\", function() {",
+									"    var jsonData = pm.response.json(),",
+									"        error = _.first(jsonData.errors);",
+									"",
+									"    pm.expect(error.detail).to.eql(\"Abstract product is not found.\");",
+									"});",
+									"",
+									"pm.test(\"Has correct status returned\", function() {",
+									"    var jsonData = pm.response.json(),",
+									"        error = _.first(jsonData.errors);",
+									"",
+									"    pm.expect(error.status).to.eql(404);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/abstract-products/{{concreteSKU}}/related-products",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"abstract-products",
+								"{{concreteSKU}}",
+								"related-products"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Negative. Get a product - wrong method PATCH",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "f7a3e79f-fa61-48b3-bfdc-30eb26193091",
+								"exec": [
+									"pm.test(\"Status code is 404\", function() {",
+									"    pm.response.to.have.status(404);",
+									"});",
+									"",
+									"pm.test(\"Has correct detail returned\", function() {",
+									"    var jsonData = pm.response.json(),",
+									"        error = _.first(jsonData.errors);",
+									"",
+									"    pm.expect(error.detail).to.eql(\"Not Found\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/abstract-products/{{abstractSKU1}}/related-products",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"abstract-products",
+								"{{abstractSKU1}}",
+								"related-products"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Negative. Get a list of related products - empty sku value",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "f7a3e79f-fa61-48b3-bfdc-30eb26193091",
+								"exec": [
+									"pm.test(\"Status code is 400\", function() {",
+									"    pm.response.to.have.status(400);",
+									"});",
+									"",
+									"pm.test(\"Has correct code returned\", function() {",
+									"    var jsonData = pm.response.json(),",
+									"        error = _.first(jsonData.errors);",
+									"",
+									"    pm.expect(error.code).to.eql(\"311\");",
+									"});",
+									"",
+									"pm.test(\"Has correct status returned\", function() {",
+									"    var jsonData = pm.response.json(),",
+									"        error = _.first(jsonData.errors);",
+									"",
+									"    pm.expect(error.status).to.eql(400);",
+									"});",
+									"",
+									"pm.test(\"Has correct detail returned\", function() {",
+									"    var jsonData = pm.response.json(),",
+									"        error = _.first(jsonData.errors);",
+									"",
+									"    pm.expect(error.detail).to.eql(\"Abstract product sku is not specified.\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/abstract-products//related-products",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"abstract-products",
+								"",
+								"related-products"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Negative. Get a product - wrong method PUT",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "f7a3e79f-fa61-48b3-bfdc-30eb26193091",
+								"exec": [
+									"pm.test(\"Status code is 404\", function() {",
+									"    pm.response.to.have.status(404);",
+									"});",
+									"",
+									"pm.test(\"Has correct detail returned\", function() {",
+									"    var jsonData = pm.response.json(),",
+									"        error = _.first(jsonData.errors);",
+									"",
+									"    pm.expect(error.detail).to.eql(\"Not Found\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/abstract-products/{{abstractSKU1}}/related-products",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"abstract-products",
+								"{{abstractSKU1}}",
+								"related-products"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Negative. Get a list of related products - wrong query",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "f7a3e79f-fa61-48b3-bfdc-30eb26193091",
+								"exec": [
+									"pm.test(\"Status code is 404\", function() {",
+									"    pm.response.to.have.status(404);",
+									"});",
+									"",
+									"pm.test(\"Has correct detail returned\", function() {",
+									"    var jsonData = pm.response.json(),",
+									"        error = _.first(jsonData.errors);",
+									"",
+									"    pm.expect(error.detail).to.eql(\"Not Found\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/abstract-products/{{abstractSKU1}}/productrelation",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"abstract-products",
+								"{{abstractSKU1}}",
+								"productrelation"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Negative. Get a product - wrong method DELETE",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "f7a3e79f-fa61-48b3-bfdc-30eb26193091",
+								"exec": [
+									"pm.test(\"Status code is 404\", function() {",
+									"    pm.response.to.have.status(404);",
+									"});",
+									"",
+									"pm.test(\"Has correct detail returned\", function() {",
+									"    var jsonData = pm.response.json(),",
+									"        error = _.first(jsonData.errors);",
+									"",
+									"    pm.expect(error.detail).to.eql(\"Not Found\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/abstract-products/{{abstractSKU1}}/related-products",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"abstract-products",
+								"{{abstractSKU1}}",
+								"related-products"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Negative. Get a list of related products by abstract sku - up-selling relation exists only",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "f7a3e79f-fa61-48b3-bfdc-30eb26193091",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"var jsonData = pm.response.json();",
+									"",
+									"pm.test(\"Has empty data array\", function() {",
+									"    pm.expect(jsonData.data).to.be.empty;",
+									"});",
+									"",
+									"pm.test(\"Has correct selflink\", function() {",
+									"    pm.expect(jsonData.links.self).to.eql(pm.environment.get(\"url\") + \"/abstract-products/209/related-products\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/abstract-products/{{abstractSKU4}}/related-products",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"abstract-products",
+								"{{abstractSKU4}}",
+								"related-products"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get access token (helper)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "dad794f2-da3f-4d0f-9c79-f9392b4fca1e",
+								"exec": [
+									"pm.environment.set(\"token\", pm.response.json().data.attributes.accessToken);",
+									"pm.environment.set(\"refresh_token\", pm.response.json().data.attributes.refreshToken);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/vnd.api+json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "de-DE, en;q=0.9"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"data\":{\"type\":\"access-tokens\",\"attributes\":{\"username\":\"{{customerEmail}}\", \"password\": \"{{customerPassword}}\"}}}"
+						},
+						"url": {
+							"raw": "{{url}}/access-tokens",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"access-tokens"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get a list of related products - wrong cart id value",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "bd1235fd-4ffc-453a-8013-b9c0a1044187",
+								"exec": [
+									"pm.test(\"Status code is 404\", function () {",
+									"    pm.response.to.have.status(404);",
+									"});",
+									"",
+									"pm.test(\"Correct code\", function () {",
+									"    pm.expect(pm.response.json().errors[0].code).to.eql(\"101\");",
+									"});",
+									"",
+									"pm.test(\"Correct status\", function () {",
+									"    pm.expect(pm.response.json().errors[0].status).to.eql(404);",
+									"});",
+									"",
+									"pm.test(\"Correct error detail\", function () {",
+									"    pm.expect(pm.response.json().errors[0].detail).to.eql(\"Cart with given uuid not found.\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/vnd.api+json",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/vnd.api+json",
+								"type": "text"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "de-DE, en;q=0.9",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/carts/59743e37-0182-5153-9935-gsdgfdfgddfgdfg/up-selling-products",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"carts",
+								"59743e37-0182-5153-9935-gsdgfdfgddfgdfg",
+								"up-selling-products"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get a list of related products - wrong access token",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "492fe680-4784-4905-8ca7-607a123ced65",
+								"exec": [
+									"pm.test(\"Status code is 401\", function () {",
+									"    pm.response.to.have.status(401);",
+									"});",
+									"",
+									"pm.test(\"Correct code\", function () {",
+									"    pm.expect(pm.response.json().errors[0].code).to.eql(\"001\");",
+									"});",
+									"",
+									"pm.test(\"Correct status\", function () {",
+									"    pm.expect(pm.response.json().errors[0].status).to.eql(401);",
+									"});",
+									"",
+									"pm.test(\"Correct error detail\", function () {",
+									"    pm.expect(pm.response.json().errors[0].detail).to.eql(\"Invalid access token.\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsImp0aSI6ImY2YjE3ZjdjYmFmMGFlZTc2YjIwMDlmNWJiMzEzNGY4MzkwOWM2YzM2YzdiYTg1ZWZiMzFkMTFhY2I3NjBiYTg1MjczMjIzYmZlNmJlMTNhIn0.eyJhdWQiOiJmcm9udGVuZCIsImp0aSI6ImY2YjE3ZjdjYmFmMGFlZTc2YjIwMDlmNWJiMzEzNGY4MzkwOWM2YzM2YzdiYTg1ZWZiMzFkMTFhY2I3NjBiYTg1MjczMjIzYmZlNmJlMTNhIiwiaWF0IjoxNTQ5MDM4NjcwLCJuYmYiOjE1NDkwMzg2NzAsImV4cCI6MTU0OTA2NzQ3MCwic3ViIjoie1wiaWRfY29tcGFueV91c2VyXCI6bnVsbCxcImN1c3RvbWVyX3JlZmVyZW5jZVwiOlwiREUtLTdcIixcImlkX2N1c3RvbWVyXCI6N30iLCJzY29wZXMiOlsiY3VzdG9tZXIiXX0.BpgRZbH8nqx3bmMPrv-P81EVX4CDNI3SonCa5EpjRdfVFojRpEotKyebuuwOY402iTYGoWg4sGUP427jEd2bN25eVT90byWgMq2hxnSBfsxrucz5FHcC4APT_UqPhHy2TBpXTXbxzsh6zbIMlksT-4kKtHlNND-Z0R7I_-gUJ8COqjVvaKlc51DHxjRywRz3UWrKdYPzeg9F_IUtCa5x5nj4H_kALqLTU1evbp7UatR4468x_Nd5VvExBHk0PNqLK8FHA5PmSsDIkm4_AxxpUxBbEjKtx3l9RU8YqAZo9goBjTUEpBju3l3TljsgsvBrsdSvE3snG2NHfa_yDJyalwfdsfsdf",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/vnd.api+json",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/vnd.api+json",
+								"type": "text"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "de-DE, en;q=0.9",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/carts/{{Cart}}/up-selling-products",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"carts",
+								"{{Cart}}",
+								"up-selling-products"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get a list of related products - missing token",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "27d1418a-31c6-4ed9-af4e-2d41df33a798",
+								"exec": [
+									"pm.test(\"Status code is 403\", function () {",
+									"    pm.response.to.have.status(403);",
+									"});",
+									"",
+									"pm.test(\"Correct code\", function () {",
+									"    pm.expect(pm.response.json().errors[0].code).to.eql(\"002\");",
+									"});",
+									"",
+									"pm.test(\"Correct status\", function () {",
+									"    pm.expect(pm.response.json().errors[0].status).to.eql(403);",
+									"});",
+									"",
+									"pm.test(\"Correct error detail\", function () {",
+									"    pm.expect(pm.response.json().errors[0].detail).to.eql(\"Missing access token.\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/vnd.api+json",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/vnd.api+json",
+								"type": "text"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "de-DE, en;q=0.9",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/carts/{{Cart}}/up-selling-products",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"carts",
+								"{{Cart}}",
+								"up-selling-products"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get a list of related products - wrong endpoint",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "36aa59d5-091b-4c71-9dd2-6b8d6c093325",
+								"exec": [
+									"pm.test(\"Status code is 404\", function () {",
+									"    pm.response.to.have.status(404);",
+									"});",
+									"",
+									"pm.test(\"Correct status\", function () {",
+									"    pm.expect(pm.response.json().errors[0].status).to.eql(404);",
+									"});",
+									"",
+									"pm.test(\"Correct error detail\", function () {",
+									"    pm.expect(pm.response.json().errors[0].detail).to.eql(\"Not Found\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/vnd.api+json",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/vnd.api+json",
+								"type": "text"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "de-DE, en;q=0.9",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/carts/{{Cart}}/upsellingproducts",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"carts",
+								"{{Cart}}",
+								"upsellingproducts"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get a list of related products - empty cart id value",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "c360c302-0387-45c9-a04a-68f0f8545cd7",
+								"exec": [
+									"pm.test(\"Status code is 400\", function () {",
+									"    pm.response.to.have.status(400);",
+									"});",
+									"",
+									"pm.test(\"Correct code\", function () {",
+									"    pm.expect(pm.response.json().errors[0].code).to.eql(\"104\");",
+									"});",
+									"",
+									"pm.test(\"Correct status\", function () {",
+									"    pm.expect(pm.response.json().errors[0].status).to.eql(400);",
+									"});",
+									"",
+									"pm.test(\"Correct error detail\", function () {",
+									"    pm.expect(pm.response.json().errors[0].detail).to.eql(\"Cart uuid is missing.\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/vnd.api+json",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/vnd.api+json",
+								"type": "text"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "de-DE, en;q=0.9",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/carts//up-selling-products",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"carts",
+								"",
+								"up-selling-products"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get a list of related products - wrong method",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "482ae9b6-1da4-4334-a027-18ec5a57d6f6",
+								"exec": [
+									"pm.test(\"Status code is 404\", function () {",
+									"    pm.response.to.have.status(404);",
+									"});",
+									"",
+									"pm.test(\"Correct status\", function () {",
+									"    pm.expect(pm.response.json().errors[0].status).to.eql(404);",
+									"});",
+									"",
+									"pm.test(\"Correct error detail\", function () {",
+									"    pm.expect(pm.response.json().errors[0].detail).to.eql(\"Not Found\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/carts/{{Cart}}/up-selling-products",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"carts",
+								"{{Cart}}",
+								"up-selling-products"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Get a list of up-selling products (cart)",
+			"item": [
+				{
+					"name": "Get access token (helper)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "dad794f2-da3f-4d0f-9c79-f9392b4fca1e",
+								"exec": [
+									"pm.environment.set(\"token\", pm.response.json().data.attributes.accessToken);",
+									"pm.environment.set(\"refresh_token\", pm.response.json().data.attributes.refreshToken);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/vnd.api+json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "de-DE, en;q=0.9"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"data\":{\"type\":\"access-tokens\",\"attributes\":{\"username\":\"{{customerEmail}}\", \"password\": \"{{customerPassword}}\"}}}"
+						},
+						"url": {
+							"raw": "{{url}}/access-tokens",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"access-tokens"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get a cart of a customer (helper)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "c081ec83-1666-4410-8990-58b4376efe12",
+								"exec": [
+									"pm.globals.set(\"Cart\", pm.response.json().data[0].id)"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/vnd.api+json",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/vnd.api+json",
+								"type": "text"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "de-DE, en;q=0.9",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/carts",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"carts"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Add a product with relation into the cart (helper)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "05370552-f35d-44b3-a690-1496fc7d0ad8",
+								"exec": [
+									"var responseJson = pm.response.json();",
+									"",
+									"pm.test(\"Status code is 201\", function () {",
+									"    pm.response.to.have.status(201);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/vnd.api+json",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "de-DE, en;q=0.9",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"data\": {\n        \"type\": \"items\",\n        \"attributes\": {\n            \"sku\": \"100_24675726\",\n            \"quantity\": 1\n        }\n    }\n}"
+						},
+						"url": {
+							"raw": "{{url}}/carts/{{Cart}}/items",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"carts",
+								"{{Cart}}",
+								"items"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get a list of related products by cart id - relation exists",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "a27d7ad1-549a-4126-bed8-90d3c840e86e",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"var jsonData = pm.response.json();",
+									"",
+									"pm.test(\"Has correct id/sku returned\", function () {",
+									"    pm.expect(jsonData.data[0].id).to.eql(\"101\");",
+									"    pm.expect(jsonData.data[0].attributes.sku).to.eql(\"101\");",
+									"});",
+									"",
+									"pm.test(\"Has correct list of attributes returned\", function() {",
+									"    pm.expect(jsonData.data[0].attributes).to.include.keys('sku', 'name', 'description', 'attributes', 'superAttributesDefinition', 'superAttributes', 'attributeMap', 'metaTitle', 'metaKeywords', 'metaDescription', 'attributeNames');",
+									"});",
+									"",
+									"pm.test(\"Has correct selflink to the related product\", function() {",
+									"    pm.expect(jsonData.data[0].links.self).to.eql(pm.environment.get(\"url\") + \"/abstract-products/101\");",
+									"});",
+									"",
+									"pm.test(\"Has correct selflink\", function() {",
+									"    pm.expect(jsonData.links.self).to.eql(pm.environment.get(\"url\") + \"/carts/\" + pm.variables.get(\"Cart\") + \"/up-selling-products\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/vnd.api+json",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/vnd.api+json",
+								"type": "text"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "de-DE, en;q=0.9",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/carts/{{Cart}}/up-selling-products",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"carts",
+								"{{Cart}}",
+								"up-selling-products"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete a product with relation from the cart (helper)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "05370552-f35d-44b3-a690-1496fc7d0ad8",
+								"exec": [
+									"pm.test(\"Status code is 204\", function () {",
+									"    pm.response.to.have.status(204);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/vnd.api+json"
+							},
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept-Language",
+								"type": "text",
+								"value": "de-DE, en;q=0.9"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/carts/{{Cart}}/items/100_24675726",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"carts",
+								"{{Cart}}",
+								"items",
+								"100_24675726"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Add a product with no relation into the cart (helper)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "05370552-f35d-44b3-a690-1496fc7d0ad8",
+								"exec": [
+									"var responseJson = pm.response.json();",
+									"",
+									"pm.test(\"Status code is 201\", function () {",
+									"    pm.response.to.have.status(201);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/vnd.api+json"
+							},
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept-Language",
+								"type": "text",
+								"value": "de-DE, en;q=0.9"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"data\": {\n        \"type\": \"items\",\n        \"attributes\": {\n            \"sku\": \"003_26138343\",\n            \"quantity\": 1\n        }\n    }\n}"
+						},
+						"url": {
+							"raw": "{{url}}/carts/{{Cart}}/items",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"carts",
+								"{{Cart}}",
+								"items"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get a list of related products - search by cart id - no relation exists",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "6354949d-421e-454e-88e3-4ff42e2c5e32",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"var jsonData = pm.response.json();",
+									"",
+									"pm.test(\"Has empty data array\", function() {",
+									"    pm.expect(jsonData.data).to.be.empty;",
+									"});",
+									"",
+									"pm.test(\"Has correct selflink\", function() {",
+									"    pm.expect(jsonData.links.self).to.eql(pm.environment.get(\"url\") + \"/carts/\" + pm.variables.get(\"Cart\") + \"/up-selling-products\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/vnd.api+json",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/vnd.api+json",
+								"type": "text"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "de-DE, en;q=0.9",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/carts/{{Cart}}/up-selling-products",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"carts",
+								"{{Cart}}",
+								"up-selling-products"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Add products with many relations into the cart (helper)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "05370552-f35d-44b3-a690-1496fc7d0ad8",
+								"exec": [
+									"var responseJson = pm.response.json();",
+									"",
+									"pm.test(\"Status code is 201\", function () {",
+									"    pm.response.to.have.status(201);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/vnd.api+json"
+							},
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept-Language",
+								"type": "text",
+								"value": "de-DE, en;q=0.9"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"data\": {\n        \"type\": \"items\",\n        \"attributes\": {\n            \"sku\": \"065_23294027\",\n            \"quantity\": 1\n        }\n    }\n}"
+						},
+						"url": {
+							"raw": "{{url}}/carts/{{Cart}}/items",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"carts",
+								"{{Cart}}",
+								"items"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get a list of related products by abstract sku - many related products",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "853de70e-d77b-4f1a-9a7d-8585f6bdc320",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"var jsonData = pm.response.json();",
+									"",
+									"pm.test(\"Has correct id/sku returned\", function () {",
+									"    pm.expect(jsonData.data[0].id).to.eql(\"042\");",
+									"    pm.expect(jsonData.data[0].attributes.sku).to.eql(\"042\");",
+									"    pm.expect(jsonData.data[1].id).to.eql(\"043\");",
+									"    pm.expect(jsonData.data[1].attributes.sku).to.eql(\"043\");",
+									"    pm.expect(jsonData.data[2].id).to.eql(\"044\");",
+									"    pm.expect(jsonData.data[2].attributes.sku).to.eql(\"044\");",
+									"    pm.expect(jsonData.data[3].id).to.eql(\"045\");",
+									"    pm.expect(jsonData.data[3].attributes.sku).to.eql(\"045\");",
+									"    pm.expect(jsonData.data[4].id).to.eql(\"046\");",
+									"    pm.expect(jsonData.data[4].attributes.sku).to.eql(\"046\");",
+									"    pm.expect(jsonData.data[5].id).to.eql(\"047\");",
+									"    pm.expect(jsonData.data[5].attributes.sku).to.eql(\"047\");",
+									"    pm.expect(jsonData.data[6].id).to.eql(\"048\");",
+									"    pm.expect(jsonData.data[6].attributes.sku).to.eql(\"048\");",
+									"    pm.expect(jsonData.data[7].id).to.eql(\"051\");",
+									"    pm.expect(jsonData.data[7].attributes.sku).to.eql(\"051\");",
+									"    pm.expect(jsonData.data[8].id).to.eql(\"052\");",
+									"    pm.expect(jsonData.data[8].attributes.sku).to.eql(\"052\");",
+									"    pm.expect(jsonData.data[9].id).to.eql(\"053\");",
+									"    pm.expect(jsonData.data[9].attributes.sku).to.eql(\"053\");",
+									"});",
+									"",
+									"pm.test(\"Has correct list of attributes returned\", function() {",
+									"    pm.expect(jsonData.data[0].attributes).to.include.keys('sku', 'name', 'description', 'attributes', 'superAttributesDefinition', 'superAttributes', 'attributeMap', 'metaTitle', 'metaKeywords', 'metaDescription', 'attributeNames');",
+									"});",
+									"",
+									"pm.test(\"Has correct selflink to the related product\", function() {",
+									"    pm.expect(jsonData.data[0].links.self).to.eql(pm.environment.get(\"url\") + \"/abstract-products/042\");",
+									"    pm.expect(jsonData.data[1].links.self).to.eql(pm.environment.get(\"url\") + \"/abstract-products/043\");",
+									"    pm.expect(jsonData.data[2].links.self).to.eql(pm.environment.get(\"url\") + \"/abstract-products/044\");",
+									"    pm.expect(jsonData.data[3].links.self).to.eql(pm.environment.get(\"url\") + \"/abstract-products/045\");",
+									"    pm.expect(jsonData.data[4].links.self).to.eql(pm.environment.get(\"url\") + \"/abstract-products/046\");",
+									"    pm.expect(jsonData.data[5].links.self).to.eql(pm.environment.get(\"url\") + \"/abstract-products/047\");",
+									"    pm.expect(jsonData.data[6].links.self).to.eql(pm.environment.get(\"url\") + \"/abstract-products/048\");",
+									"    pm.expect(jsonData.data[7].links.self).to.eql(pm.environment.get(\"url\") + \"/abstract-products/051\");",
+									"    pm.expect(jsonData.data[8].links.self).to.eql(pm.environment.get(\"url\") + \"/abstract-products/052\");",
+									"    pm.expect(jsonData.data[9].links.self).to.eql(pm.environment.get(\"url\") + \"/abstract-products/053\");",
+									"});",
+									"",
+									"pm.test(\"Has correct selflink\", function() {",
+									"    pm.expect(jsonData.links.self).to.eql(pm.environment.get(\"url\") + \"/carts/\" + pm.variables.get(\"Cart\") + \"/up-selling-products\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/vnd.api+json",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/vnd.api+json",
+								"type": "text"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "de-DE, en;q=0.9",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/carts/{{Cart}}/up-selling-products",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"carts",
+								"{{Cart}}",
+								"up-selling-products"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"auth": {
+				"type": "bearer",
+				"bearer": [
+					{
+						"key": "token",
+						"value": "{{token}}",
+						"type": "string"
+					}
+				]
+			},
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "9cbd8266-34b5-43ef-9f21-ddc03f70a7ee",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "6e33ab74-26ac-47c0-bf88-e30f0481b6ce",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "Get a list of up-selling products (guest cart)",
+			"item": [
+				{
+					"name": "Create a guest cart (helper)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "235d0822-0a81-45b4-a052-0f896f350190",
+								"exec": [
+									"pm.globals.set(\"Cart\", pm.response.json().data.id)"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/vnd.api+json",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "de-DE, en;q=0.9",
+								"type": "text"
+							},
+							{
+								"key": "X-Anonymous-Customer-Unique-Id",
+								"value": "001",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"data\": {\n        \"type\": \"guest-cart-items\",\n        \"attributes\": {\n            \"sku\": \"100_24675726\",\n            \"quantity\": 1\n        }\n    }\n}"
+						},
+						"url": {
+							"raw": "{{url}}/guest-cart-items",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"guest-cart-items"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get a list of related products by cart id - relation exists",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "dd7d8f71-fe17-4afd-a4ab-188fd5e80ebe",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"var jsonData = pm.response.json();",
+									"",
+									"pm.test(\"Has correct id/sku returned\", function () {",
+									"    pm.expect(jsonData.data[0].id).to.eql(\"101\");",
+									"    pm.expect(jsonData.data[0].attributes.sku).to.eql(\"101\");",
+									"});",
+									"",
+									"pm.test(\"Has correct list of attributes returned\", function() {",
+									"    pm.expect(jsonData.data[0].attributes).to.include.keys('sku', 'name', 'description', 'attributes', 'superAttributesDefinition', 'superAttributes', 'attributeMap', 'metaTitle', 'metaKeywords', 'metaDescription', 'attributeNames');",
+									"});",
+									"",
+									"pm.test(\"Has correct selflink to the related product\", function() {",
+									"    pm.expect(jsonData.data[0].links.self).to.eql(pm.environment.get(\"url\") + \"/abstract-products/101\");",
+									"});",
+									"",
+									"pm.test(\"Has correct selflink\", function() {",
+									"    pm.expect(jsonData.links.self).to.eql(pm.environment.get(\"url\") + \"/guest-carts/\" + pm.variables.get(\"Cart\") + \"/up-selling-products\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/vnd.api+json",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/vnd.api+json",
+								"type": "text"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "de-DE, en;q=0.9",
+								"type": "text"
+							},
+							{
+								"key": "X-Anonymous-Customer-Unique-Id",
+								"value": "001",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/guest-carts/{{Cart}}/up-selling-products",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"guest-carts",
+								"{{Cart}}",
+								"up-selling-products"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete a product with relation from the cart (helper)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "02b92d5c-51ae-47a9-af93-b76eecd69b12",
+								"exec": [
+									"pm.test(\"Status code is 204\", function () {",
+									"    pm.response.to.have.status(204);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/vnd.api+json",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/vnd.api+json",
+								"type": "text"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "de-DE, en;q=0.9",
+								"type": "text"
+							},
+							{
+								"key": "X-Anonymous-Customer-Unique-Id",
+								"value": "001",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/guest-carts/{{Cart}}/guest-cart-items/100_24675726",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"guest-carts",
+								"{{Cart}}",
+								"guest-cart-items",
+								"100_24675726"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Add a product with no relation into the cart (helper)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "235d0822-0a81-45b4-a052-0f896f350190",
+								"exec": [
+									"pm.globals.set(\"Cart\", pm.response.json().data.id)"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/vnd.api+json"
+							},
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept-Language",
+								"type": "text",
+								"value": "de-DE, en;q=0.9"
+							},
+							{
+								"key": "X-Anonymous-Customer-Unique-Id",
+								"type": "text",
+								"value": "001"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"data\": {\n        \"type\": \"guest-cart-items\",\n        \"attributes\": {\n            \"sku\": \"003_26138343\",\n            \"quantity\": 1\n        }\n    }\n}"
+						},
+						"url": {
+							"raw": "{{url}}/guest-cart-items",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"guest-cart-items"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get a list of related products by cart id - no relation exists",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "dd7d8f71-fe17-4afd-a4ab-188fd5e80ebe",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"var jsonData = pm.response.json();",
+									"",
+									"pm.test(\"Has empty data array\", function() {",
+									"    pm.expect(jsonData.data).to.be.empty;",
+									"});",
+									"",
+									"pm.test(\"Has correct selflink\", function() {",
+									"    pm.expect(jsonData.links.self).to.eql(pm.environment.get(\"url\") + \"/guest-carts/\" + pm.variables.get(\"Cart\") + \"/up-selling-products\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/vnd.api+json",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/vnd.api+json",
+								"type": "text"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "de-DE, en;q=0.9",
+								"type": "text"
+							},
+							{
+								"key": "X-Anonymous-Customer-Unique-Id",
+								"value": "001",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/guest-carts/{{Cart}}/up-selling-products",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"guest-carts",
+								"{{Cart}}",
+								"up-selling-products"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"auth": {
+				"type": "noauth"
+			},
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "14f9dfda-b19a-4ee3-8beb-f18cce759a57",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "49256195-da2e-471b-b1b1-ed0c4dda3b46",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "94c5ac63-8fba-4a2c-bbb1-d9d1dda6a84d",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "062241f4-5d5b-4147-a83b-1f2ba34e368e",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"id": "d4f7e336-9c6e-4e78-81cf-ab00c767e8c3",
+			"key": "abstractSKU1",
+			"value": "001",
+			"type": "string"
+		},
+		{
+			"id": "ebe3a129-e56f-4189-b6c2-d924ccf66458",
+			"key": "notExistingSKUValue",
+			"value": "123456789",
+			"type": "string"
+		},
+		{
+			"id": "f36c7ee2-b871-4821-b1e1-226f96a5b518",
+			"key": "concreteSKU",
+			"value": "001_25904006",
+			"type": "string"
+		},
+		{
+			"id": "f7cb466f-09ad-43b7-b874-eda42f04e370",
+			"key": "abstractSKU3",
+			"value": "011",
+			"type": "string"
+		},
+		{
+			"id": "43cedd39-5a39-472d-953d-adf391b79244",
+			"key": "abstractSKU4",
+			"value": "209",
+			"type": "string"
+		},
+		{
+			"id": "eab386c2-22d5-4cc9-a92e-5de42d2f5ac5",
+			"key": "abstractSKU5",
+			"value": "063",
+			"type": "string"
+		},
+		{
+			"id": "ff70e527-d51b-4615-97e1-5f848b905a3f",
+			"key": "abstractSKU2",
+			"value": "016",
+			"type": "string"
+		},
+		{
+			"id": "0ddf354b-cd9f-43ab-975f-58ab9f253b12",
+			"key": "customerEmail",
+			"value": "anne.boleyn@spryker.com",
+			"type": "string"
+		},
+		{
+			"id": "247654e2-533b-4945-bfc3-b99e32c27d6d",
+			"key": "customerPassword",
+			"value": "change123",
+			"type": "string"
+		}
+	]
+}

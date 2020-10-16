@@ -1,0 +1,2978 @@
+{
+	"info": {
+		"_postman_id": "16bce760-e716-40e7-8696-bd0f53880ee8",
+		"name": "[GLUE-3173] B2B resources",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Company resource",
+			"item": [
+				{
+					"name": "{{url}}/access-tokens(helper)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "cea9639a-d73f-42d3-bc7f-45361e17bb74",
+								"exec": [
+									"var responseData = pm.response.json().data;",
+									"",
+									"pm.environment.set(\"token\", responseData.attributes.accessToken);",
+									"pm.variables.set(\"refresh-token\", responseData.attributes.refreshToken);",
+									"",
+									"pm.test(\"Has correct type\", function() {",
+									"    pm.expect(responseData.type).to.eql(\"access-tokens\");",
+									"});",
+									"",
+									"pm.test(\"Has id null\", function() {",
+									"    pm.expect(responseData.id).to.eql(null);",
+									"});",
+									"",
+									"pm.test(\"Has token type Bearer\", function(){",
+									"    pm.expect(responseData.attributes.tokenType).to.eql(\"Bearer\");",
+									"});",
+									"",
+									"pm.test(\"Has expiration time\", function() {",
+									"    pm.expect(responseData.attributes.expiresIn).to.eql(28800);",
+									"});",
+									"",
+									"pm.test(\"Has access token returned\", function() {",
+									"    pm.expect(responseData.attributes.accessToken).to.not.be.empty;",
+									"});",
+									"",
+									"pm.test(\"Has refresh token returned\", function() {",
+									"    pm.expect(responseData.attributes.refreshToken).to.not.be.empty;",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/vnd.api+json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "de-DE, en;q=0.9"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"data\":{\"type\":\"access-tokens\",\"attributes\":{\"username\":\"sonia@spryker.com\", \"password\": \"change123\"}}}"
+						},
+						"url": {
+							"raw": "{{url}}/access-tokens",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"access-tokens"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "{{url}}/companies/0818f408-cc84-575d-ad54-92118a0e4273",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "c9319877-8832-4244-b496-89a910a5e318",
+								"exec": [
+									"let jsonResponse = pm.response.json(),",
+									"    response = jsonResponse.data,",
+									"    links = response.links,",
+									"    selfLink = pm.variables.get(\"url\") + \"/companies/62de4ab6-b768-5c21-8835-455d9f341625\";",
+									"",
+									"const resourceType = \"companies\";",
+									"",
+									"pm.test(\"Status code is 200\", function() {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Has correct type returned\", function() {",
+									"    pm.expect(response.type).to.eql(resourceType);",
+									"    pm.expect(response.type).to.be.a(\"string\");",
+									"});",
+									"",
+									"pm.test(\"Has id returned\", function() {",
+									"    pm.expect(response.id).to.be.a(\"string\");",
+									"    pm.expect(response.id).to.not.be.empty;",
+									"});",
+									"",
+									"",
+									"pm.test(\"Has company correct attributes\", function() {",
+									"    let company = response.attributes;",
+									"",
+									"    pm.expect(company.name).to.be.eql(\"Spryker Systems GmbH\");",
+									"    pm.expect(company.status).to.be.eql(\"approved\");",
+									"    pm.expect(company.isActive).to.be.a(\"boolean\");",
+									"});",
+									"",
+									"pm.test(\"Has self link\", function() {",
+									"    pm.expect(links.self).to.eql(selfLink);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/companies/62de4ab6-b768-5c21-8835-455d9f341625",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"companies",
+								"62de4ab6-b768-5c21-8835-455d9f341625"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "{{url}}/companies/",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "5cc892aa-a894-4dbe-ae48-3c9dc384af7b",
+								"exec": [
+									"pm.test(\"Status code is 501\", function() {",
+									"    pm.response.to.have.status(501);",
+									"});",
+									"",
+									"pm.test(\"Has correct type returned\", function() {",
+									"    var jsonData = pm.response.json(),",
+									"        error = _.first(jsonData.errors);",
+									"",
+									"    pm.expect(error.detail).to.eql(\"Endpoint is not implemented.\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/companies/",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"companies",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "{{url}}/companies/baduuid",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "87d0f7f8-a489-423c-a55c-3010d36c6ec5",
+								"exec": [
+									"",
+									"pm.test(\"Status code is 404\", function() {",
+									"    pm.response.to.have.status(404);",
+									"});",
+									"",
+									"pm.test(\"Has correct type returned\", function() {",
+									"    var jsonData = pm.response.json(),",
+									"        error = _.first(jsonData.errors);",
+									"",
+									"    pm.expect(error.detail).to.eql(\"Company not found.\");",
+									"    pm.expect(error.code).to.eql(\"1801\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/companies/baduuid",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"companies",
+								"baduuid"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "wrong method",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "28391f3a-bc2a-4f40-82ea-e870e794c7e4",
+								"exec": [
+									"",
+									"pm.test(\"Status code is 404\", function() {",
+									"    pm.response.to.have.status(404);",
+									"});",
+									"",
+									"pm.test(\"Has correct type returned\", function() {",
+									"    var jsonData = pm.response.json(),",
+									"        error = _.first(jsonData.errors);",
+									"",
+									"    pm.expect(error.detail).to.eql(\"Not Found\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/companies/",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"companies",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "without access token",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "e8bfdc32-34f2-4870-92ed-15f8d7fff299",
+								"exec": [
+									"",
+									"pm.test(\"Status code is 403\", function() {",
+									"    pm.response.to.have.status(403);",
+									"});",
+									"",
+									"pm.test(\"Has correct type returned\", function() {",
+									"    var jsonData = pm.response.json(),",
+									"        error = _.first(jsonData.errors);",
+									"",
+									"    pm.expect(error.detail).to.eql(\"Missing access token.\");",
+									"    pm.expect(error.code).to.eql(\"002\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/companies/0818f408-cc84-575d-ad54-92118a0e4273",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"companies",
+								"0818f408-cc84-575d-ad54-92118a0e4273"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "with other access token (on Hold)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "3810f480-4b4c-45df-aa08-8d38e80b69ea",
+								"exec": [
+									"pm.test(\"Status code is 403\", function () {",
+									"    pm.response.to.have.status(403);",
+									"});",
+									"",
+									"pm.test(\"Has correct error message returned\", function() {",
+									"    var jsonData = pm.response.json(), error = jsonData.errors[0];",
+									"    ",
+									"    pm.expect(error.code).to.eql(\"411\");",
+									"    pm.expect(error.detail).to.eql(\"Unauthorized request.\");",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/companies/0818f408-cc84-575d-ad54-92118a0e4273",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"companies",
+								"0818f408-cc84-575d-ad54-92118a0e4273"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "{{url}}/companies/mine",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "c0889c9f-36b1-4c24-91de-c88ba39b7ecf",
+								"exec": [
+									"let jsonResponse = pm.response.json(),",
+									"    response = jsonResponse.data,",
+									"    links = jsonResponse.links,",
+									"    selfLink = pm.variables.get(\"url\") + \"/companies/mine\",",
+									"    selfLinkItem = pm.variables.get(\"url\") + \"/companies/62de4ab6-b768-5c21-8835-455d9f341625\";",
+									"",
+									"const resourceType = \"companies\";",
+									"",
+									"pm.test(\"Status code is 200\", function() {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Has correct type returned\", function() {",
+									"    pm.expect(response[0].type).to.eql(resourceType);",
+									"    pm.expect(response[0].type).to.be.a(\"string\");",
+									"});",
+									"",
+									"pm.test(\"Has id returned\", function() {",
+									"    pm.expect(response[0].id).to.be.a(\"string\");",
+									"    pm.expect(response[0].id).to.not.be.empty;",
+									"});",
+									"",
+									"",
+									"pm.test(\"Has company correct attributes\", function() {",
+									"    let company = response[0].attributes;",
+									"",
+									"    pm.expect(company.isActive).to.be.a(\"boolean\");",
+									"    pm.expect(company.name).to.be.eql(\"Spryker Systems GmbH\");",
+									"    pm.expect(company.status).to.be.eql(\"approved\");",
+									"});",
+									"",
+									"pm.test(\"Has self item link\", function() {",
+									"    pm.expect(response[0].links.self).to.eql(selfLinkItem);",
+									"});",
+									"",
+									"pm.test(\"Has self link\", function() {",
+									"    pm.expect(links.self).to.eql(selfLink);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/companies/mine",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"companies",
+								"mine"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Business Unit Resource",
+			"item": [
+				{
+					"name": "{{url}}/access-tokens",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "cea9639a-d73f-42d3-bc7f-45361e17bb74",
+								"exec": [
+									"var responseData = pm.response.json().data;",
+									"",
+									"pm.environment.set(\"token\", responseData.attributes.accessToken);",
+									"pm.variables.set(\"refresh-token\", responseData.attributes.refreshToken);",
+									"",
+									"pm.test(\"Has correct type\", function() {",
+									"    pm.expect(responseData.type).to.eql(\"access-tokens\");",
+									"});",
+									"",
+									"pm.test(\"Has id null\", function() {",
+									"    pm.expect(responseData.id).to.eql(null);",
+									"});",
+									"",
+									"pm.test(\"Has token type Bearer\", function(){",
+									"    pm.expect(responseData.attributes.tokenType).to.eql(\"Bearer\");",
+									"});",
+									"",
+									"pm.test(\"Has expiration time\", function() {",
+									"    pm.expect(responseData.attributes.expiresIn).to.eql(28800);",
+									"});",
+									"",
+									"pm.test(\"Has access token returned\", function() {",
+									"    pm.expect(responseData.attributes.accessToken).to.not.be.empty;",
+									"});",
+									"",
+									"pm.test(\"Has refresh token returned\", function() {",
+									"    pm.expect(responseData.attributes.refreshToken).to.not.be.empty;",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/vnd.api+json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "de-DE, en;q=0.9"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"data\":{\"type\":\"access-tokens\",\"attributes\":{\"username\":\"sonia@spryker.com\", \"password\": \"change123\"}}}"
+						},
+						"url": {
+							"raw": "{{url}}/access-tokens",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"access-tokens"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "company-business-units with valid uuid",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "9842e35e-6d32-4cb4-bc96-aa40b6cc8f43",
+								"exec": [
+									"let jsonResponse = pm.response.json(),",
+									"    response = jsonResponse.data,",
+									"    links = response.links,",
+									"    selfLink = pm.variables.get(\"url\") + \"/company-business-units/d8943c86-4481-5c2a-b5f6-28c8dbdf1a23\";",
+									"",
+									"const resourceType = \"company-business-units\";",
+									"",
+									"pm.test(\"Status code is 200\", function() {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Has correct type returned\", function() {",
+									"    pm.expect(response.type).to.eql(resourceType);",
+									"    pm.expect(response.type).to.be.a(\"string\");",
+									"});",
+									"",
+									"pm.test(\"Has id returned\", function() {",
+									"    pm.expect(response.id).to.be.a(\"string\");",
+									"    pm.expect(response.id).to.not.be.empty;",
+									"});",
+									"",
+									"",
+									"pm.test(\"Has company-business-units correct attributes\", function() {",
+									"    let BU = response.attributes;",
+									"",
+									"    pm.expect(BU.name).to.be.a(\"string\");",
+									"    pm.expect(BU.email).to.be.a(\"string\");",
+									"    pm.expect(BU.phone).to.be.a(\"string\");",
+									"    pm.expect(BU.externalUrl).to.be.a(\"string\");",
+									"    pm.expect(BU.bic).to.be.a(\"string\");",
+									"    pm.expect(BU.iban).to.be.a(\"string\");",
+									"});",
+									"",
+									"pm.test(\"Has self link\", function() {",
+									"    pm.expect(links.self).to.eql(selfLink);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/company-business-units/d8943c86-4481-5c2a-b5f6-28c8dbdf1a23",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"company-business-units",
+								"d8943c86-4481-5c2a-b5f6-28c8dbdf1a23"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get BU without uuid",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "effa3e06-790a-41b6-afb1-330a2850af05",
+								"exec": [
+									"pm.test(\"Status code is 501\", function() {",
+									"    pm.response.to.have.status(501);",
+									"});",
+									"",
+									"pm.test(\"Has correct type returned\", function() {",
+									"    var jsonData = pm.response.json(),",
+									"        error = _.first(jsonData.errors);",
+									"",
+									"    pm.expect(error.detail).to.eql(\"Endpoint is not implemented.\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/company-business-units",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"company-business-units"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get BU with invalid uuid",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "42c7b201-a98d-4ffa-89ee-1b45013b597e",
+								"exec": [
+									"",
+									"pm.test(\"Status code is 404\", function() {",
+									"    pm.response.to.have.status(404);",
+									"});",
+									"",
+									"pm.test(\"Has correct type returned\", function() {",
+									"    var jsonData = pm.response.json(),",
+									"        error = _.first(jsonData.errors);",
+									"",
+									"    pm.expect(error.detail).to.eql(\"Company business unit not found.\");",
+									"    pm.expect(error.code).to.eql(\"1901\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/company-business-units/invaliduuid",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"company-business-units",
+								"invaliduuid"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "{{url}}/company-business-units/invaliduuid",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "6245c253-7be8-4496-ae54-f40f6fa221b5",
+								"exec": [
+									"pm.test(\"Status code is 404\", function() {",
+									"    pm.response.to.have.status(404);",
+									"});",
+									"",
+									"pm.test(\"Has correct type returned\", function() {",
+									"    var jsonData = pm.response.json(),",
+									"        error = _.first(jsonData.errors);",
+									"",
+									"    pm.expect(error.detail).to.eql(\"Not Found\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/company-business-units/validuuid",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"company-business-units",
+								"validuuid"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "{{url}}/company-business-units",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "56e7f775-9ed7-4d8b-946b-6625d11a9eb9",
+								"exec": [
+									"pm.test(\"Status code is 404\", function() {",
+									"    pm.response.to.have.status(404);",
+									"});",
+									"",
+									"pm.test(\"Has correct type returned\", function() {",
+									"    var jsonData = pm.response.json(),",
+									"        error = _.first(jsonData.errors);",
+									"",
+									"    pm.expect(error.detail).to.eql(\"Not Found\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/company-business-units/validuuid",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"company-business-units",
+								"validuuid"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "without access token",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "2e475771-6194-410a-88cc-1ff440ff672f",
+								"exec": [
+									"pm.test(\"Status code is 403\", function() {",
+									"    pm.response.to.have.status(403);",
+									"});",
+									"",
+									"pm.test(\"Has correct type returned\", function() {",
+									"    var jsonData = pm.response.json(),",
+									"        error = _.first(jsonData.errors);",
+									"",
+									"    pm.expect(error.detail).to.eql(\"Missing access token.\");",
+									"    pm.expect(error.code).to.eql(\"002\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/company-business-units/b8a06475-73f5-575a-b1e9-1954de7a49ef",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"company-business-units",
+								"b8a06475-73f5-575a-b1e9-1954de7a49ef"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "with other access token(on Hold)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "9f510a7f-b920-48cc-8ef8-55ce0a4fc352",
+								"exec": [
+									"pm.test(\"Status code is 403\", function () {",
+									"    pm.response.to.have.status(403);",
+									"});",
+									"",
+									"pm.test(\"Has correct error message returned\", function() {",
+									"    var jsonData = pm.response.json(), error = jsonData.errors[0];",
+									"    ",
+									"    pm.expect(error.code).to.eql(\"411\");",
+									"    pm.expect(error.detail).to.eql(\"Unauthorized request.\");",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/company-business-units/b8a06475-73f5-575a-b1e9-1954de7a49ef",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"company-business-units",
+								"b8a06475-73f5-575a-b1e9-1954de7a49ef"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "BU with companies included",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "dab81660-114e-418c-954d-1d7758d4c05f",
+								"exec": [
+									"let jsonResponse = pm.response.json(),",
+									"    response = jsonResponse.data,",
+									"    links = response.links,",
+									"    selfLink = pm.variables.get(\"url\") + \"/company-business-units/d8943c86-4481-5c2a-b5f6-28c8dbdf1a23?include=companies\",",
+									"    resourceName = 'companies';",
+									"",
+									"const resourceType = \"company-business-units\";",
+									"",
+									"pm.test(\"Status code is 200\", function() {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Has correct type returned\", function() {",
+									"    pm.expect(response.type).to.eql(resourceType);",
+									"    pm.expect(response.type).to.be.a(\"string\");",
+									"});",
+									"",
+									"pm.test(\"Has id returned\", function() {",
+									"    pm.expect(response.id).to.be.a(\"string\");",
+									"    pm.expect(response.id).to.not.be.empty;",
+									"});",
+									"",
+									"",
+									"pm.test(\"Has company-business-units correct attributes\", function() {",
+									"    let BU = response.attributes;",
+									"",
+									"    pm.expect(BU.name).to.be.a(\"string\");",
+									"    pm.expect(BU.email).to.be.a(\"string\");",
+									"    pm.expect(BU.phone).to.be.a(\"string\");",
+									"    pm.expect(BU.externalUrl).to.be.a(\"string\");",
+									"    pm.expect(BU.bic).to.be.a(\"string\");",
+									"    pm.expect(BU.iban).to.be.a(\"string\");",
+									"});",
+									"",
+									"pm.test(\"Has self link\", function() {",
+									"    pm.expect(links.self).to.eql(selfLink);",
+									"});",
+									"",
+									"pm.test(\"Has correct company relationships\", function() {",
+									"    let BU = response.relationships.companies;",
+									"  ",
+									"    pm.test(\"Has correct type returned\", function() {",
+									"    pm.expect(BU.data[0].type).to.eql(resourceName);",
+									"    pm.expect(jsonResponse.included[0].type).to.eql(resourceName);",
+									"});",
+									"",
+									"pm.test(\"Has correct ID returned\", function() {",
+									"    pm.expect(BU.data[0].id).to.eql(pm.variables.get(\"companyID\"));",
+									"    pm.expect(jsonResponse.included[0].id).to.eql(pm.variables.get(\"companyID\"));",
+									"});",
+									"});",
+									"",
+									"pm.test(\"Has correct company attributes returned\", function() {",
+									"    pm.expect(jsonResponse.included[0].attributes.isActive).to.be.a(\"boolean\");",
+									"    pm.expect(jsonResponse.included[0].attributes.name).to.be.a(\"string\");",
+									"    pm.expect(jsonResponse.included[0].attributes.status).to.be.a(\"string\");",
+									"});",
+									"",
+									"pm.test(\"Has self link\", function() {",
+									"    pm.expect(links.self).to.eql(selfLink);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/company-business-units/d8943c86-4481-5c2a-b5f6-28c8dbdf1a23?include=companies",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"company-business-units",
+								"d8943c86-4481-5c2a-b5f6-28c8dbdf1a23"
+							],
+							"query": [
+								{
+									"key": "include",
+									"value": "companies"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "BU with company-business-unit-addresses included",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "f1e0b68b-c196-41c0-a885-66eb509a686f",
+								"exec": [
+									"let jsonResponse = pm.response.json(),",
+									"    response = jsonResponse.data,",
+									"    links = response.links,",
+									"    selfLink = pm.variables.get(\"url\") + \"/company-business-units/d8943c86-4481-5c2a-b5f6-28c8dbdf1a23?include=company-business-unit-addresses\",",
+									"    resourceName = \"company-business-unit-addresses\";",
+									"",
+									"const resourceType = \"company-business-units\";",
+									"",
+									"pm.test(\"Status code is 200\", function() {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Has correct type returned\", function() {",
+									"    pm.expect(response.type).to.eql(resourceType);",
+									"    pm.expect(response.type).to.be.a(\"string\");",
+									"});",
+									"",
+									"pm.test(\"Has id returned\", function() {",
+									"    pm.expect(response.id).to.be.a(\"string\");",
+									"    pm.expect(response.id).to.not.be.empty;",
+									"});",
+									"",
+									"",
+									"pm.test(\"Has company-business-units correct attributes\", function() {",
+									"    let BU = response.attributes;",
+									"",
+									"    pm.expect(BU.name).to.be.a(\"string\");",
+									"    pm.expect(BU.email).to.be.a(\"string\");",
+									"    pm.expect(BU.phone).to.be.a(\"string\");",
+									"    pm.expect(BU.externalUrl).to.be.a(\"string\");",
+									"    pm.expect(BU.bic).to.be.a(\"string\");",
+									"    pm.expect(BU.iban).to.be.a(\"string\");",
+									"});",
+									"",
+									"pm.test(\"Has self link\", function() {",
+									"    pm.expect(links.self).to.eql(selfLink);",
+									"});",
+									"",
+									"pm.test(\"Has correct company business unit addresses relationships\", function() {",
+									"  ",
+									"    pm.test(\"Has correct type returned\", function() {",
+									"    pm.expect(jsonResponse.included[0].type).to.eql(resourceName);",
+									"});",
+									"",
+									"pm.test(\"Has correct ID returned\", function() {",
+									"    pm.expect(jsonResponse.included[0].id).to.eql(pm.variables.get(\"addressID\"));",
+									"});",
+									"});",
+									"",
+									"pm.test(\"Has correct company attributes returned\", function() {",
+									"    pm.expect(jsonResponse.included[0].attributes.address1).to.be.a(\"string\");",
+									"    pm.expect(jsonResponse.included[0].attributes.address2).to.be.a(\"string\");",
+									"    pm.expect(jsonResponse.included[0].attributes.address3).to.be.a(\"string\");",
+									"    pm.expect(jsonResponse.included[0].attributes.zipCode).to.be.a(\"string\");",
+									"    pm.expect(jsonResponse.included[0].attributes.city).to.be.a(\"string\");",
+									"    pm.expect(jsonResponse.included[0].attributes.phone).to.be.a(\"string\");",
+									"    pm.expect(jsonResponse.included[0].attributes.iso2Code).to.be.a(\"string\");",
+									"    pm.expect(jsonResponse.included[0].attributes.comment).to.be.a(\"string\");",
+									"});",
+									"",
+									"pm.test(\"Has self link\", function() {",
+									"    pm.expect(links.self).to.eql(selfLink);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/company-business-units/d8943c86-4481-5c2a-b5f6-28c8dbdf1a23?include=company-business-unit-addresses",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"company-business-units",
+								"d8943c86-4481-5c2a-b5f6-28c8dbdf1a23"
+							],
+							"query": [
+								{
+									"key": "include",
+									"value": "company-business-unit-addresses"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "{{url}}/company-business-units/mine",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "554e4405-bdbd-437d-8581-cc23b8a6ee90",
+								"exec": [
+									"let jsonResponse = pm.response.json(),",
+									"    response = jsonResponse.data,",
+									"    links = jsonResponse.links,",
+									"    selfLinkItemOne = pm.variables.get(\"url\") + \"/company-business-units/5b9c6fc4-bf5d-5b53-9ca9-1916657e6fb2\",",
+									"    selfLink = pm.variables.get(\"url\") + \"/company-business-units/mine\";",
+									"    ",
+									"",
+									"const resourceType = \"company-business-units\";",
+									"",
+									"pm.test(\"Status code is 200\", function() {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Has correct type returned\", function() {",
+									"    pm.expect(response[0].type).to.eql(resourceType);",
+									"    pm.expect(response[0].type).to.be.a(\"string\");",
+									"});",
+									"",
+									"pm.test(\"Has id returned\", function() {",
+									"    pm.expect(response[0].id).to.be.a(\"string\");",
+									"    pm.expect(response[0].id).to.not.be.empty;",
+									"});",
+									"",
+									"",
+									"pm.test(\"Has company-business-units correct attributes\", function() {",
+									"    let BU = response[0].attributes;",
+									"",
+									"    pm.expect(BU.name).to.be.a(\"string\");",
+									"    pm.expect(BU.email).to.be.a(\"string\");",
+									"    pm.expect(BU.phone).to.be.a(\"string\");",
+									"    pm.expect(BU.externalUrl).to.be.a(\"string\");",
+									"    pm.expect(BU.bic).to.be.a(\"string\");",
+									"    pm.expect(BU.iban).to.be.a(\"string\");",
+									"});",
+									"",
+									"pm.test(\"Has item one self link\", function() {",
+									"    pm.expect(response[0].links.self).to.eql(selfLinkItemOne);",
+									"});",
+									"",
+									"pm.test(\"Has self link\", function() {",
+									"    pm.expect(links.self).to.eql(selfLink);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/company-business-units/mine",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"company-business-units",
+								"mine"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Mine incuded companies",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "95068575-6edf-465e-946e-0b258389496d",
+								"exec": [
+									"let jsonResponse = pm.response.json(),",
+									"    response = jsonResponse.data,",
+									"    links = jsonResponse.links,",
+									"    selfLinkItemOne = pm.variables.get(\"url\") + \"/company-business-units/5b9c6fc4-bf5d-5b53-9ca9-1916657e6fb2?include=companies\",",
+									"    selfLink = pm.variables.get(\"url\") + \"/company-business-units/mine?include=companies\",",
+									"    resourceName = 'companies';",
+									"    ",
+									"",
+									"const resourceType = \"company-business-units\";",
+									"",
+									"pm.test(\"Status code is 200\", function() {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Has correct type returned\", function() {",
+									"    pm.expect(response[0].type).to.eql(resourceType);",
+									"    pm.expect(response[0].type).to.be.a(\"string\");",
+									"});",
+									"",
+									"pm.test(\"Has id returned\", function() {",
+									"    pm.expect(response[0].id).to.be.a(\"string\");",
+									"    pm.expect(response[0].id).to.not.be.empty;",
+									"});",
+									"",
+									"",
+									"pm.test(\"Has company-business-units correct attributes\", function() {",
+									"    let BU = response[0].attributes;",
+									"",
+									"    pm.expect(BU.name).to.be.a(\"string\");",
+									"    pm.expect(BU.email).to.be.a(\"string\");",
+									"    pm.expect(BU.phone).to.be.a(\"string\");",
+									"    pm.expect(BU.externalUrl).to.be.a(\"string\");",
+									"    pm.expect(BU.bic).to.be.a(\"string\");",
+									"    pm.expect(BU.iban).to.be.a(\"string\");",
+									"});",
+									"",
+									"pm.test(\"Has item one self link\", function() {",
+									"    pm.expect(response[0].links.self).to.eql(selfLinkItemOne);",
+									"});",
+									"",
+									"pm.test(\"Has self link\", function() {",
+									"    pm.expect(links.self).to.eql(selfLink);",
+									"});",
+									"",
+									"pm.test(\"Has correct company relationships\", function() {",
+									"    let BU = response[0].relationships.companies;",
+									"  ",
+									"    pm.test(\"Has correct type returned\", function() {",
+									"    pm.expect(BU.data[0].type).to.eql(resourceName);",
+									"    pm.expect(jsonResponse.included[0].type).to.eql(resourceName);",
+									"});",
+									"",
+									"pm.test(\"Has correct ID returned\", function() {",
+									"    pm.expect(BU.data[0].id).to.eql(pm.variables.get(\"companyID\"));",
+									"    pm.expect(jsonResponse.included[0].id).to.eql(pm.variables.get(\"companyID\"));",
+									"});",
+									"});",
+									"",
+									"pm.test(\"Has correct company attributes returned\", function() {",
+									"    pm.expect(jsonResponse.included[0].attributes.isActive).to.be.a(\"boolean\");",
+									"    pm.expect(jsonResponse.included[0].attributes.name).to.be.a(\"string\");",
+									"    pm.expect(jsonResponse.included[0].attributes.status).to.be.a(\"string\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/company-business-units/mine?include=companies",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"company-business-units",
+								"mine"
+							],
+							"query": [
+								{
+									"key": "include",
+									"value": "companies"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Mine included BU addresses",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "9ead57b0-7e27-4080-b197-2e159b2f76a9",
+								"exec": [
+									"let jsonResponse = pm.response.json(),",
+									"    response = jsonResponse.data,",
+									"    links = jsonResponse.links,",
+									"    selfLinkItemOne = pm.variables.get(\"url\") + \"/company-business-units/5b9c6fc4-bf5d-5b53-9ca9-1916657e6fb2?include=company-business-unit-addresses\",",
+									"    selfLink = pm.variables.get(\"url\") + \"/company-business-units/mine?include=company-business-unit-addresses\",",
+									"    selfLinkInclude = pm.variables.get(\"url\") + \"/company-business-unit-addresses/19a55c0d-7bf0-580c-a9e8-6edacdc1ecde\",",
+									"    resourceName = \"company-business-unit-addresses\";",
+									"    ",
+									"",
+									"const resourceType = \"company-business-units\";",
+									"",
+									"pm.test(\"Status code is 200\", function() {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Has correct type returned\", function() {",
+									"    pm.expect(response[0].type).to.eql(resourceType);",
+									"    pm.expect(response[0].type).to.be.a(\"string\");",
+									"});",
+									"",
+									"pm.test(\"Has id returned\", function() {",
+									"    pm.expect(response[0].id).to.be.a(\"string\");",
+									"    pm.expect(response[0].id).to.not.be.empty;",
+									"});",
+									"",
+									"",
+									"pm.test(\"Has company-business-units correct attributes\", function() {",
+									"    let BU = response[0].attributes;",
+									"",
+									"    pm.expect(BU.name).to.be.a(\"string\");",
+									"    pm.expect(BU.email).to.be.a(\"string\");",
+									"    pm.expect(BU.phone).to.be.a(\"string\");",
+									"    pm.expect(BU.externalUrl).to.be.a(\"string\");",
+									"    pm.expect(BU.bic).to.be.a(\"string\");",
+									"    pm.expect(BU.iban).to.be.a(\"string\");",
+									"});",
+									"",
+									"pm.test(\"Has item one self link\", function() {",
+									"    pm.expect(response[0].links.self).to.eql(selfLinkItemOne);",
+									"});",
+									"",
+									"pm.test(\"Has self link\", function() {",
+									"    pm.expect(links.self).to.eql(selfLink);",
+									"});",
+									"",
+									"pm.test(\"Has correct company business unit addresses relationships\", function() {",
+									"  ",
+									"    pm.test(\"Has correct type returned\", function() {",
+									"    pm.expect(jsonResponse.included[0].type).to.eql(resourceName);",
+									"});",
+									"",
+									"pm.test(\"Has correct ID returned\", function() {",
+									"    pm.expect(jsonResponse.included[0].id).to.eql(pm.variables.get(\"addressID\"));",
+									"});",
+									"});",
+									"",
+									"pm.test(\"Has correct company attributes returned\", function() {",
+									"    pm.expect(jsonResponse.included[0].attributes.address1).to.be.a(\"string\");",
+									"    pm.expect(jsonResponse.included[0].attributes.address2).to.be.a(\"string\");",
+									"    pm.expect(jsonResponse.included[0].attributes.address3).to.be.a(\"string\");",
+									"    pm.expect(jsonResponse.included[0].attributes.zipCode).to.be.a(\"string\");",
+									"    pm.expect(jsonResponse.included[0].attributes.city).to.be.a(\"string\");",
+									"    pm.expect(jsonResponse.included[0].attributes.phone).to.be.a(\"string\");",
+									"    pm.expect(jsonResponse.included[0].attributes.iso2Code).to.be.a(\"string\");",
+									"    pm.expect(jsonResponse.included[0].attributes.comment).to.be.a(\"string\");",
+									"});",
+									"",
+									"pm.test(\"Has self link\", function() {",
+									"pm.expect(jsonResponse.included[0].links.self).to.eql(selfLinkInclude);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/company-business-units/mine?include=company-business-unit-addresses",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"company-business-units",
+								"mine"
+							],
+							"query": [
+								{
+									"key": "include",
+									"value": "company-business-unit-addresses"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Company roles Resource",
+			"item": [
+				{
+					"name": "{{url}}/access-tokens",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "cea9639a-d73f-42d3-bc7f-45361e17bb74",
+								"exec": [
+									"var responseData = pm.response.json().data;",
+									"",
+									"pm.environment.set(\"token\", responseData.attributes.accessToken);",
+									"pm.variables.set(\"refresh-token\", responseData.attributes.refreshToken);",
+									"",
+									"pm.test(\"Has correct type\", function() {",
+									"    pm.expect(responseData.type).to.eql(\"access-tokens\");",
+									"});",
+									"",
+									"pm.test(\"Has id null\", function() {",
+									"    pm.expect(responseData.id).to.eql(null);",
+									"});",
+									"",
+									"pm.test(\"Has token type Bearer\", function(){",
+									"    pm.expect(responseData.attributes.tokenType).to.eql(\"Bearer\");",
+									"});",
+									"",
+									"pm.test(\"Has expiration time\", function() {",
+									"    pm.expect(responseData.attributes.expiresIn).to.eql(28800);",
+									"});",
+									"",
+									"pm.test(\"Has access token returned\", function() {",
+									"    pm.expect(responseData.attributes.accessToken).to.not.be.empty;",
+									"});",
+									"",
+									"pm.test(\"Has refresh token returned\", function() {",
+									"    pm.expect(responseData.attributes.refreshToken).to.not.be.empty;",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/vnd.api+json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "de-DE, en;q=0.9"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"data\":{\"type\":\"access-tokens\",\"attributes\":{\"username\":\"sonia@spryker.com\", \"password\": \"change123\"}}}"
+						},
+						"url": {
+							"raw": "{{url}}/access-tokens",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"access-tokens"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "company-roles with valid uuid",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "68672e3b-51a1-45c6-951b-f3ae88eb25bb",
+								"exec": [
+									"let jsonResponse = pm.response.json(),",
+									"    response = jsonResponse.data,",
+									"    links = response.links,",
+									"    selfLink = pm.variables.get(\"url\") + \"/company-roles/8e8adac3-f430-57ba-9c4e-69b2b3e666f0\";",
+									"",
+									"const resourceType = \"company-roles\";",
+									"",
+									"pm.test(\"Status code is 200\", function() {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Has correct type returned\", function() {",
+									"    pm.expect(response.type).to.eql(resourceType);",
+									"    pm.expect(response.type).to.be.a(\"string\");",
+									"});",
+									"",
+									"pm.test(\"Has id returned\", function() {",
+									"    pm.expect(response.id).to.be.a(\"string\");",
+									"    pm.expect(response.id).to.not.be.empty;",
+									"});",
+									"",
+									"",
+									"pm.test(\"Has company-business-units correct attributes\", function() {",
+									"    let role = response.attributes;",
+									"",
+									"    pm.expect(role.name).to.be.a(\"string\");",
+									"    pm.expect(role.isDefault).to.be.a(\"boolean\");",
+									"",
+									"});",
+									"",
+									"pm.test(\"Has self link\", function() {",
+									"    pm.expect(links.self).to.eql(selfLink);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/company-roles/8e8adac3-f430-57ba-9c4e-69b2b3e666f0",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"company-roles",
+								"8e8adac3-f430-57ba-9c4e-69b2b3e666f0"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get company roles without uuid",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "aa5093ac-4936-4225-9311-a3c03e4aa389",
+								"exec": [
+									"pm.test(\"Status code is 501\", function() {",
+									"    pm.response.to.have.status(501);",
+									"});",
+									"",
+									"pm.test(\"Has correct type returned\", function() {",
+									"    var jsonData = pm.response.json(),",
+									"        error = _.first(jsonData.errors);",
+									"",
+									"    pm.expect(error.detail).to.eql(\"Resource is not implemented.\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/company-roles/",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"company-roles",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get company roles with invalid uuid",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "e4d9696d-66d5-4ace-900b-5447c25c6379",
+								"exec": [
+									"pm.test(\"Status code is 404\", function() {",
+									"    pm.response.to.have.status(404);",
+									"});",
+									"",
+									"pm.test(\"Has correct type returned\", function() {",
+									"    var jsonData = pm.response.json(),",
+									"        error = _.first(jsonData.errors);",
+									"",
+									"    pm.expect(error.detail).to.eql(\"Company role not found.\");",
+									"    pm.expect(error.code).to.eql(\"2101\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/company-roles/2f0a9d3e-9e69-53eb-8518-284a0db04376invalid",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"company-roles",
+								"2f0a9d3e-9e69-53eb-8518-284a0db04376invalid"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "company role invalid method",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "3fefa9fc-3dab-4b6e-8c91-4b50b4de9e13",
+								"exec": [
+									"pm.test(\"Status code is 404\", function() {",
+									"    pm.response.to.have.status(404);",
+									"});",
+									"",
+									"pm.test(\"Has correct type returned\", function() {",
+									"    var jsonData = pm.response.json(),",
+									"        error = _.first(jsonData.errors);",
+									"",
+									"    pm.expect(error.detail).to.eql(\"Not Found\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/company-roles/2f0a9d3e-9e69-53eb-8518-284a0db04376",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"company-roles",
+								"2f0a9d3e-9e69-53eb-8518-284a0db04376"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "company roles wrong method",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "b483964d-5711-4881-8375-3baab843ffda",
+								"exec": [
+									"pm.test(\"Status code is 404\", function() {",
+									"    pm.response.to.have.status(404);",
+									"});",
+									"",
+									"pm.test(\"Has correct type returned\", function() {",
+									"    var jsonData = pm.response.json(),",
+									"        error = _.first(jsonData.errors);",
+									"",
+									"    pm.expect(error.detail).to.eql(\"Not Found\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/company-roles",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"company-roles"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "without access token",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "08db61fa-f5fa-4d03-9c72-6651957f7544",
+								"exec": [
+									"pm.test(\"Status code is 403\", function() {",
+									"    pm.response.to.have.status(403);",
+									"});",
+									"",
+									"pm.test(\"Has correct type returned\", function() {",
+									"    var jsonData = pm.response.json(),",
+									"        error = _.first(jsonData.errors);",
+									"",
+									"    pm.expect(error.detail).to.eql(\"Missing access token.\");",
+									"    pm.expect(error.code).to.eql(\"002\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/company-roles/2f0a9d3e-9e69-53eb-8518-284a0db04376",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"company-roles",
+								"2f0a9d3e-9e69-53eb-8518-284a0db04376"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "with other access token(on Hold)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "1d3cbfe4-a8f1-48bb-be51-c90f7ea6a91d",
+								"exec": [
+									"pm.test(\"Status code is 403\", function () {",
+									"    pm.response.to.have.status(403);",
+									"});",
+									"",
+									"pm.test(\"Has correct error message returned\", function() {",
+									"    var jsonData = pm.response.json(), error = jsonData.errors[0];",
+									"    ",
+									"    pm.expect(error.code).to.eql(\"411\");",
+									"    pm.expect(error.detail).to.eql(\"Unauthorized request.\");",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/company-roles/2f0a9d3e-9e69-53eb-8518-284a0db04376",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"company-roles",
+								"2f0a9d3e-9e69-53eb-8518-284a0db04376"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Company roles with companies included",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "e60f76aa-d11c-4689-8e33-3f0479df88ec",
+								"exec": [
+									"let jsonResponse = pm.response.json(),",
+									"    response = jsonResponse.data,",
+									"    links = response.links,",
+									"    selfLink = pm.variables.get(\"url\") + \"/company-roles/8e8adac3-f430-57ba-9c4e-69b2b3e666f0?include=companies\",",
+									"    selfLinkIncluded = pm.variables.get(\"url\") + \"/companies/62de4ab6-b768-5c21-8835-455d9f341625\",",
+									"    resourceName = 'companies';",
+									"",
+									"const resourceType = \"company-roles\";",
+									"",
+									"pm.test(\"Status code is 200\", function() {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Has correct type returned\", function() {",
+									"    pm.expect(response.type).to.eql(resourceType);",
+									"    pm.expect(response.type).to.be.a(\"string\");",
+									"});",
+									"",
+									"pm.test(\"Has id returned\", function() {",
+									"    pm.expect(response.id).to.be.a(\"string\");",
+									"    pm.expect(response.id).to.not.be.empty;",
+									"});",
+									"",
+									"",
+									"pm.test(\"Has company-business-units correct attributes\", function() {",
+									"    let role = response.attributes;",
+									"",
+									"    pm.expect(role.name).to.be.a(\"string\");",
+									"    pm.expect(role.isDefault).to.be.a(\"boolean\");",
+									"",
+									"});",
+									"",
+									"pm.test(\"Has self link\", function() {",
+									"    pm.expect(links.self).to.eql(selfLink);",
+									"});",
+									"",
+									"pm.test(\"Has correct company relationships\", function() {",
+									"    let BU = response.relationships.companies;",
+									"  ",
+									"    pm.test(\"Has correct type returned\", function() {",
+									"    pm.expect(BU.data[0].type).to.eql(resourceName);",
+									"    pm.expect(jsonResponse.included[0].type).to.eql(resourceName);",
+									"});",
+									"",
+									"pm.test(\"Has correct ID returned\", function() {",
+									"    pm.expect(BU.data[0].id).to.eql(pm.variables.get(\"companyID\"));",
+									"    pm.expect(jsonResponse.included[0].id).to.eql(pm.variables.get(\"companyID\"));",
+									"});",
+									"});",
+									"",
+									"pm.test(\"Has correct company attributes returned\", function() {",
+									"    pm.expect(jsonResponse.included[0].attributes.isActive).to.be.a(\"boolean\");",
+									"    pm.expect(jsonResponse.included[0].attributes.name).to.be.a(\"string\");",
+									"    pm.expect(jsonResponse.included[0].attributes.status).to.be.a(\"string\");",
+									"});",
+									"",
+									"pm.test(\"Has included self link\", function() {",
+									"    pm.expect(jsonResponse.included[0].links.self).to.eql(selfLinkIncluded);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/company-roles/8e8adac3-f430-57ba-9c4e-69b2b3e666f0?include=companies",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"company-roles",
+								"8e8adac3-f430-57ba-9c4e-69b2b3e666f0"
+							],
+							"query": [
+								{
+									"key": "include",
+									"value": "companies"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "{{url}}/company-roles/mine",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "83eeed42-70ec-436a-a13a-5350ed5f0a21",
+								"exec": [
+									"let jsonResponse = pm.response.json(),",
+									"    response = jsonResponse.data,",
+									"    links = jsonResponse.links,",
+									"    selfLinkItemOne = pm.variables.get(\"url\") + \"/company-roles/b5b4988f-4c29-568a-858b-a66b8784b5ac\",",
+									"    selfLinkItemTwo = pm.variables.get(\"url\") + \"/company-roles/50c647a4-d27f-5d82-a587-1d0b7cc6b58d\",",
+									"    selfLink = pm.variables.get(\"url\") + \"/company-roles/mine\";",
+									"",
+									"const resourceType = \"company-roles\";",
+									"",
+									"pm.test(\"Status code is 200\", function() {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Has correct type returned\", function() {",
+									"    pm.expect(response[0].type).to.eql(resourceType);",
+									"    pm.expect(response[0].type).to.be.a(\"string\");",
+									"});",
+									"",
+									"pm.test(\"Has id returned\", function() {",
+									"    pm.expect(response[0].id).to.be.a(\"string\");",
+									"    pm.expect(response[0].id).to.not.be.empty;",
+									"});",
+									"",
+									"",
+									"pm.test(\"Has company-business-units correct attributes\", function() {",
+									"    let role = response[0].attributes;",
+									"",
+									"    pm.expect(role.name).to.be.a(\"string\");",
+									"    pm.expect(role.isDefault).to.be.a(\"boolean\");",
+									"",
+									"});",
+									"",
+									"pm.test(\"Has item one self link\", function() {",
+									"    pm.expect(response[0].links.self).to.eql(selfLinkItemOne);",
+									"});",
+									"",
+									"pm.test(\"Has correct type returned\", function() {",
+									"    pm.expect(response[1].type).to.eql(resourceType);",
+									"    pm.expect(response[1].type).to.be.a(\"string\");",
+									"});",
+									"",
+									"pm.test(\"Has id returned\", function() {",
+									"    pm.expect(response[1].id).to.be.a(\"string\");",
+									"    pm.expect(response[1].id).to.not.be.empty;",
+									"});",
+									"",
+									"",
+									"pm.test(\"Has company-business-units correct attributes\", function() {",
+									"    let role = response[1].attributes;",
+									"",
+									"    pm.expect(role.name).to.be.a(\"string\");",
+									"    pm.expect(role.isDefault).to.be.a(\"boolean\");",
+									"",
+									"});",
+									"",
+									"pm.test(\"Has item two self link\", function() {",
+									"    pm.expect(response[1].links.self).to.eql(selfLinkItemTwo);",
+									"});",
+									"",
+									"pm.test(\"Has self link\", function() {",
+									"    pm.expect(links.self).to.eql(selfLink);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/company-roles/mine",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"company-roles",
+								"mine"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Mine include companies",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "e8ab666b-bd2a-4f60-82b9-cf2cd808bc87",
+								"exec": [
+									"let jsonResponse = pm.response.json(),",
+									"    response = jsonResponse.data,",
+									"    links = jsonResponse.links,",
+									"    selfLinkItemOne = pm.variables.get(\"url\") + \"/company-roles/b5b4988f-4c29-568a-858b-a66b8784b5ac?include=companies\",",
+									"    selfLinkItemTwo = pm.variables.get(\"url\") + \"/company-roles/50c647a4-d27f-5d82-a587-1d0b7cc6b58d?include=companies\",",
+									"    selfLink = pm.variables.get(\"url\") + \"/company-roles/mine?include=companies\",",
+									"    selfLinkIncluded = pm.variables.get(\"url\") + \"/companies/62de4ab6-b768-5c21-8835-455d9f341625\",",
+									"    resourceName = 'companies';",
+									"",
+									"const resourceType = \"company-roles\";",
+									"",
+									"pm.test(\"Status code is 200\", function() {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Has correct type returned\", function() {",
+									"    pm.expect(response[0].type).to.eql(resourceType);",
+									"    pm.expect(response[0].type).to.be.a(\"string\");",
+									"});",
+									"",
+									"pm.test(\"Has id returned\", function() {",
+									"    pm.expect(response[0].id).to.be.a(\"string\");",
+									"    pm.expect(response[0].id).to.not.be.empty;",
+									"});",
+									"",
+									"",
+									"pm.test(\"Has company-business-units correct attributes\", function() {",
+									"    let role = response[0].attributes;",
+									"",
+									"    pm.expect(role.name).to.be.a(\"string\");",
+									"    pm.expect(role.isDefault).to.be.a(\"boolean\");",
+									"",
+									"});",
+									"",
+									"pm.test(\"Has item one self link\", function() {",
+									"    pm.expect(response[0].links.self).to.eql(selfLinkItemOne);",
+									"});",
+									"",
+									"pm.test(\"Has correct type returned\", function() {",
+									"    pm.expect(response[1].type).to.eql(resourceType);",
+									"    pm.expect(response[1].type).to.be.a(\"string\");",
+									"});",
+									"",
+									"pm.test(\"Has id returned\", function() {",
+									"    pm.expect(response[1].id).to.be.a(\"string\");",
+									"    pm.expect(response[1].id).to.not.be.empty;",
+									"});",
+									"",
+									"",
+									"pm.test(\"Has company-business-units correct attributes\", function() {",
+									"    let role = response[1].attributes;",
+									"",
+									"    pm.expect(role.name).to.be.a(\"string\");",
+									"    pm.expect(role.isDefault).to.be.a(\"boolean\");",
+									"",
+									"});",
+									"",
+									"pm.test(\"Has correct company relationships\", function() {",
+									"    let BU = response[0].relationships.companies;",
+									"  ",
+									"    pm.test(\"Has correct type returned\", function() {",
+									"    pm.expect(BU.data[0].type).to.eql(resourceName);",
+									"    pm.expect(jsonResponse.included[0].type).to.eql(resourceName);",
+									"});",
+									"",
+									"pm.test(\"Has correct ID returned\", function() {",
+									"    pm.expect(BU.data[0].id).to.eql(pm.variables.get(\"companyID\"));",
+									"    pm.expect(jsonResponse.included[0].id).to.eql(pm.variables.get(\"companyID\"));",
+									"});",
+									"});",
+									"",
+									"pm.test(\"Has correct company relationships second item\", function() {",
+									"    let BU = response[1].relationships.companies;",
+									"  ",
+									"    pm.test(\"Has correct type returned\", function() {",
+									"    pm.expect(BU.data[0].type).to.eql(resourceName);",
+									"    pm.expect(jsonResponse.included[0].type).to.eql(resourceName);",
+									"});",
+									"",
+									"pm.test(\"Has correct ID returned\", function() {",
+									"    pm.expect(BU.data[0].id).to.eql(pm.variables.get(\"companyID\"));",
+									"    pm.expect(jsonResponse.included[0].id).to.eql(pm.variables.get(\"companyID\"));",
+									"});",
+									"});",
+									"",
+									"pm.test(\"Has item two self link\", function() {",
+									"    pm.expect(response[1].links.self).to.eql(selfLinkItemTwo);",
+									"});",
+									"",
+									"pm.test(\"Has self link\", function() {",
+									"    pm.expect(links.self).to.eql(selfLink);",
+									"});",
+									"",
+									"pm.test(\"Has correct company attributes returned\", function() {",
+									"    pm.expect(jsonResponse.included[0].attributes.isActive).to.be.a(\"boolean\");",
+									"    pm.expect(jsonResponse.included[0].attributes.name).to.be.a(\"string\");",
+									"    pm.expect(jsonResponse.included[0].attributes.status).to.be.a(\"string\");",
+									"});",
+									"",
+									"pm.test(\"Has included self link\", function() {",
+									"    pm.expect(jsonResponse.included[0].links.self).to.eql(selfLinkIncluded);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/company-roles/mine?include=companies",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"company-roles",
+								"mine"
+							],
+							"query": [
+								{
+									"key": "include",
+									"value": "companies"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Business unit addresses Resource",
+			"item": [
+				{
+					"name": "{{url}}/access-tokens",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "cea9639a-d73f-42d3-bc7f-45361e17bb74",
+								"exec": [
+									"var responseData = pm.response.json().data;",
+									"",
+									"pm.environment.set(\"token\", responseData.attributes.accessToken);",
+									"pm.variables.set(\"refresh-token\", responseData.attributes.refreshToken);",
+									"",
+									"pm.test(\"Has correct type\", function() {",
+									"    pm.expect(responseData.type).to.eql(\"access-tokens\");",
+									"});",
+									"",
+									"pm.test(\"Has id null\", function() {",
+									"    pm.expect(responseData.id).to.eql(null);",
+									"});",
+									"",
+									"pm.test(\"Has token type Bearer\", function(){",
+									"    pm.expect(responseData.attributes.tokenType).to.eql(\"Bearer\");",
+									"});",
+									"",
+									"pm.test(\"Has expiration time\", function() {",
+									"    pm.expect(responseData.attributes.expiresIn).to.eql(28800);",
+									"});",
+									"",
+									"pm.test(\"Has access token returned\", function() {",
+									"    pm.expect(responseData.attributes.accessToken).to.not.be.empty;",
+									"});",
+									"",
+									"pm.test(\"Has refresh token returned\", function() {",
+									"    pm.expect(responseData.attributes.refreshToken).to.not.be.empty;",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/vnd.api+json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "de-DE, en;q=0.9"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"data\":{\"type\":\"access-tokens\",\"attributes\":{\"username\":\"sonia@spryker.com\", \"password\": \"change123\"}}}"
+						},
+						"url": {
+							"raw": "{{url}}/access-tokens",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"access-tokens"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "BU-address with valid uuid",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "2f030d6e-ebda-4e45-ba0e-e32d5857a563",
+								"exec": [
+									"let jsonResponse = pm.response.json(),",
+									"    response = jsonResponse.data,",
+									"    links = response.links,",
+									"    selfLink = pm.variables.get(\"url\") + \"/company-business-unit-addresses/55fc0ce5-daab-5cdd-8f49-bfaadaf32207\";",
+									"",
+									"const resourceType = \"company-business-unit-addresses\";",
+									"",
+									"pm.test(\"Status code is 200\", function() {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Has correct type returned\", function() {",
+									"    pm.expect(response.type).to.eql(resourceType);",
+									"    pm.expect(response.type).to.be.a(\"string\");",
+									"});",
+									"",
+									"pm.test(\"Has id returned\", function() {",
+									"    pm.expect(response.id).to.be.a(\"string\");",
+									"    pm.expect(response.id).to.not.be.empty;",
+									"});",
+									"",
+									"",
+									"pm.test(\"Has company-business-unit-addresses correct attributes\", function() {",
+									"    let address = response.attributes;",
+									"",
+									"    pm.expect(address.address1).to.be.a(\"string\");",
+									"    pm.expect(address.address2).to.be.a(\"string\");",
+									"    pm.expect(address.address3).to.be.a(\"string\");",
+									"    pm.expect(address.zipCode).to.be.a(\"string\");",
+									"    pm.expect(address.city).to.be.a(\"string\");",
+									"    pm.expect(address.phone).to.be.a(\"string\");",
+									"    pm.expect(address.iso2Code).to.be.a(\"string\");",
+									"    pm.expect(address.comment).to.be.a(\"string\");",
+									"});",
+									"",
+									"pm.test(\"Has self link\", function() {",
+									"    pm.expect(links.self).to.eql(selfLink);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/company-business-unit-addresses/55fc0ce5-daab-5cdd-8f49-bfaadaf32207",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"company-business-unit-addresses",
+								"55fc0ce5-daab-5cdd-8f49-bfaadaf32207"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get BU-address without uuid",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "7ff6c355-2771-497b-b58a-7c964df477f3",
+								"exec": [
+									"pm.test(\"Status code is 501\", function() {",
+									"    pm.response.to.have.status(501);",
+									"});",
+									"",
+									"pm.test(\"Has correct type returned\", function() {",
+									"    var jsonData = pm.response.json(),",
+									"        error = _.first(jsonData.errors);",
+									"",
+									"    pm.expect(error.detail).to.eql(\"Resource is not implemented.\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/company-business-unit-addresses/",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"company-business-unit-addresses",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get BU-address with invalid uuid",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "93b67289-2c56-4592-8409-6000078fff9e",
+								"exec": [
+									"pm.test(\"Status code is 404\", function() {",
+									"    pm.response.to.have.status(404);",
+									"});",
+									"",
+									"pm.test(\"Has correct type returned\", function() {",
+									"    var jsonData = pm.response.json(),",
+									"        error = _.first(jsonData.errors);",
+									"",
+									"    pm.expect(error.detail).to.eql(\"Company business unit address not found.\");",
+									"    pm.expect(error.code).to.eql(\"2001\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/company-business-unit-addresses/efc2d49c-86c4-57d7-9383-cdb067166ce3invalid",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"company-business-unit-addresses",
+								"efc2d49c-86c4-57d7-9383-cdb067166ce3invalid"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "BU-address invalid method",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "57aa7584-59e3-4cb6-9986-e2e40de0bb98",
+								"exec": [
+									"pm.test(\"Status code is 404\", function() {",
+									"    pm.response.to.have.status(404);",
+									"});",
+									"",
+									"pm.test(\"Has correct type returned\", function() {",
+									"    var jsonData = pm.response.json(),",
+									"        error = _.first(jsonData.errors);",
+									"",
+									"    pm.expect(error.detail).to.eql(\"Not Found\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/company-business-unit-addresses/efc2d49c-86c4-57d7-9383-cdb067166ce3",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"company-business-unit-addresses",
+								"efc2d49c-86c4-57d7-9383-cdb067166ce3"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "BU-addresses wrong method",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "31337619-8233-4bdd-b2fd-7685c945b77b",
+								"exec": [
+									"pm.test(\"Status code is 404\", function() {",
+									"    pm.response.to.have.status(404);",
+									"});",
+									"",
+									"pm.test(\"Has correct type returned\", function() {",
+									"    var jsonData = pm.response.json(),",
+									"        error = _.first(jsonData.errors);",
+									"",
+									"    pm.expect(error.detail).to.eql(\"Not Found\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/company-business-unit-addresses",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"company-business-unit-addresses"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "without access token",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "5c9efcee-7b64-4a24-9dce-3fdb19af0921",
+								"exec": [
+									"pm.test(\"Status code is 403\", function() {",
+									"    pm.response.to.have.status(403);",
+									"});",
+									"",
+									"pm.test(\"Has correct type returned\", function() {",
+									"    var jsonData = pm.response.json(),",
+									"        error = _.first(jsonData.errors);",
+									"",
+									"    pm.expect(error.detail).to.eql(\"Missing access token.\");",
+									"    pm.expect(error.code).to.eql(\"002\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/company-business-unit-addresses/efc2d49c-86c4-57d7-9383-cdb067166ce3",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"company-business-unit-addresses",
+								"efc2d49c-86c4-57d7-9383-cdb067166ce3"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "with other access token(on Hold)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "1b1f39aa-5d6f-4671-a17a-9753802a6bea",
+								"exec": [
+									"pm.test(\"Status code is 403\", function () {",
+									"    pm.response.to.have.status(403);",
+									"});",
+									"",
+									"pm.test(\"Has correct error message returned\", function() {",
+									"    var jsonData = pm.response.json(), error = jsonData.errors[0];",
+									"    ",
+									"    pm.expect(error.code).to.eql(\"411\");",
+									"    pm.expect(error.detail).to.eql(\"Unauthorized request.\");",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/company-business-unit-addresses/efc2d49c-86c4-57d7-9383-cdb067166ce3",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"company-business-unit-addresses",
+								"efc2d49c-86c4-57d7-9383-cdb067166ce3"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "list of BU-addresses",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "871afe0b-99b6-44cf-83a2-fdd8d9276284",
+								"exec": [
+									"pm.test(\"Status code is 501\", function() {",
+									"    pm.response.to.have.status(501);",
+									"});",
+									"",
+									"pm.test(\"Has correct type returned\", function() {",
+									"    var jsonData = pm.response.json(),",
+									"        error = _.first(jsonData.errors);",
+									"",
+									"    pm.expect(error.detail).to.eql(\"Resource is not implemented.\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/company-business-unit-addresses",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"company-business-unit-addresses"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "{{url}}/company-business-unit-addresses/mine",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "f5cc0a63-516c-4541-a7bd-f24d46ba9776",
+								"exec": [
+									"pm.test(\"Status code is 404\", function() {",
+									"    pm.response.to.have.status(404);",
+									"});",
+									"",
+									"pm.test(\"Has correct type returned\", function() {",
+									"    var jsonData = pm.response.json(),",
+									"        error = _.first(jsonData.errors);",
+									"",
+									"    pm.expect(error.code).to.eql(\"2001\");",
+									"    pm.expect(error.detail).to.eql(\"Company business unit address not found.\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/company-business-unit-addresses/mine",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"company-business-unit-addresses",
+								"mine"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "bc5c9511-551e-4a51-ba2d-166fd11eba88",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "8f17a8a4-9f3a-4caa-99f6-9023b7be3189",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"id": "118d7f9a-cb2d-4d9c-8ac7-2349215103c2",
+			"key": "companyID",
+			"value": "62de4ab6-b768-5c21-8835-455d9f341625",
+			"type": "string"
+		},
+		{
+			"id": "6d0fa3a3-5af2-4212-b6a9-8a44eab082ea",
+			"key": "addressID",
+			"value": "19a55c0d-7bf0-580c-a9e8-6edacdc1ecde",
+			"type": "string"
+		}
+	]
+}

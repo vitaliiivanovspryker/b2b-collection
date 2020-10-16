@@ -1,0 +1,100 @@
+{
+	"info": {
+		"_postman_id": "0963c3a6-a217-4210-ae00-5959b93340f7",
+		"name": "b2b-login-manual-rest-api",
+		"description": "1. Remove is_default flag fron anne.boleyn@spryker.com in \"spy_company_user table.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Request access token for existing customer but without default company user",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "71697741-b089-45dc-9995-43714c41e10c",
+						"exec": [
+							"var responseData = pm.response.json().data;",
+							"",
+							"pm.variables.set(\"token\", responseData.attributes.accessToken);",
+							"",
+							"pm.test(\"Status code is 201\", function () {",
+							"    pm.response.to.have.status(201);",
+							"});",
+							"",
+							"pm.test(\"Has correct type\", function() {",
+							"    pm.expect(responseData.type).to.eql(\"access-tokens\");",
+							"});",
+							"",
+							"pm.test(\"Has idCompanyUser null\", function() {",
+							"    pm.expect(responseData.attributes.idCompanyUser).to.eql(null);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"data\": {\n        \"type\": \"access-tokens\",\n        \"attributes\": {\n            \"username\": \"anne.boleyn@spryker.com\",\n            \"password\": \"{{password}}\"\n        }\n    }\n}"
+				},
+				"url": {
+					"raw": "{{url}}/access-tokens",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"access-tokens"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "ae4f3d7c-cd94-4531-8086-28d9620f6b3e",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "6a3462eb-3a8b-4eeb-8ce2-ada28a62cb4d",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"id": "b97aaa80-ed14-49c9-af50-74af05e9ba17",
+			"key": "password",
+			"value": "change123",
+			"type": "string"
+		},
+		{
+			"id": "c988f2ae-e539-41c2-b128-2ae97e1da1f4",
+			"key": "token",
+			"value": "string",
+			"type": "string"
+		}
+	]
+}

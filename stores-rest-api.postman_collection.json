@@ -1,0 +1,497 @@
+{
+	"info": {
+		"_postman_id": "9281ac3e-bf85-4881-a7cc-9528d971dbec",
+		"name": "stores-rest-api",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Request to Stores",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "863a2d4b-7e41-4d50-b50d-82f652c06103",
+						"exec": [
+							"pm.test(\"Status code is 200\", function() {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Has type and id returned\", function() {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.data[0].type).to.eql(\"stores\"); ",
+							"    pm.expect(jsonData.data[0].id).to.eql(\"DE\");",
+							"    ",
+							"    ",
+							"});",
+							"",
+							"pm.test(\"Has correct time zone, default currency returned\", function() {",
+							"    var jsonData = pm.response.json(),",
+							"        attributes = jsonData.data[0].attributes;",
+							"    pm.expect(attributes.timeZone).to.eql(\"Europe/Berlin\");",
+							"    pm.expect(attributes.defaultCurrency).to.eql(\"EUR\");",
+							"});",
+							"",
+							"pm.test(\"Has correct currency returned\", function() {",
+							"    var jsonData = pm.response.json()",
+							"        currencies = jsonData.data[0].attributes.currencies;",
+							"    pm.expect(currencies[0].code).to.eql(\"EUR\");",
+							"    pm.expect(currencies[0].name).to.eql(\"Euro\");",
+							"    pm.expect(currencies[1].code).to.eql(\"CHF\");",
+							"    pm.expect(currencies[1].name).to.eql(\"Swiss Franc\");",
+							"});    ",
+							"",
+							"",
+							"pm.test(\"Has correct locales returned\", function() {",
+							"    var jsonData = pm.response.json()",
+							"        currencies = jsonData.data[0].attributes.currencies;",
+							"    pm.expect(currencies[0].code).to.eql(\"EUR\");",
+							"    pm.expect(currencies[0].name).to.eql(\"Euro\");",
+							"    pm.expect(currencies[1].code).to.eql(\"CHF\");",
+							"    pm.expect(currencies[1].name).to.eql(\"Swiss Franc\");",
+							"});",
+							"",
+							"pm.test(\"Has correct first country returned\", function() {",
+							"    var jsonData = pm.response.json(),",
+							"        countries = jsonData.data[0].attributes.countries",
+							"        hasCorrectCountry = false;",
+							"        ",
+							"    for  (var i in countries) {",
+							"        if (countries[i].iso2Code == \"DE\") {",
+							"            pm.expect(countries[i].iso2Code).to.eql(\"DE\");",
+							"            pm.expect(countries[i].iso3Code).to.eql(\"DEU\");",
+							"            pm.expect(countries[i].name).to.eql(\"Germany\");",
+							"            pm.expect(countries[i].postalCodeMandatory).to.eql(true);",
+							"            pm.expect(countries[i].postalCodeRegex).to.eql(\"\\\\d{5}\");",
+							"            pm.expect(countries[i].regions).to.be.empty;",
+							"            hasCorrectCountry = true;",
+							"        }",
+							"    }",
+							"    pm.expect(hasCorrectCountry).to.eql(true);",
+							"});",
+							"",
+							"pm.test(\"Has correct second country returned\", function() {",
+							"    var jsonData = pm.response.json(),",
+							"        countries = jsonData.data[0].attributes.countries",
+							"        hasCorrectCountry = false;",
+							"    ",
+							"    for  (var i in countries) {",
+							"        if (countries[i].iso2Code == \"AT\") {",
+							"            pm.expect(countries[i].iso2Code).to.eql(\"AT\");",
+							"            pm.expect(countries[i].iso3Code).to.eql(\"AUT\");",
+							"            pm.expect(countries[i].name).to.eql(\"Austria\");",
+							"            pm.expect(countries[i].postalCodeMandatory).to.eql(true);",
+							"            pm.expect(countries[i].postalCodeRegex).to.eql(\"\\\\d{4}\");",
+							"            pm.expect(countries[i].regions).to.be.empty;",
+							"            hasCorrectCountry = true;",
+							"        }",
+							"    }",
+							"    pm.expect(hasCorrectCountry).to.eql(true);",
+							"});",
+							"",
+							"pm.test(\"Has self link\", function() {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.data[0].links.self).to.eql(pm.variables.get(\"url\") + /stores/ + \"DE\"   ); ",
+							"});",
+							"console.log(pm.response.json().data[0].attributes);",
+							"var schema = {",
+							" \"data\": {",
+							" \"type\": \"string\",",
+							" \"id\": \"string\",",
+							" \"attributes\": {",
+							"     \"timeZone\": \"string\",",
+							"     \"defaultCurrency\": \"string\",",
+							"     \"currencies\": \"array\",",
+							"     \"locales\": \"array\",",
+							"     \"countries\": \"boolean\",",
+							"     \"links\": {",
+							"         \"self\": \"string\"",
+							"     }",
+							" }",
+							"}",
+							"};",
+							"",
+							"pm.test('Schema is valid', function() {",
+							"  pm.expect(tv4.validate(pm.response.json(), schema)).to.be.true;",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/vnd.api+json"
+					},
+					{
+						"key": "Accept-Language",
+						"value": "de-DE, en;q=0.9"
+					},
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{url}}/stores",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"stores"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Request to Stores with broken URL ",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "863a2d4b-7e41-4d50-b50d-82f652c06103",
+						"exec": [
+							"pm.test(\"Status code is 404\", function () {",
+							"    pm.response.to.have.status(404);",
+							"});",
+							"",
+							"pm.test(\"Correct details message\", function(){",
+							"    pm.expect(pm.response.json().errors[0].detail).to.eql(\"Not Found\");",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/vnd.api+json"
+					},
+					{
+						"key": "Accept-Language",
+						"value": "de-DE, en;q=0.9"
+					},
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{url}}/stres",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"stres"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Request to stores by non-existent ID",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "30d0463e-23a3-4157-810a-9deeb5a421e2",
+						"exec": [
+							"var jsonData = pm.response.json();",
+							"",
+							"pm.test(\"Status code is 404\", function () {",
+							"    pm.response.to.have.status(404);",
+							"});",
+							"",
+							"pm.test(\"Has correct code returned\", function () {",
+							"    pm.expect(jsonData.errors[0].code).to.be.equal(\"601\");",
+							"});",
+							"",
+							"pm.test(\"Has correct status returned\", function () {",
+							"    pm.expect(jsonData.errors[0].status).to.be.equal(404);",
+							"});",
+							"",
+							"pm.test(\"Has correct detail returned\", function () {",
+							"    pm.expect(jsonData.errors[0].detail).to.be.equal(\"Store not found.\");",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/vnd.api+json"
+					},
+					{
+						"key": "Accept-Language",
+						"value": "de-DE, en;q=0.9"
+					},
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{url}}/stores/UA",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"stores",
+						"UA"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Negative. Request to Stores with wrong method",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "863a2d4b-7e41-4d50-b50d-82f652c06103",
+						"exec": [
+							"pm.test(\"Status code is 404\", function () {",
+							"    pm.response.to.have.status(404);",
+							"});",
+							"",
+							"pm.test(\"Correct details message\", function(){",
+							"    pm.expect(pm.response.json().errors[0].detail).to.eql(\"Not Found\");",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/vnd.api+json"
+					},
+					{
+						"key": "Accept-Language",
+						"value": "de-DE, en;q=0.9"
+					},
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{url}}/stores",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"stores"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Negative. Request to Stores with wrong  POST method",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "863a2d4b-7e41-4d50-b50d-82f652c06103",
+						"exec": [
+							"pm.test(\"Status code is 404\", function () {",
+							"    pm.response.to.have.status(404);",
+							"});",
+							"",
+							"pm.test(\"Correct details message\", function(){",
+							"    pm.expect(pm.response.json().errors[0].detail).to.eql(\"Not Found\");",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/vnd.api+json"
+					},
+					{
+						"key": "Accept-Language",
+						"value": "de-DE, en;q=0.9"
+					},
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"data\":{\"type\":\"resource-mock\",\"attributes\":{\"sample\":\"test\"}}}"
+				},
+				"url": {
+					"raw": "{{url}}/stores",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"stores"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Negative. Request to Stores with wrong  PATCH method",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "863a2d4b-7e41-4d50-b50d-82f652c06103",
+						"exec": [
+							"pm.test(\"Status code is 404\", function () {",
+							"    pm.response.to.have.status(404);",
+							"});",
+							"",
+							"pm.test(\"Correct details message\", function(){",
+							"    pm.expect(pm.response.json().errors[0].detail).to.eql(\"Not Found\");",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/vnd.api+json"
+					},
+					{
+						"key": "Accept-Language",
+						"value": "de-DE, en;q=0.9"
+					},
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"data\":{\"type\":\"resource-mock\",\"attributes\":{\"sample\":\"test\"}}}"
+				},
+				"url": {
+					"raw": "{{url}}/stores",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"stores"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Negative. Request to Stores with wrong  PUT method",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "863a2d4b-7e41-4d50-b50d-82f652c06103",
+						"exec": [
+							"pm.test(\"Status code is 404\", function () {",
+							"    pm.response.to.have.status(404);",
+							"});",
+							"",
+							"pm.test(\"Correct details message\", function(){",
+							"    pm.expect(pm.response.json().errors[0].detail).to.eql(\"Not Found\");",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/vnd.api+json"
+					},
+					{
+						"key": "Accept-Language",
+						"value": "de-DE, en;q=0.9"
+					},
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"data\":{\"type\":\"resource-mock\",\"attributes\":{\"sample\":\"test\"}}}"
+				},
+				"url": {
+					"raw": "{{url}}/stores",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"stores"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

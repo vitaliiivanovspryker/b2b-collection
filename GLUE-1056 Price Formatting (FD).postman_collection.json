@@ -1,0 +1,2016 @@
+{
+	"info": {
+		"_postman_id": "6f644310-f2b4-49eb-92d8-30df38611f25",
+		"name": "GLUE-1056 Price Formatting (FD)",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Search",
+			"item": [
+				{
+					"name": "GLUE-1056 Price Formatting (FD)",
+					"item": [
+						{
+							"name": "GLUE-1779 Price object improvement",
+							"item": [
+								{
+									"name": "Request search-catalog resource which contains price object for the abstract product ",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "1c239adc-f926-48f6-bf9a-ee18262c531a",
+												"exec": [
+													"let expectedDataType = \"catalog-search\";",
+													"let abstractProductIncludeType = 'abstract-products';",
+													"let priceIncludeType = 'abstract-product-prices';",
+													"let productSku = pm.variables.get('abstract_sku_with_1product');",
+													"",
+													"pm.test(\"Status code is 200\", function () {",
+													"    pm.response.to.have.status(200);",
+													"});",
+													"",
+													"pm.test(\"Id is null\", function () {",
+													"    pm.expect(pm.response.to.have.jsonBody('data'));",
+													"    for (var key in data) {",
+													"        pm.expect(pm.response.json().data[key].id).to.equal(null);",
+													"    }",
+													"});",
+													"",
+													"pm.test(\"Response type is correct\", function () {",
+													"    pm.expect(pm.response.to.have.jsonBody('data'));",
+													"    for (var key in data) {",
+													"        pm.expect(pm.response.json().data[key].type).to.equal(expectedDataType);",
+													"    }",
+													"});",
+													"",
+													"pm.test(\"Requested product found\", function () {",
+													"    let requestedProduct = getProductFromResponse(pm.response.json().data, productSku);",
+													"    pm.expect(requestedProduct.abstractSku).to.eql(productSku);",
+													"});",
+													"",
+													"pm.test('Response contains currency data in abstract price', function () {",
+													"    let requestedProduct = getProductFromResponse(pm.response.json().data, productSku);",
+													"    ",
+													"    for (var priceKey in requestedProduct.prices) {",
+													"        var price = requestedProduct.prices[priceKey];",
+													"        pm.expect(price).to.have.property('currency').that.is.an('object');",
+													"        pm.expect(price.currency).to.have.property('code', 'EUR');",
+													"        pm.expect(price.currency).to.have.property('name', 'Euro');",
+													"        pm.expect(price.currency).to.have.property('symbol', '€');",
+													"    }",
+													"});",
+													"",
+													"pm.test('Relationship exists', function() {",
+													"    let data = pm.response.json().data;",
+													"    for (var dataKey in data) {",
+													"        pm.expect(data[dataKey].relationships[abstractProductIncludeType]).to.not.be.empty;",
+													"    }",
+													"});",
+													"",
+													"pm.test('Included object exists', function() {",
+													"    let includedPrices = getIncluded(priceIncludeType, productSku);",
+													"    pm.expect(includedPrices.id).to.eql(productSku);",
+													"    pm.expect(includedPrices.type).to.eql(priceIncludeType);",
+													"});",
+													"",
+													"pm.test('Included object contains currency data', function() {",
+													"    for (var key in pm.response.json().data) {",
+													"        let includedPrices = getIncluded(priceIncludeType, productSku);",
+													"        for (var priceKey in includedPrices.attributes.prices) {",
+													"            let price = includedPrices.attributes.prices[priceKey];",
+													"            pm.expect(price).to.have.property('currency').that.is.an('object');",
+													"            pm.expect(price.currency).to.have.property('code', 'EUR');",
+													"            pm.expect(price.currency).to.have.property('name', 'Euro');",
+													"            pm.expect(price.currency).to.have.property('symbol', '€');",
+													"        }",
+													"    }",
+													"});",
+													"",
+													"function getProductFromResponse(data, sku) {",
+													"    for (var dataKey in data) {",
+													"        let products = data[dataKey].attributes.abstractProducts;",
+													"        for (var productKey in products) {",
+													"            if (products[productKey].abstractSku === sku) {",
+													"                return products[productKey];",
+													"            }",
+													"        }",
+													"    }",
+													"}",
+													"",
+													"function getIncluded(type, id) {",
+													"    let included = pm.response.json().included;",
+													"    for (var key in included) {",
+													"        if (included[key].type === priceIncludeType && included[key].id === id) {",
+													"            return included[key];",
+													"        }",
+													"    }",
+													"}",
+													""
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{url}}/catalog-search?q={{abstract_sku_with_1product}}",
+											"host": [
+												"{{url}}"
+											],
+											"path": [
+												"catalog-search"
+											],
+											"query": [
+												{
+													"key": "q",
+													"value": "{{abstract_sku_with_1product}}"
+												}
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Request search-catalog-suggestion resource which contains price object for the abstract product",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "1c239adc-f926-48f6-bf9a-ee18262c531a",
+												"exec": [
+													"let expectedDataType = \"catalog-search-suggestions\";",
+													"let abstractProductIncludeType = 'abstract-products';",
+													"let priceIncludeType = 'abstract-product-prices';",
+													"",
+													"pm.test(\"Status code is 200\", function () {",
+													"    pm.response.to.have.status(200);",
+													"});",
+													"",
+													"pm.test(\"Id is null\", function () {",
+													"    pm.expect(pm.response.to.have.jsonBody('data'));",
+													"    for (var key in data) {",
+													"        pm.expect(pm.response.json().data[key].id).to.equal(null);",
+													"    }",
+													"});",
+													"",
+													"pm.test(\"Response type is correct\", function () {",
+													"    pm.expect(pm.response.to.have.jsonBody('data'));",
+													"    for (var key in data) {",
+													"        pm.expect(pm.response.json().data[key].type).to.equal(expectedDataType);",
+													"    }",
+													"});",
+													"",
+													"pm.test('Relationship exists', function() {",
+													"    let data = pm.response.json().data;",
+													"    for (var dataKey in data) {",
+													"        pm.expect(data[dataKey].relationships[abstractProductIncludeType]).to.not.be.empty;",
+													"    }",
+													"});",
+													"",
+													"pm.test('Included object exists', function() {",
+													"    let suggestedProducts = getFoundProducts();",
+													"    for (var key in suggestedProducts) {",
+													"        let productSku = suggestedProducts[key].abstract_sku;",
+													"        let includedPrices = getIncluded(priceIncludeType, productSku);",
+													"        pm.expect(includedPrices.id).to.eql(productSku);",
+													"        pm.expect(includedPrices.type).to.eql(priceIncludeType);",
+													"    }",
+													"});",
+													"",
+													"pm.test('Included objects contain currency data', function() {",
+													"    let suggestedProducts = getFoundProducts();",
+													"    for (var suggestedProductsKey in suggestedProducts) {",
+													"        let productSku = suggestedProducts[suggestedProductsKey].abstract_sku;",
+													"        let includedPrices = getIncluded(priceIncludeType, productSku);",
+													"        for (var priceKey in includedPrices.attributes.prices) {",
+													"            let price = includedPrices.attributes.prices[priceKey];",
+													"            pm.expect(price).to.have.property('currency').that.is.an('object');",
+													"            pm.expect(price.currency).to.have.property('code', 'EUR');",
+													"            pm.expect(price.currency).to.have.property('name', 'Euro');",
+													"            pm.expect(price.currency).to.have.property('symbol', '€');",
+													"        }",
+													"    }",
+													"});",
+													"",
+													"function getIncluded(type, id) {",
+													"    let included = pm.response.json().included;",
+													"    for (var key in included) {",
+													"        if (included[key].type === priceIncludeType && included[key].id === id) {",
+													"            return included[key];",
+													"        }",
+													"    }",
+													"}",
+													"",
+													"function getFoundProducts(data) {",
+													"    var result = [];",
+													"    for (var dataKey in data) {",
+													"        result.concat(data[dataKey].attributes.abstractProducts);",
+													"    }",
+													"    ",
+													"    return result;",
+													"}",
+													""
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{url}}/catalog-search-suggestions?q=com",
+											"host": [
+												"{{url}}"
+											],
+											"path": [
+												"catalog-search-suggestions"
+											],
+											"query": [
+												{
+													"key": "q",
+													"value": "com"
+												}
+											]
+										}
+									},
+									"response": []
+								}
+							],
+							"_postman_isSubFolder": true
+						},
+						{
+							"name": "GLUE-1780 Request improvements",
+							"item": [
+								{
+									"name": "Positive",
+									"item": [
+										{
+											"name": "Request the catalog-search with extra params \"CHF & GROSS_MODE\"",
+											"event": [
+												{
+													"listen": "test",
+													"script": {
+														"id": "8fa7f3e2-d00c-45b1-820a-3ddfe00745c4",
+														"exec": [
+															"let expectedDataType = \"catalog-search\";",
+															"let abstractProductIncludeType = 'abstract-products';",
+															"let priceIncludeType = 'abstract-product-prices';",
+															"let productSku = pm.variables.get('abstract_sku_with_1product');",
+															"",
+															"pm.test(\"Status code is 200\", function () {",
+															"    pm.response.to.have.status(200);",
+															"});",
+															"",
+															"pm.test(\"Response type is correct\", function () {",
+															"    pm.expect(pm.response.to.have.jsonBody('data'));",
+															"    for (var key in data) {",
+															"        pm.expect(pm.response.json().data[key].type).to.equal(expectedDataType);",
+															"    }",
+															"});",
+															"",
+															"pm.test(\"Id is null\", function () {",
+															"    pm.expect(pm.response.to.have.jsonBody('data'));",
+															"    for (var key in data) {",
+															"        pm.expect(pm.response.json().data[key].id).to.equal(null);",
+															"    }",
+															"});",
+															"",
+															"pm.test('Gross price is not null in products', function () {",
+															"    let foundProducts = getFoundProducts(pm.response.json().data);",
+															"    for (var productKey in foundProducts) {",
+															"        let prices = foundProducts[productKey].prices;",
+															"        for (var pricesKey in prices) {",
+															"            pm.expect(prices[pricesKey].grossAmount).is.not.eql(null);",
+															"        }",
+															"    }",
+															"});",
+															"",
+															"pm.test('Product prices contain currency data', function() {",
+															"    let foundProducts = getFoundProducts(pm.response.json().data);",
+															"    for (var productKey in foundProducts) {",
+															"        let productPrices = foundProducts[productKey].prices;",
+															"        for (var priceKey in productPrices) {",
+															"            let price = productPrices[priceKey];",
+															"            pm.expect(price).to.have.property('currency').that.is.an('object');",
+															"            pm.expect(price.currency).to.have.property('code', 'CHF');",
+															"            pm.expect(price.currency).to.have.property('name', 'Swiss Franc');",
+															"            pm.expect(price.currency).to.have.property('symbol', 'CHF');",
+															"        }",
+															"    }",
+															"});",
+															"",
+															"pm.test('Included objects exist', function() {",
+															"    let foundProducts = getFoundProducts(pm.response.json().data);",
+															"    for (var key in foundProducts) {",
+															"        let productSku = foundProducts[key].abstractSku;",
+															"        let includedPrices = getIncluded(priceIncludeType, productSku);",
+															"        ",
+															"        pm.expect(includedPrices.id).to.eql(productSku);",
+															"        pm.expect(includedPrices.type).to.eql(priceIncludeType);",
+															"    }",
+															"});",
+															"",
+															"pm.test('Gross price is not null in includes', function () {",
+															"    let foundProducts = getFoundProducts(pm.response.json().data);",
+															"    for (var productKey in foundProducts) {",
+															"        var productSku = foundProducts[productKey].abstractSku;",
+															"        var includedPrices = getIncluded(priceIncludeType, productSku);",
+															"        for (var pricesKey in includedPrices.attributes.prices) {",
+															"            pm.expect(includedPrices.attributes.prices[pricesKey].grossAmount).is.not.eql(null);",
+															"        }",
+															"    }",
+															"});",
+															"",
+															"pm.test('Included objects contain currency data', function() {",
+															"    let foundProducts = getFoundProducts(pm.response.json().data);",
+															"    for (var foundProductsKey in foundProducts) {",
+															"        let productSku = foundProducts[foundProductsKey].abstractSku;",
+															"        let includedPrices = getIncluded(priceIncludeType, productSku);",
+															"        for (var priceKey in includedPrices.attributes.prices) {",
+															"            let price = includedPrices.attributes.prices[priceKey];",
+															"            pm.expect(price).to.have.property('currency').that.is.an('object');",
+															"            pm.expect(price.currency).to.have.property('code', 'CHF');",
+															"            pm.expect(price.currency).to.have.property('name', 'Swiss Franc');",
+															"            pm.expect(price.currency).to.have.property('symbol', 'CHF');",
+															"        }",
+															"    }",
+															"});",
+															"",
+															"function getIncluded(type, id) {",
+															"    let included = pm.response.json().included;",
+															"    for (var key in included) {",
+															"        if (included[key].type === priceIncludeType && included[key].id === id) {",
+															"            return included[key];",
+															"        }",
+															"    }",
+															"}",
+															"",
+															"function getFoundProducts(data) {",
+															"    var result = [];",
+															"    for (var dataKey in data) {",
+															"        result = result.concat(data[dataKey].attributes.abstractProducts);",
+															"    }",
+															"    ",
+															"    return result;",
+															"}"
+														],
+														"type": "text/javascript"
+													}
+												}
+											],
+											"request": {
+												"method": "GET",
+												"header": [],
+												"url": {
+													"raw": "{{url}}/catalog-search?q=camera&currency=CHF&priceMode=GROSS_MODE",
+													"host": [
+														"{{url}}"
+													],
+													"path": [
+														"catalog-search"
+													],
+													"query": [
+														{
+															"key": "q",
+															"value": "camera"
+														},
+														{
+															"key": "currency",
+															"value": "CHF"
+														},
+														{
+															"key": "priceMode",
+															"value": "GROSS_MODE"
+														}
+													]
+												}
+											},
+											"response": []
+										},
+										{
+											"name": "Request the catalog-search-suggestions with extra params \"CHF & GROSS_MODE\"",
+											"event": [
+												{
+													"listen": "test",
+													"script": {
+														"id": "10c5289d-be97-41a7-88e2-7c76756e7186",
+														"exec": [
+															"let expectedDataType = \"catalog-search-suggestions\";",
+															"let abstractProductIncludeType = 'abstract-products';",
+															"let priceIncludeType = 'abstract-product-prices';",
+															"let productSku = pm.variables.get('abstract_sku_with_1product');",
+															"",
+															"pm.test(\"Status code is 200\", function () {",
+															"    pm.response.to.have.status(200);",
+															"});",
+															"",
+															"pm.test(\"Response type is correct\", function () {",
+															"    pm.expect(pm.response.to.have.jsonBody('data'));",
+															"    for (var key in data) {",
+															"        pm.expect(pm.response.json().data[key].type).to.equal(expectedDataType);",
+															"    }",
+															"});",
+															"",
+															"pm.test(\"Id is null\", function () {",
+															"    pm.expect(pm.response.to.have.jsonBody('data'));",
+															"    for (var key in data) {",
+															"        pm.expect(pm.response.json().data[key].id).to.equal(null);",
+															"    }",
+															"});",
+															"",
+															"pm.test('Gross price is not null in products', function () {",
+															"    let foundProducts = getFoundProducts(pm.response.json().data);",
+															"    for (var productKey in foundProducts) {",
+															"        let prices = foundProducts[productKey].prices;",
+															"        for (var pricesKey in prices) {",
+															"            pm.expect(prices[pricesKey].netAmount).is.not.eql(null);",
+															"        }",
+															"    }",
+															"});",
+															"",
+															"pm.test('Included objects exist', function() {",
+															"    let foundProducts = getFoundProducts(pm.response.json().data);",
+															"    for (var key in foundProducts) {",
+															"        let productSku = foundProducts[key].abstractSku;",
+															"        let includedPrices = getIncluded(priceIncludeType, productSku);",
+															"        ",
+															"        pm.expect(includedPrices.id).to.eql(productSku);",
+															"        pm.expect(includedPrices.type).to.eql(priceIncludeType);",
+															"    }",
+															"});",
+															"",
+															"pm.test('Gross price is not null in includes', function () {",
+															"    let foundProducts = getFoundProducts(pm.response.json().data);",
+															"    for (var productKey in foundProducts) {",
+															"        var productSku = foundProducts[productKey].abstractSku;",
+															"        var includedPrices = getIncluded(priceIncludeType, productSku);",
+															"        for (var pricesKey in includedPrices.attributes.prices) {",
+															"            pm.expect(includedPrices.attributes.prices[pricesKey].grossAmount).is.not.eql(null);",
+															"        }",
+															"    }",
+															"});",
+															"",
+															"pm.test('Included objects contain currency data', function() {",
+															"    let foundProducts = getFoundProducts(pm.response.json().data);",
+															"    for (var foundProductsKey in foundProducts) {",
+															"        let productSku = foundProducts[foundProductsKey].abstractSku;",
+															"        let includedPrices = getIncluded(priceIncludeType, productSku);",
+															"        for (var priceKey in includedPrices.attributes.prices) {",
+															"            let price = includedPrices.attributes.prices[priceKey];",
+															"            pm.expect(price).to.have.property('currency').that.is.an('object');",
+															"            pm.expect(price.currency).to.have.property('code', 'CHF');",
+															"            pm.expect(price.currency).to.have.property('name', 'Swiss Franc');",
+															"            pm.expect(price.currency).to.have.property('symbol', 'CHF');",
+															"        }",
+															"    }",
+															"});",
+															"",
+															"function getIncluded(type, id) {",
+															"    let included = pm.response.json().included;",
+															"    for (var key in included) {",
+															"        if (included[key].type === priceIncludeType && included[key].id === id) {",
+															"            return included[key];",
+															"        }",
+															"    }",
+															"}",
+															"",
+															"function getFoundProducts(data) {",
+															"    var result = [];",
+															"    for (var dataKey in data) {",
+															"        result = result.concat(data[dataKey].attributes.abstractProducts);",
+															"    }",
+															"    ",
+															"    return result;",
+															"}"
+														],
+														"type": "text/javascript"
+													}
+												}
+											],
+											"request": {
+												"method": "GET",
+												"header": [],
+												"url": {
+													"raw": "{{url}}/catalog-search-suggestions?q=camera&currency=CHF&priceMode=GROSS_MODE",
+													"host": [
+														"{{url}}"
+													],
+													"path": [
+														"catalog-search-suggestions"
+													],
+													"query": [
+														{
+															"key": "q",
+															"value": "camera"
+														},
+														{
+															"key": "currency",
+															"value": "CHF"
+														},
+														{
+															"key": "priceMode",
+															"value": "GROSS_MODE"
+														}
+													]
+												}
+											},
+											"response": []
+										},
+										{
+											"name": "Request the catalog-search-suggestions with extra params \"EUR & NET_MODE\" Copy",
+											"event": [
+												{
+													"listen": "test",
+													"script": {
+														"id": "68b4037d-7e35-4f59-a4c3-8a52680c9d3d",
+														"exec": [
+															"let expectedDataType = \"catalog-search-suggestions\";",
+															"let abstractProductIncludeType = 'abstract-products';",
+															"let priceIncludeType = 'abstract-product-prices';",
+															"let productSku = pm.variables.get('abstract_sku_with_1product');",
+															"",
+															"pm.test(\"Status code is 200\", function () {",
+															"    pm.response.to.have.status(200);",
+															"});",
+															"",
+															"pm.test(\"Response type is correct\", function () {",
+															"    pm.expect(pm.response.to.have.jsonBody('data'));",
+															"    for (var key in data) {",
+															"        pm.expect(pm.response.json().data[key].type).to.equal(expectedDataType);",
+															"    }",
+															"});",
+															"",
+															"pm.test(\"Id is null\", function () {",
+															"    pm.expect(pm.response.to.have.jsonBody('data'));",
+															"    for (var key in data) {",
+															"        pm.expect(pm.response.json().data[key].id).to.equal(null);",
+															"    }",
+															"});",
+															"",
+															"pm.test('Net price is not null in products', function () {",
+															"    let foundProducts = getFoundProducts(pm.response.json().data);",
+															"    for (var productKey in foundProducts) {",
+															"        let prices = foundProducts[productKey].prices;",
+															"        for (var pricesKey in prices) {",
+															"            pm.expect(prices[pricesKey].netAmount).is.not.eql(null);",
+															"        }",
+															"    }",
+															"});",
+															"",
+															"pm.test('Included objects exist', function() {",
+															"    let foundProducts = getFoundProducts(pm.response.json().data);",
+															"    for (var key in foundProducts) {",
+															"        let productSku = foundProducts[key].abstractSku;",
+															"        let includedPrices = getIncluded(priceIncludeType, productSku);",
+															"        ",
+															"        pm.expect(includedPrices.id).to.eql(productSku);",
+															"        pm.expect(includedPrices.type).to.eql(priceIncludeType);",
+															"    }",
+															"});",
+															"",
+															"pm.test('Net price is not null in includes', function () {",
+															"    let foundProducts = getFoundProducts(pm.response.json().data);",
+															"    for (var productKey in foundProducts) {",
+															"        var productSku = foundProducts[productKey].abstractSku;",
+															"        var includedPrices = getIncluded(priceIncludeType, productSku);",
+															"        for (var pricesKey in includedPrices.attributes.prices) {",
+															"            pm.expect(includedPrices.attributes.prices[pricesKey].netAmount).is.not.eql(null);",
+															"        }",
+															"    }",
+															"});",
+															"",
+															"pm.test('Included objects contain currency data', function() {",
+															"    let foundProducts = getFoundProducts(pm.response.json().data);",
+															"    for (var foundProductsKey in foundProducts) {",
+															"        let productSku = foundProducts[foundProductsKey].abstractSku;",
+															"        let includedPrices = getIncluded(priceIncludeType, productSku);",
+															"        for (var priceKey in includedPrices.attributes.prices) {",
+															"            let price = includedPrices.attributes.prices[priceKey];",
+															"            pm.expect(price).to.have.property('currency').that.is.an('object');",
+															"            pm.expect(price.currency).to.have.property('code', 'EUR');",
+															"            pm.expect(price.currency).to.have.property('name', 'Euro');",
+															"            pm.expect(price.currency).to.have.property('symbol', '€');",
+															"        }",
+															"    }",
+															"});",
+															"",
+															"function getIncluded(type, id) {",
+															"    let included = pm.response.json().included;",
+															"    for (var key in included) {",
+															"        if (included[key].type === priceIncludeType && included[key].id === id) {",
+															"            return included[key];",
+															"        }",
+															"    }",
+															"}",
+															"",
+															"function getFoundProducts(data) {",
+															"    var result = [];",
+															"    for (var dataKey in data) {",
+															"        result = result.concat(data[dataKey].attributes.abstractProducts);",
+															"    }",
+															"    ",
+															"    return result;",
+															"}"
+														],
+														"type": "text/javascript"
+													}
+												}
+											],
+											"request": {
+												"method": "GET",
+												"header": [],
+												"url": {
+													"raw": "{{url}}/catalog-search-suggestions?q=camera&currency=EUR&priceMode=NET_MODE",
+													"host": [
+														"{{url}}"
+													],
+													"path": [
+														"catalog-search-suggestions"
+													],
+													"query": [
+														{
+															"key": "q",
+															"value": "camera"
+														},
+														{
+															"key": "currency",
+															"value": "EUR"
+														},
+														{
+															"key": "priceMode",
+															"value": "NET_MODE"
+														}
+													]
+												}
+											},
+											"response": []
+										},
+										{
+											"name": "Request the catalog-search with extra params \"EURO & NET_MODE\"",
+											"event": [
+												{
+													"listen": "test",
+													"script": {
+														"id": "fa727bb9-c421-4774-ab26-df35b274bdac",
+														"exec": [
+															"let expectedDataType = \"catalog-search\";",
+															"let abstractProductIncludeType = 'abstract-products';",
+															"let priceIncludeType = 'abstract-product-prices';",
+															"let productSku = pm.variables.get('abstract_sku_with_1product');",
+															"",
+															"pm.test(\"Status code is 200\", function () {",
+															"    pm.response.to.have.status(200);",
+															"});",
+															"",
+															"pm.test(\"Response type is correct\", function () {",
+															"    pm.expect(pm.response.to.have.jsonBody('data'));",
+															"    for (var key in data) {",
+															"        pm.expect(pm.response.json().data[key].type).to.equal(expectedDataType);",
+															"    }",
+															"});",
+															"",
+															"pm.test(\"Id is null\", function () {",
+															"    pm.expect(pm.response.to.have.jsonBody('data'));",
+															"    for (var key in data) {",
+															"        pm.expect(pm.response.json().data[key].id).to.equal(null);",
+															"    }",
+															"});",
+															"",
+															"pm.test('Net price is not null in products', function () {",
+															"    let foundProducts = getFoundProducts(pm.response.json().data);",
+															"    for (var productKey in foundProducts) {",
+															"        let prices = foundProducts[productKey].prices;",
+															"        for (var pricesKey in prices) {",
+															"            pm.expect(prices[pricesKey].netAmount).to.be.not.eql(null);",
+															"        }",
+															"    }",
+															"});",
+															"",
+															"pm.test('Product prices contain currency data', function() {",
+															"    let foundProducts = getFoundProducts(pm.response.json().data);",
+															"    for (var productKey in foundProducts) {",
+															"        let productPrices = foundProducts[productKey].prices;",
+															"        for (var priceKey in productPrices) {",
+															"            let price = productPrices[priceKey];",
+															"            pm.expect(price).to.have.property('currency').that.is.an('object');",
+															"            pm.expect(price.currency).to.have.property('code', 'EUR');",
+															"            pm.expect(price.currency).to.have.property('name', 'Euro');",
+															"            pm.expect(price.currency).to.have.property('symbol', '€');",
+															"        }",
+															"    }",
+															"});",
+															"",
+															"pm.test('Included objects exist', function() {",
+															"    let foundProducts = getFoundProducts(pm.response.json().data);",
+															"    for (var key in foundProducts) {",
+															"        let productSku = foundProducts[key].abstractSku;",
+															"        let includedPrices = getIncluded(priceIncludeType, productSku);",
+															"        ",
+															"        pm.expect(includedPrices.id).to.eql(productSku);",
+															"        pm.expect(includedPrices.type).to.eql(priceIncludeType);",
+															"    }",
+															"});",
+															"",
+															"pm.test('Net price is not null in includes', function () {",
+															"    let foundProducts = getFoundProducts(pm.response.json().data);",
+															"    for (var productKey in foundProducts) {",
+															"        var productSku = foundProducts[productKey].abstractSku;",
+															"        var includedPrices = getIncluded(priceIncludeType, productSku);",
+															"        for (var pricesKey in includedPrices.attributes.prices) {",
+															"            pm.expect(includedPrices.attributes.prices[pricesKey].netAmount).is.not.eql(null);",
+															"        }",
+															"    }",
+															"});",
+															"",
+															"pm.test('Included objects contain currency data', function() {",
+															"    let foundProducts = getFoundProducts(pm.response.json().data);",
+															"    for (var foundProductsKey in foundProducts) {",
+															"        let productSku = foundProducts[foundProductsKey].abstractSku;",
+															"        let includedPrices = getIncluded(priceIncludeType, productSku);",
+															"        for (var priceKey in includedPrices.attributes.prices) {",
+															"            let price = includedPrices.attributes.prices[priceKey];",
+															"            pm.expect(price).to.have.property('currency').that.is.an('object');",
+															"            pm.expect(price.currency).to.have.property('code', 'EUR');",
+															"            pm.expect(price.currency).to.have.property('name', 'Euro');",
+															"            pm.expect(price.currency).to.have.property('symbol', '€');",
+															"        }",
+															"    }",
+															"});",
+															"",
+															"function getIncluded(type, id) {",
+															"    let included = pm.response.json().included;",
+															"    for (var key in included) {",
+															"        if (included[key].type === priceIncludeType && included[key].id === id) {",
+															"            return included[key];",
+															"        }",
+															"    }",
+															"}",
+															"",
+															"function getFoundProducts(data) {",
+															"    var result = [];",
+															"    for (var dataKey in data) {",
+															"        result = result.concat(data[dataKey].attributes.abstractProducts);",
+															"    }",
+															"    ",
+															"    return result;",
+															"}"
+														],
+														"type": "text/javascript"
+													}
+												}
+											],
+											"request": {
+												"method": "GET",
+												"header": [],
+												"url": {
+													"raw": "{{url}}/catalog-search?q=camera&currency=EUR&priceMode=NET_MODE",
+													"host": [
+														"{{url}}"
+													],
+													"path": [
+														"catalog-search"
+													],
+													"query": [
+														{
+															"key": "q",
+															"value": "camera"
+														},
+														{
+															"key": "currency",
+															"value": "EUR"
+														},
+														{
+															"key": "priceMode",
+															"value": "NET_MODE"
+														}
+													]
+												}
+											},
+											"response": []
+										}
+									],
+									"_postman_isSubFolder": true
+								}
+							],
+							"_postman_isSubFolder": true
+						}
+					],
+					"_postman_isSubFolder": true
+				}
+			]
+		},
+		{
+			"name": "Products",
+			"item": [
+				{
+					"name": "GLUE-1056 Price Formatting (TD)",
+					"item": [
+						{
+							"name": "GLUE-1780 Request improvements",
+							"item": [
+								{
+									"name": "Positive",
+									"item": [
+										{
+											"name": "Request the abstract product with extra params \"EURO & NET_MODE\"",
+											"event": [
+												{
+													"listen": "test",
+													"script": {
+														"id": "7d3c080c-0f64-42ee-9ace-5cadaf730de8",
+														"exec": [
+															"let expectedDataType = \"abstract-products\";",
+															"let priceIncludeType = 'abstract-product-prices';",
+															"let productSku = pm.variables.get(\"abstract_sku_with_1product\");",
+															"",
+															"pm.test(\"Status code is 200\", function () {",
+															"    pm.response.to.have.status(200);",
+															"});",
+															"",
+															"pm.test(\"Response type is correct\", function () {",
+															"    pm.expect(pm.response.to.have.jsonBody('data'));",
+															"    pm.expect(pm.response.json().data.type).to.equal(expectedDataType);",
+															"});",
+															"",
+															"pm.test(\"Id is equal to the sku from url\", function () {",
+															"    for (var key in pm.response.json().data) {",
+															"         pm.expect(pm.response.json().data.id).to.equal(productSku);",
+															"    }",
+															"});",
+															"",
+															"pm.test('Included object exists', function() {",
+															"    let includedPrices = getIncluded(priceIncludeType, productSku);",
+															"    pm.expect(includedPrices.id).to.eql(productSku);",
+															"    pm.expect(includedPrices.type).to.eql(priceIncludeType);",
+															"});",
+															"",
+															"pm.test('Net price is not null', function () {",
+															"    let includedPrices = getIncluded(priceIncludeType, productSku);",
+															"    for (var pricesKey in includedPrices.attributes.prices) {",
+															"        pm.expect(includedPrices.attributes.prices[pricesKey].netAmount).is.not.eql(null);",
+															"    }",
+															"});",
+															"",
+															"pm.test('Includes contain currency data', function() {",
+															"    for (var key in pm.response.json().data) {",
+															"        let includedPrices = getIncluded(priceIncludeType, productSku);",
+															"        for (var priceKey in includedPrices.attributes.prices) {",
+															"            let price = includedPrices.attributes.prices[priceKey];",
+															"            pm.expect(price).to.have.property('currency').that.is.an('object');",
+															"            pm.expect(price.currency).to.have.property('code', 'EUR');",
+															"            pm.expect(price.currency).to.have.property('name', 'Euro');",
+															"            pm.expect(price.currency).to.have.property('symbol', '€');",
+															"        }",
+															"    }",
+															"});",
+															"",
+															"function getIncluded(type, id) {",
+															"    let included = pm.response.json().included;",
+															"    for (var key in included) {",
+															"        if (included[key].type === priceIncludeType && included[key].id === id) {",
+															"            return included[key];",
+															"        }",
+															"    }",
+															"}"
+														],
+														"type": "text/javascript"
+													}
+												}
+											],
+											"request": {
+												"method": "GET",
+												"header": [],
+												"url": {
+													"raw": "{{url}}/abstract-products/{{abstract_sku_with_1product}}?currency=EUR&priceMode=NET_MODE",
+													"host": [
+														"{{url}}"
+													],
+													"path": [
+														"abstract-products",
+														"{{abstract_sku_with_1product}}"
+													],
+													"query": [
+														{
+															"key": "currency",
+															"value": "EUR"
+														},
+														{
+															"key": "priceMode",
+															"value": "NET_MODE"
+														}
+													]
+												}
+											},
+											"response": []
+										},
+										{
+											"name": "Request the abstract product with extra params \"CHF & GROSS_MODE\"",
+											"event": [
+												{
+													"listen": "test",
+													"script": {
+														"id": "5806a46b-f6c0-4b49-b179-1dcb9146c6ec",
+														"exec": [
+															"let expectedDataType = \"abstract-products\";",
+															"let priceIncludeType = 'abstract-product-prices';",
+															"let productSku = pm.variables.get(\"abstract_sku_with_1product\");",
+															"",
+															"pm.test(\"Status code is 200\", function () {",
+															"    pm.response.to.have.status(200);",
+															"});",
+															"",
+															"pm.test(\"Response type is correct\", function () {",
+															"    pm.expect(pm.response.to.have.jsonBody('data'));",
+															"    pm.expect(pm.response.json().data.type).to.equal(expectedDataType);",
+															"});",
+															"",
+															"pm.test(\"Id is equal to the sku from url\", function () {",
+															"    for (var key in pm.response.json().data) {",
+															"         pm.expect(pm.response.json().data.id).to.equal(productSku);",
+															"    }",
+															"});",
+															"",
+															"pm.test('Included object exists', function() {",
+															"    let includedPrices = getIncluded(priceIncludeType, productSku);",
+															"    pm.expect(includedPrices.id).to.eql(productSku);",
+															"    pm.expect(includedPrices.type).to.eql(priceIncludeType);",
+															"});",
+															"",
+															"pm.test('Includes contain currency data', function() {",
+															"    for (var key in pm.response.json().data) {",
+															"        let includedPrices = getIncluded(priceIncludeType, productSku);",
+															"        for (var priceKey in includedPrices.attributes.prices) {",
+															"            let price = includedPrices.attributes.prices[priceKey];",
+															"            pm.expect(price).to.have.property('currency').that.is.an('object');",
+															"            pm.expect(price.currency).to.have.property('code', 'CHF');",
+															"            pm.expect(price.currency).to.have.property('name', 'Swiss Franc');",
+															"            pm.expect(price.currency).to.have.property('symbol', 'CHF');",
+															"        }",
+															"    }",
+															"});",
+															"",
+															"pm.test('Gross price is not null', function () {",
+															"    let includedPrices = getIncluded(priceIncludeType, productSku);",
+															"    for (var pricesKey in includedPrices.attributes.prices) {",
+															"        pm.expect(includedPrices.attributes.prices[pricesKey].grossAmount).is.not.eql(null);",
+															"    }",
+															"});",
+															"",
+															"function getIncluded(type, id) {",
+															"    let included = pm.response.json().included;",
+															"    for (var key in included) {",
+															"        if (included[key].type === priceIncludeType && included[key].id === id) {",
+															"            return included[key];",
+															"        }",
+															"    }",
+															"}"
+														],
+														"type": "text/javascript"
+													}
+												}
+											],
+											"request": {
+												"method": "GET",
+												"header": [],
+												"url": {
+													"raw": "{{url}}/abstract-products/{{abstract_sku_with_1product}}?currency=CHF&priceMode=GROSS_MODE",
+													"host": [
+														"{{url}}"
+													],
+													"path": [
+														"abstract-products",
+														"{{abstract_sku_with_1product}}"
+													],
+													"query": [
+														{
+															"key": "currency",
+															"value": "CHF"
+														},
+														{
+															"key": "priceMode",
+															"value": "GROSS_MODE"
+														}
+													]
+												}
+											},
+											"response": []
+										},
+										{
+											"name": "Request the concrete product with extra params \"EURO & NET_MODE\"",
+											"event": [
+												{
+													"listen": "test",
+													"script": {
+														"id": "f7a3e79f-fa61-48b3-bfdc-30eb26193091",
+														"exec": [
+															"let expectedDataType = \"concrete-products\";",
+															"let priceIncludeType = 'concrete-product-prices';",
+															"let productSku = pm.variables.get(\"concrete_sku\");",
+															"",
+															"pm.test(\"Status code is 200\", function () {",
+															"    pm.response.to.have.status(200);",
+															"});",
+															"",
+															"pm.test(\"Response type is correct\", function () {",
+															"    pm.expect(pm.response.to.have.jsonBody('data'));",
+															"    pm.expect(pm.response.json().data.type).to.equal(expectedDataType);",
+															"});",
+															"",
+															"pm.test(\"Id is equal to the sku from url\", function () {",
+															"    for (var key in pm.response.json().data) {",
+															"         pm.expect(pm.response.json().data.id).to.equal(productSku);",
+															"    }",
+															"});",
+															"",
+															"pm.test('Included object exists', function() {",
+															"    let includedPrices = getIncluded(priceIncludeType, productSku);",
+															"    pm.expect(includedPrices.id).to.eql(productSku);",
+															"    pm.expect(includedPrices.type).to.eql(priceIncludeType);",
+															"});",
+															"",
+															"pm.test('Includes contain currency data', function() {",
+															"    for (var key in pm.response.json().data) {",
+															"        let includedPrices = getIncluded(priceIncludeType, productSku);",
+															"        for (var priceKey in includedPrices.attributes.prices) {",
+															"            let price = includedPrices.attributes.prices[priceKey];",
+															"            pm.expect(price).to.have.property('currency').that.is.an('object');",
+															"            pm.expect(price.currency).to.have.property('code', 'EUR');",
+															"            pm.expect(price.currency).to.have.property('name', 'Euro');",
+															"            pm.expect(price.currency).to.have.property('symbol', '€');",
+															"        }",
+															"    }",
+															"});",
+															"",
+															"pm.test('Net price is not null', function () {",
+															"    let includedPrices = getIncluded(priceIncludeType, productSku);",
+															"    for (var pricesKey in includedPrices.attributes.prices) {",
+															"        pm.expect(includedPrices.attributes.prices[pricesKey].netAmount).is.not.eql(null);",
+															"    }",
+															"});",
+															"",
+															"function getIncluded(type, id) {",
+															"    let included = pm.response.json().included;",
+															"    for (var key in included) {",
+															"        if (included[key].type === priceIncludeType && included[key].id === id) {",
+															"            return included[key];",
+															"        }",
+															"    }",
+															"}"
+														],
+														"type": "text/javascript"
+													}
+												}
+											],
+											"request": {
+												"method": "GET",
+												"header": [],
+												"url": {
+													"raw": "{{url}}/concrete-products/{{concrete_sku}}?currency=EUR&priceMode=NET_MODE",
+													"host": [
+														"{{url}}"
+													],
+													"path": [
+														"concrete-products",
+														"{{concrete_sku}}"
+													],
+													"query": [
+														{
+															"key": "currency",
+															"value": "EUR"
+														},
+														{
+															"key": "priceMode",
+															"value": "NET_MODE"
+														}
+													]
+												}
+											},
+											"response": []
+										},
+										{
+											"name": "Request the concrete product with extra params \"CHF & GROSS_MODE\"",
+											"event": [
+												{
+													"listen": "test",
+													"script": {
+														"id": "fe4e498e-b7a9-4d0c-bfd8-91a38b5c2b34",
+														"exec": [
+															"let expectedDataType = \"concrete-products\";",
+															"let priceIncludeType = 'concrete-product-prices';",
+															"let productSku = pm.variables.get(\"concrete_sku\");",
+															"",
+															"pm.test(\"Status code is 200\", function () {",
+															"    pm.response.to.have.status(200);",
+															"});",
+															"",
+															"pm.test(\"Response type is correct\", function () {",
+															"    pm.expect(pm.response.to.have.jsonBody('data'));",
+															"    pm.expect(pm.response.json().data.type).to.equal(expectedDataType);",
+															"});",
+															"",
+															"pm.test(\"Id is equal to the sku from url\", function () {",
+															"    for (var key in pm.response.json().data) {",
+															"         pm.expect(pm.response.json().data.id).to.equal(productSku);",
+															"    }",
+															"});",
+															"",
+															"pm.test('Included object exists', function() {",
+															"    let includedPrices = getIncluded(priceIncludeType, productSku);",
+															"    pm.expect(includedPrices.id).to.eql(productSku);",
+															"    pm.expect(includedPrices.type).to.eql(priceIncludeType);",
+															"});",
+															"",
+															"pm.test('Includes contain currency data', function() {",
+															"    for (var key in pm.response.json().data) {",
+															"        let includedPrices = getIncluded(priceIncludeType, productSku);",
+															"        for (var priceKey in includedPrices.attributes.prices) {",
+															"            let price = includedPrices.attributes.prices[priceKey];",
+															"            pm.expect(price).to.have.property('currency').that.is.an('object');",
+															"            pm.expect(price.currency).to.have.property('code', 'CHF');",
+															"            pm.expect(price.currency).to.have.property('name', 'Swiss Franc');",
+															"            pm.expect(price.currency).to.have.property('symbol', 'CHF');",
+															"        }",
+															"    }",
+															"});",
+															"",
+															"pm.test('Gross price is not null', function () {",
+															"    let includedPrices = getIncluded(priceIncludeType, productSku);",
+															"    for (var pricesKey in includedPrices.attributes.prices) {",
+															"        pm.expect(includedPrices.attributes.prices[pricesKey].grossAmount).is.not.eql(null);",
+															"    }",
+															"});",
+															"",
+															"function getIncluded(type, id) {",
+															"    let included = pm.response.json().included;",
+															"    for (var key in included) {",
+															"        if (included[key].type === priceIncludeType && included[key].id === id) {",
+															"            return included[key];",
+															"        }",
+															"    }",
+															"}"
+														],
+														"type": "text/javascript"
+													}
+												}
+											],
+											"request": {
+												"method": "GET",
+												"header": [],
+												"url": {
+													"raw": "{{url}}/concrete-products/{{concrete_sku}}?currency=CHF&priceMode=GROSS_MODE",
+													"host": [
+														"{{url}}"
+													],
+													"path": [
+														"concrete-products",
+														"{{concrete_sku}}"
+													],
+													"query": [
+														{
+															"key": "currency",
+															"value": "CHF"
+														},
+														{
+															"key": "priceMode",
+															"value": "GROSS_MODE"
+														}
+													]
+												}
+											},
+											"response": []
+										}
+									],
+									"_postman_isSubFolder": true
+								},
+								{
+									"name": "Negative",
+									"item": [
+										{
+											"name": "Request the abstract product with no existing currency like \"URK\"",
+											"event": [
+												{
+													"listen": "test",
+													"script": {
+														"id": "816e4ec2-5e19-48b0-b1aa-96a82ce9bb5c",
+														"exec": [
+															"pm.test(\"Status code is 400\", function () {",
+															"    pm.response.to.have.status(400);",
+															"});",
+															"",
+															"pm.test(\"Error response is correct\", function () {",
+															"    pm.expect(pm.response.to.have.jsonBody('errors'));",
+															"    ",
+															"    pm.response.json().errors.forEach(function (element) {",
+															"        pm.expect(element).to.have.property('detail', 'Currency is invalid.');",
+															"        pm.expect(element).to.have.property('code', '313');",
+															"        pm.expect(element).to.have.property('status', 400);",
+															"    });",
+															"});"
+														],
+														"type": "text/javascript"
+													}
+												}
+											],
+											"request": {
+												"method": "GET",
+												"header": [],
+												"url": {
+													"raw": "{{url}}/abstract-products/{{abstract_sku_with_1product}}?currency=URK&priceMode=NET_MODE",
+													"host": [
+														"{{url}}"
+													],
+													"path": [
+														"abstract-products",
+														"{{abstract_sku_with_1product}}"
+													],
+													"query": [
+														{
+															"key": "currency",
+															"value": "URK"
+														},
+														{
+															"key": "priceMode",
+															"value": "NET_MODE"
+														}
+													]
+												}
+											},
+											"response": []
+										},
+										{
+											"name": "Request the concrete product with no existing currency like \"URK\"",
+											"event": [
+												{
+													"listen": "test",
+													"script": {
+														"id": "efd43db4-02a7-4d3e-85eb-97467f716d01",
+														"exec": [
+															"pm.test(\"Status code is 400\", function () {",
+															"    pm.response.to.have.status(400);",
+															"});",
+															"",
+															"pm.test(\"Error response is correct\", function () {",
+															"    pm.expect(pm.response.to.have.jsonBody('errors'));",
+															"    ",
+															"    pm.response.json().errors.forEach(function (element) {",
+															"        pm.expect(element).to.have.property('detail', 'Currency is invalid.');",
+															"        pm.expect(element).to.have.property('code', '313');",
+															"        pm.expect(element).to.have.property('status', 400);",
+															"    });",
+															"});"
+														],
+														"type": "text/javascript"
+													}
+												}
+											],
+											"request": {
+												"method": "GET",
+												"header": [],
+												"url": {
+													"raw": "{{url}}/concrete-products/{{concrete_sku}}?currency=URK&priceMode=NET_MODE",
+													"host": [
+														"{{url}}"
+													],
+													"path": [
+														"concrete-products",
+														"{{concrete_sku}}"
+													],
+													"query": [
+														{
+															"key": "currency",
+															"value": "URK"
+														},
+														{
+															"key": "priceMode",
+															"value": "NET_MODE"
+														}
+													]
+												}
+											},
+											"response": []
+										},
+										{
+											"name": "Request the abstract product with no existing currency like \"MIN_MODE\"",
+											"event": [
+												{
+													"listen": "test",
+													"script": {
+														"id": "b1e4ec41-c67a-43e4-a000-6b942fd3f828",
+														"exec": [
+															"pm.test(\"Status code is 400\", function () {",
+															"    pm.response.to.have.status(400);",
+															"});",
+															"",
+															"pm.test(\"Error response is correct\", function () {",
+															"    pm.expect(pm.response.to.have.jsonBody('errors'));",
+															"    ",
+															"    pm.response.json().errors.forEach(function (element) {",
+															"        pm.expect(element).to.have.property('detail', 'Price mode is invalid.');",
+															"        pm.expect(element).to.have.property('code', '314');",
+															"        pm.expect(element).to.have.property('status', 400);",
+															"    });",
+															"});"
+														],
+														"type": "text/javascript"
+													}
+												}
+											],
+											"request": {
+												"method": "GET",
+												"header": [],
+												"url": {
+													"raw": "{{url}}/abstract-products/{{abstract_sku_with_1product}}?currency=EUR&priceMode=MIN_MODE",
+													"host": [
+														"{{url}}"
+													],
+													"path": [
+														"abstract-products",
+														"{{abstract_sku_with_1product}}"
+													],
+													"query": [
+														{
+															"key": "currency",
+															"value": "EUR"
+														},
+														{
+															"key": "priceMode",
+															"value": "MIN_MODE"
+														}
+													]
+												}
+											},
+											"response": []
+										},
+										{
+											"name": "Request the concrete product with no existing currency like \"MIN_MODE\"",
+											"event": [
+												{
+													"listen": "test",
+													"script": {
+														"id": "316015be-abec-460b-92dd-79f527ee7a5b",
+														"exec": [
+															"pm.test(\"Status code is 400\", function () {",
+															"    pm.response.to.have.status(400);",
+															"});",
+															"",
+															"pm.test(\"Error response is correct\", function () {",
+															"    pm.expect(pm.response.to.have.jsonBody('errors'));",
+															"    ",
+															"    pm.response.json().errors.forEach(function (element) {",
+															"        pm.expect(element).to.have.property('detail', 'Price mode is invalid.');",
+															"        pm.expect(element).to.have.property('code', '314');",
+															"        pm.expect(element).to.have.property('status', 400);",
+															"    });",
+															"});"
+														],
+														"type": "text/javascript"
+													}
+												}
+											],
+											"request": {
+												"method": "GET",
+												"header": [],
+												"url": {
+													"raw": "{{url}}/abstract-products/{{concrete_sku}}?currency=EUR&priceMode=MIN_MODE",
+													"host": [
+														"{{url}}"
+													],
+													"path": [
+														"abstract-products",
+														"{{concrete_sku}}"
+													],
+													"query": [
+														{
+															"key": "currency",
+															"value": "EUR"
+														},
+														{
+															"key": "priceMode",
+															"value": "MIN_MODE"
+														}
+													]
+												}
+											},
+											"response": []
+										},
+										{
+											"name": "Request the abstract product currency, not available for currect store like \"UAH\"",
+											"event": [
+												{
+													"listen": "test",
+													"script": {
+														"id": "816e4ec2-5e19-48b0-b1aa-96a82ce9bb5c",
+														"exec": [
+															"pm.test(\"Status code is 400\", function () {",
+															"    pm.response.to.have.status(400);",
+															"});",
+															"",
+															"pm.test(\"Error response is correct\", function () {",
+															"    pm.expect(pm.response.to.have.jsonBody('errors'));",
+															"    ",
+															"    pm.response.json().errors.forEach(function (element) {",
+															"        pm.expect(element).to.have.property('detail', 'Currency is invalid.');",
+															"        pm.expect(element).to.have.property('code', '313');",
+															"        pm.expect(element).to.have.property('status', 400);",
+															"    });",
+															"});"
+														],
+														"type": "text/javascript"
+													}
+												}
+											],
+											"request": {
+												"method": "GET",
+												"header": [],
+												"url": {
+													"raw": "{{url}}/abstract-products/{{abstract_sku_with_1product}}?currency=UAH&priceMode=NET_MODE",
+													"host": [
+														"{{url}}"
+													],
+													"path": [
+														"abstract-products",
+														"{{abstract_sku_with_1product}}"
+													],
+													"query": [
+														{
+															"key": "currency",
+															"value": "UAH"
+														},
+														{
+															"key": "priceMode",
+															"value": "NET_MODE"
+														}
+													]
+												}
+											},
+											"response": []
+										},
+										{
+											"name": "Request the concrete product currency, not available for currect store like \"UAH\"",
+											"event": [
+												{
+													"listen": "test",
+													"script": {
+														"id": "efd43db4-02a7-4d3e-85eb-97467f716d01",
+														"exec": [
+															"pm.test(\"Status code is 400\", function () {",
+															"    pm.response.to.have.status(400);",
+															"});",
+															"",
+															"pm.test(\"Error response is correct\", function () {",
+															"    pm.expect(pm.response.to.have.jsonBody('errors'));",
+															"    ",
+															"    pm.response.json().errors.forEach(function (element) {",
+															"        pm.expect(element).to.have.property('detail', 'Currency is invalid.');",
+															"        pm.expect(element).to.have.property('code', '313');",
+															"        pm.expect(element).to.have.property('status', 400);",
+															"    });",
+															"});"
+														],
+														"type": "text/javascript"
+													}
+												}
+											],
+											"request": {
+												"method": "GET",
+												"header": [],
+												"url": {
+													"raw": "{{url}}/concrete-products/{{concrete_sku}}?currency=UAH&priceMode=NET_MODE",
+													"host": [
+														"{{url}}"
+													],
+													"path": [
+														"concrete-products",
+														"{{concrete_sku}}"
+													],
+													"query": [
+														{
+															"key": "currency",
+															"value": "UAH"
+														},
+														{
+															"key": "priceMode",
+															"value": "NET_MODE"
+														}
+													]
+												}
+											},
+											"response": []
+										}
+									],
+									"_postman_isSubFolder": true
+								}
+							],
+							"_postman_isSubFolder": true
+						}
+					],
+					"_postman_isSubFolder": true
+				}
+			]
+		},
+		{
+			"name": "Product Prices",
+			"item": [
+				{
+					"name": "GLUE-1056 Price Formatting (FD)",
+					"item": [
+						{
+							"name": "GLUE-1779 Price object improvements",
+							"item": [
+								{
+									"name": "Request the prices for abstract product-prices",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "968602c9-4771-4617-aa59-4aee79d2e75b",
+												"exec": [
+													"let expectedDataType = \"abstract-product-prices\";",
+													"",
+													"pm.test(\"Status code is 200\", function () {",
+													"    pm.response.to.have.status(200);",
+													"});",
+													"",
+													"pm.test(\"Response type is correct\", function () {",
+													"    pm.expect(pm.response.to.have.jsonBody('data'));",
+													"    for (var key in pm.response.json().data) {",
+													"         pm.expect(pm.response.json().data[key].type).to.equal(expectedDataType);",
+													"    }",
+													"});",
+													"",
+													"pm.test(\"Id is equal to the sku from url\", function () {",
+													"    for (var key in pm.response.json().data) {",
+													"         pm.expect(pm.response.json().data[key].id).to.equal(pm.variables.get(\"abstract_sku_with_1product\"));",
+													"    }",
+													"});",
+													"",
+													"pm.test('Response contains currency data', function () {",
+													"    for (var key in pm.response.json().data) {",
+													"        let prices = pm.response.json().data[key].attributes.prices;",
+													"        for (var pricesKey in prices) {",
+													"            pm.expect(prices[pricesKey]).to.have.property('currency').that.is.an('object');",
+													"            pm.expect(prices[pricesKey].currency).to.have.property('code', 'EUR');",
+													"            pm.expect(prices[pricesKey].currency).to.have.property('name', 'Euro');",
+													"            pm.expect(prices[pricesKey].currency).to.have.property('symbol', '€');",
+													"        }",
+													"    }",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{url}}/abstract-products/{{abstract_sku_with_1product}}/abstract-product-prices",
+											"host": [
+												"{{url}}"
+											],
+											"path": [
+												"abstract-products",
+												"{{abstract_sku_with_1product}}",
+												"abstract-product-prices"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Request the prices for concrete product-prices",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "91d8b9c1-2116-4185-a54d-da9dfb623993",
+												"exec": [
+													"let expectedDataType = \"concrete-product-prices\";",
+													"",
+													"pm.test(\"Status code is 200\", function () {",
+													"    pm.response.to.have.status(200);",
+													"});",
+													"",
+													"pm.test(\"Response type is correct\", function () {",
+													"    pm.expect(pm.response.to.have.jsonBody('data'));",
+													"    for (var key in pm.response.json().data) {",
+													"         pm.expect(pm.response.json().data[key].type).to.equal('concrete-product-prices');",
+													"    }",
+													"});",
+													"",
+													"pm.test(\"Id is equal to the sku from url\", function () {",
+													"    for (var key in pm.response.json().data) {",
+													"         pm.expect(pm.response.json().data[key].id).to.equal(pm.variables.get(\"concrete_sku\"));",
+													"    }",
+													"});",
+													"",
+													"pm.test('Response contains currency data', function () {",
+													"    for (var key in pm.response.json().data) {",
+													"        let prices = pm.response.json().data[key].attributes.prices;",
+													"        for (var pricesKey in prices) {",
+													"            pm.expect(prices[pricesKey]).to.have.property('currency').that.is.an('object');",
+													"            pm.expect(prices[pricesKey].currency).to.have.property('code', 'EUR');",
+													"            pm.expect(prices[pricesKey].currency).to.have.property('name', 'Euro');",
+													"            pm.expect(prices[pricesKey].currency).to.have.property('symbol', '€');",
+													"        }",
+													"    }",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{url}}/concrete-products/{{concrete_sku}}/concrete-product-prices",
+											"host": [
+												"{{url}}"
+											],
+											"path": [
+												"concrete-products",
+												"{{concrete_sku}}",
+												"concrete-product-prices"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Request abstract product which contains price object ",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "bf916bf8-1ec2-4fe7-9ad2-8f29e9a03d2a",
+												"exec": [
+													"let expectedDataType = \"abstract-products\";",
+													"let priceIncludeType = 'abstract-product-prices';",
+													"let productSku = pm.variables.get(\"abstract_sku_with_1product\");",
+													"",
+													"pm.test(\"Status code is 200\", function() {",
+													"    pm.response.to.have.status(200);",
+													"});",
+													"",
+													"pm.test(\"Response type is correct\", function() {",
+													"    pm.expect(pm.response.to.have.jsonBody('data'));",
+													"    pm.expect(pm.response.json().data.type).to.equal(expectedDataType);",
+													"});",
+													"",
+													"pm.test(\"Id is equal to the sku from url\", function() {",
+													"    pm.expect(pm.response.json().data.id).to.equal(productSku);",
+													"});",
+													"",
+													"pm.test('Relationship exists', function() {",
+													"    pm.expect(pm.response.json().data.relationships[priceIncludeType].data).to.not.be.empty;",
+													"});",
+													"",
+													"pm.test('Included object exists', function() {",
+													"    let includedPrices = getIncluded(priceIncludeType, productSku);",
+													"    pm.expect(includedPrices.id).to.eql(productSku);",
+													"    pm.expect(includedPrices.type).to.eql(priceIncludeType);",
+													"});",
+													"",
+													"pm.test('Response contains currency data', function() {",
+													"    for (var key in pm.response.json().data) {",
+													"        let includedPrices = getIncluded(priceIncludeType, productSku);",
+													"        for (var priceKey in includedPrices.attributes.prices) {",
+													"            let price = includedPrices.attributes.prices[priceKey];",
+													"            pm.expect(price).to.have.property('currency').that.is.an('object');",
+													"            pm.expect(price.currency).to.have.property('code', 'EUR');",
+													"            pm.expect(price.currency).to.have.property('name', 'Euro');",
+													"            pm.expect(price.currency).to.have.property('symbol', '€');",
+													"        }",
+													"    }",
+													"});",
+													"",
+													"function getIncluded(type, id) {",
+													"    let included = pm.response.json().included;",
+													"    for (var key in included) {",
+													"        if (included[key].type === priceIncludeType && included[key].id === id) {",
+													"            return included[key];",
+													"        }",
+													"    }",
+													"}"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{url}}/abstract-products/{{abstract_sku_with_1product}}?include=abstract-product-prices",
+											"host": [
+												"{{url}}"
+											],
+											"path": [
+												"abstract-products",
+												"{{abstract_sku_with_1product}}"
+											],
+											"query": [
+												{
+													"key": "include",
+													"value": "abstract-product-prices"
+												}
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Request abstract product which contains price object 2",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "bf916bf8-1ec2-4fe7-9ad2-8f29e9a03d2a",
+												"exec": [
+													"let expectedDataType = \"abstract-products\";",
+													"let priceIncludeType = 'abstract-product-prices';",
+													"let productSku = pm.variables.get(\"abstract_sku_with_1product\");",
+													"",
+													"pm.test(\"Status code is 200\", function() {",
+													"    pm.response.to.have.status(200);",
+													"});",
+													"",
+													"pm.test(\"Response type is correct\", function() {",
+													"    pm.expect(pm.response.to.have.jsonBody('data'));",
+													"    pm.expect(pm.response.json().data.type).to.equal(expectedDataType);",
+													"});",
+													"",
+													"pm.test(\"Id is equal to the sku from url\", function() {",
+													"    pm.expect(pm.response.json().data.id).to.equal(productSku);",
+													"});",
+													"",
+													"pm.test('Relationship exists', function() {",
+													"    pm.expect(pm.response.json().data.relationships[priceIncludeType].data).to.not.be.empty;",
+													"});",
+													"",
+													"pm.test('Included object exists', function() {",
+													"    let includedPrices = getIncluded(priceIncludeType, productSku);",
+													"    pm.expect(includedPrices.id).to.eql(productSku);",
+													"    pm.expect(includedPrices.type).to.eql(priceIncludeType);",
+													"});",
+													"",
+													"pm.test('Response contains currency data', function() {",
+													"    for (var key in pm.response.json().data) {",
+													"        let includedPrices = getIncluded(priceIncludeType, productSku);",
+													"        for (var priceKey in includedPrices.attributes.prices) {",
+													"            let price = includedPrices.attributes.prices[priceKey];",
+													"            pm.expect(price).to.have.property('currency').that.is.an('object');",
+													"            pm.expect(price.currency).to.have.property('code', 'EUR');",
+													"            pm.expect(price.currency).to.have.property('name', 'Euro');",
+													"            pm.expect(price.currency).to.have.property('symbol', '€');",
+													"        }",
+													"    }",
+													"});",
+													"",
+													"function getIncluded(type, id) {",
+													"    let included = pm.response.json().included;",
+													"    for (var key in included) {",
+													"        if (included[key].type === priceIncludeType && included[key].id === id) {",
+													"            return included[key];",
+													"        }",
+													"    }",
+													"}"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{url}}/abstract-products/{{abstract_sku_with_1product}}",
+											"host": [
+												"{{url}}"
+											],
+											"path": [
+												"abstract-products",
+												"{{abstract_sku_with_1product}}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Request concrete product which contains price object ",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "4ab9e5d3-0d3e-424d-a8d7-58bae2199cc6",
+												"exec": [
+													"let expectedDataType = \"concrete-products\";",
+													"let priceIncludeType = 'concrete-product-prices';",
+													"let productSku = pm.variables.get(\"concrete_sku\");",
+													"",
+													"pm.test(\"Status code is 200\", function() {",
+													"    pm.response.to.have.status(200);",
+													"});",
+													"",
+													"pm.test(\"Response type is correct\", function() {",
+													"    pm.expect(pm.response.to.have.jsonBody('data'));",
+													"    pm.expect(pm.response.json().data.type).to.equal(expectedDataType);",
+													"});",
+													"",
+													"pm.test(\"Id is equal to the sku from url\", function() {",
+													"    pm.expect(pm.response.json().data.id).to.equal(productSku);",
+													"});",
+													"",
+													"pm.test('Relationship exists', function() {",
+													"    pm.expect(pm.response.json().data.relationships[priceIncludeType].data).to.not.be.empty;",
+													"});",
+													"",
+													"pm.test('Included object exists', function() {",
+													"    let includedPrices = getIncluded(priceIncludeType, productSku);",
+													"    pm.expect(includedPrices.id).to.eql(productSku);",
+													"    pm.expect(includedPrices.type).to.eql(priceIncludeType);",
+													"});",
+													"",
+													"pm.test('Response contains currency data', function() {",
+													"    for (var key in pm.response.json().data) {",
+													"        let includedPrices = getIncluded(priceIncludeType, productSku);",
+													"        for (var priceKey in includedPrices.attributes.prices) {",
+													"            let price = includedPrices.attributes.prices[priceKey];",
+													"            pm.expect(price).to.have.property('currency').that.is.an('object');",
+													"            pm.expect(price.currency).to.have.property('code', 'EUR');",
+													"            pm.expect(price.currency).to.have.property('name', 'Euro');",
+													"            pm.expect(price.currency).to.have.property('symbol', '€');",
+													"        }",
+													"    }",
+													"});",
+													"",
+													"function getIncluded(type, id) {",
+													"    let included = pm.response.json().included;",
+													"    for (var key in included) {",
+													"        if (included[key].type === priceIncludeType && included[key].id === id) {",
+													"            return included[key];",
+													"        }",
+													"    }",
+													"}"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{url}}/concrete-products/{{concrete_sku}}?include=concrete-product-prices",
+											"host": [
+												"{{url}}"
+											],
+											"path": [
+												"concrete-products",
+												"{{concrete_sku}}"
+											],
+											"query": [
+												{
+													"key": "include",
+													"value": "concrete-product-prices"
+												}
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Request concrete product which contains price object 2",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "4ab9e5d3-0d3e-424d-a8d7-58bae2199cc6",
+												"exec": [
+													"let expectedDataType = \"concrete-products\";",
+													"let priceIncludeType = 'concrete-product-prices';",
+													"let productSku = pm.variables.get(\"concrete_sku\");",
+													"",
+													"pm.test(\"Status code is 200\", function() {",
+													"    pm.response.to.have.status(200);",
+													"});",
+													"",
+													"pm.test(\"Response type is correct\", function() {",
+													"    pm.expect(pm.response.to.have.jsonBody('data'));",
+													"    pm.expect(pm.response.json().data.type).to.equal(expectedDataType);",
+													"});",
+													"",
+													"pm.test(\"Id is equal to the sku from url\", function() {",
+													"    pm.expect(pm.response.json().data.id).to.equal(productSku);",
+													"});",
+													"",
+													"pm.test('Relationship exists', function() {",
+													"    pm.expect(pm.response.json().data.relationships[priceIncludeType].data).to.not.be.empty;",
+													"});",
+													"",
+													"pm.test('Included object exists', function() {",
+													"    let includedPrices = getIncluded(priceIncludeType, productSku);",
+													"    pm.expect(includedPrices.id).to.eql(productSku);",
+													"    pm.expect(includedPrices.type).to.eql(priceIncludeType);",
+													"});",
+													"",
+													"pm.test('Response contains currency data', function() {",
+													"    for (var key in pm.response.json().data) {",
+													"        let includedPrices = getIncluded(priceIncludeType, productSku);",
+													"        for (var priceKey in includedPrices.attributes.prices) {",
+													"            let price = includedPrices.attributes.prices[priceKey];",
+													"            pm.expect(price).to.have.property('currency').that.is.an('object');",
+													"            pm.expect(price.currency).to.have.property('code', 'EUR');",
+													"            pm.expect(price.currency).to.have.property('name', 'Euro');",
+													"            pm.expect(price.currency).to.have.property('symbol', '€');",
+													"        }",
+													"    }",
+													"});",
+													"",
+													"function getIncluded(type, id) {",
+													"    let included = pm.response.json().included;",
+													"    for (var key in included) {",
+													"        if (included[key].type === priceIncludeType && included[key].id === id) {",
+													"            return included[key];",
+													"        }",
+													"    }",
+													"}"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{url}}/concrete-products/{{concrete_sku}}?include=concrete-product-prices",
+											"host": [
+												"{{url}}"
+											],
+											"path": [
+												"concrete-products",
+												"{{concrete_sku}}"
+											],
+											"query": [
+												{
+													"key": "include",
+													"value": "concrete-product-prices"
+												}
+											]
+										}
+									},
+									"response": []
+								}
+							],
+							"_postman_isSubFolder": true
+						}
+					],
+					"_postman_isSubFolder": true
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "274455c8-23ce-4582-8f6a-013802dccf86",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "85bcbf16-908b-4dbd-a4c9-39e7f8ca76c8",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"id": "8fbb7d8b-0cbe-4d34-b90d-945ad2a6ab36",
+			"key": "abstract_sku_with_1product",
+			"value": "M53331",
+			"type": "string"
+		},
+		{
+			"id": "97187b19-b5d4-4c83-8eb0-520bd694a649",
+			"key": "concrete_sku",
+			"value": "100949",
+			"type": "string"
+		}
+	]
+}

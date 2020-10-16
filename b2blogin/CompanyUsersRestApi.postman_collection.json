@@ -1,0 +1,681 @@
+{
+	"info": {
+		"_postman_id": "9e7ed26a-0c10-4b2f-845e-e640d8149df9",
+		"name": "CompanyUsersRestApi",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Company users - Get company users ",
+			"item": [
+				{
+					"name": "Request access token",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "cea9639a-d73f-42d3-bc7f-45361e17bb74",
+								"exec": [
+									"var responseData = pm.response.json().data;",
+									"",
+									"pm.variables.set(\"token\", responseData.attributes.accessToken);",
+									"pm.variables.set(\"refresh-token\", responseData.attributes.refreshToken);",
+									"",
+									"pm.test(\"Has correct type\", function() {",
+									"    pm.expect(responseData.type).to.eql(\"access-tokens\");",
+									"});",
+									"",
+									"pm.test(\"Has id null\", function() {",
+									"    pm.expect(responseData.id).to.eql(null);",
+									"});",
+									"",
+									"pm.test(\"Has token type Bearer\", function(){",
+									"    pm.expect(responseData.attributes.tokenType).to.eql(\"Bearer\");",
+									"});",
+									"",
+									"pm.test(\"Has expiration time\", function() {",
+									"    pm.expect(responseData.attributes.expiresIn).to.eql(28800);",
+									"});",
+									"",
+									"pm.test(\"Has access token returned\", function() {",
+									"    pm.expect(responseData.attributes.accessToken).to.not.be.empty;",
+									"});",
+									"",
+									"pm.test(\"Has refresh token returned\", function() {",
+									"    pm.expect(responseData.attributes.refreshToken).to.not.be.empty;",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/vnd.api+json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "de-DE, en;q=0.9"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"data\":{\"type\":\"access-tokens\",\"attributes\":{\"username\":\"{{email}}\", \"password\": \"change123\"}}}"
+						},
+						"url": {
+							"raw": "{{url}}/access-tokens",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"access-tokens"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Request access token",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/vnd.api+json"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/vnd.api+json"
+									},
+									{
+										"key": "Accept-Language",
+										"value": "de-DE, en;q=0.9"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\"data\":{\"type\":\"access_tokens\",\"attributes\":{\"username\":\"spencor.hopkin@spryker.com\", \"password\": \"change123\"}}}"
+								},
+								"url": {
+									"raw": "{{url}}/access_tokens",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"access_tokens"
+									]
+								}
+							},
+							"status": "Created",
+							"code": 201,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Cache-Control",
+									"value": "no-cache",
+									"name": "Cache-Control",
+									"description": "Tells all caching mechanisms from server to client whether they may cache this object. It is measured in seconds"
+								},
+								{
+									"key": "Connection",
+									"value": "close",
+									"name": "Connection",
+									"description": "Options that are desired for the connection"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/vnd.api+json",
+									"name": "Content-Type",
+									"description": "The mime type of this content"
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 21 Jun 2018 15:09:53 GMT",
+									"name": "Date",
+									"description": "The date and time that the message was sent"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked",
+									"name": "Transfer-Encoding",
+									"description": "The form of encoding used to safely transfer the entity to the user. Currently defined methods are: chunked, compress, deflate, gzip, identity."
+								},
+								{
+									"key": "X-Server",
+									"value": "spryker-vagrant",
+									"name": "X-Server",
+									"description": "Custom header"
+								},
+								{
+									"key": "content-language",
+									"value": "en_US",
+									"name": "content-language",
+									"description": "The language the content is in"
+								}
+							],
+							"cookie": [],
+							"body": "{\"data\":{\"type\":\"access_tokens\",\"id\":null,\"attributes\":{\"token_type\":\"Bearer\",\"expires_in\":28799,\"access_token\":\"eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsImp0aSI6IjI3NjYxZTJlMTk1Njc2ZDgzNTI3MDYwZDY5ODY2MGU3MjA1ODIzMTJkZTUwMjZmMTNjZDFkY2YxNjk1NmE0MTBiZGVmNzc5MDJjNGE1ZmRjIn0.eyJhdWQiOiJmcm9udGVuZCIsImp0aSI6IjI3NjYxZTJlMTk1Njc2ZDgzNTI3MDYwZDY5ODY2MGU3MjA1ODIzMTJkZTUwMjZmMTNjZDFkY2YxNjk1NmE0MTBiZGVmNzc5MDJjNGE1ZmRjIiwiaWF0IjoxNTI5NTkzNzkyLCJuYmYiOjE1Mjk1OTM3OTIsImV4cCI6MTUyOTYyMjU5Miwic3ViIjoie1wiY3VzdG9tZXJfcmVmZXJlbmNlXCI6XCJERS0tMVwiLFwiaWRfY3VzdG9tZXJcIjoxfSIsInNjb3BlcyI6WyJjdXN0b21lciJdfQ.U1Ij4aDJ7H34E8XFCXfQORCnytk7wUuGRAGkBGhhWQsHDQucgSJs8V5q820E9Z3V8lEGXoY2vpZJZ-wP41HVFMsXJo10LG6NenekOeRNVpSpBVAcys5cSCBT25sv32OqFnn-g18CkemAgKAx9qCqzIRj6hmrkGjXDWhHpphJYBX40s38hR7IDHK2DSODifm-lyivd7wIohASbi4nVTgL57TsNsiSJJaWje4mc8Vs-rcNiuwl4t6pVvHRDMlDskq_S1tNp8GXrj_ESNtesuFf_F_iiUt20tJFgdqYddeMZNIECRX1S1WQjefRVZBgvvqDUAeemVb75CAF1TCILW8S-Q\",\"refresh_token\":\"def5020076edcef1e548965759216bcb4957c4e3623e567bbcb66de2e2fdc4e00fbe539bd5d77837c48d05dfa223aeea9701eb43b808b1b71d5820222500fc4bfc045686a636cf5479c6d437f0c210e73de919b044e56471d44402496ff5253d23b9d0d821bf4925e27eb2817eba1538abb5f861a03dd0290897d97b8902e58fcd995c217309ac661d2db449417eb26fb24fd9832312a26cf065ac5122ba747044ac6eb4898fe2ef8b0ba57642c3989a5ac1dd72785098b3da12ed0d35b3f481a09a9d235386de514526e1267c8fe7178e9e229154f6c0dc9c547927ca61a6f725ca23c33930453fcae7e448dd8407d77dec07a41e8c360a3fafe5e1b50b535814e18ac513528113b2726b6414977096b1a7477d43d0bb319906c8086984f8ae182190b30103e8b4ebacc37438d7fada1c06102f870c85660c52a47d879e57e9643369206ac614a6051fd4eb1a3f4a032b74b59af84b88e1a2620b0f86b8ac59366100a9ef03b7606100f884d25d7fc56ac13c5538ccf985701b64ded1e2ec462a0800861747d2706b3184d1b3a4082b7f1e717d17092c4b70b75e5c14fb69d27dc4bdd0c0a905\"},\"links\":{\"self\":\"http:\\/\\/glue.de.shop-suite.local\\/access_tokens\\/\"}}}"
+						}
+					]
+				},
+				{
+					"name": "Get company users",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "1fb26cd9-e70a-428e-8551-ab50406473aa",
+								"exec": [
+									"let jsonResponse = pm.response.json(),",
+									"    response = jsonResponse.data,",
+									"    links = jsonResponse.links,",
+									"    selfLink = pm.variables.get(\"url\") + \"/company-users\";",
+									"",
+									"const resourceType = \"company-users\";",
+									"",
+									"pm.test(\"Status code is 200\", function() {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Has correct type returned\", function() {",
+									"    pm.expect(response[0].type).to.eql(resourceType);",
+									"    pm.expect(response[0].type).to.be.a(\"string\");",
+									"});",
+									"",
+									"pm.test(\"Has id returned\", function() {",
+									"    pm.expect(response[0].id).to.be.a(\"string\");",
+									"    pm.expect(response[0].id).to.not.be.empty;",
+									"});",
+									"",
+									"pm.test(\"Has four company users\", function() {",
+									"    pm.expect(response).to.have.lengthOf(4);",
+									"});",
+									"",
+									"pm.test(\"Has company user correct business unit attributes\", function() {",
+									"    let companyUser = _.first(response).attributes,",
+									"        companyBusinessUnit = companyUser.companyBusinessUnit;",
+									"",
+									"    pm.expect(companyBusinessUnit.name).to.be.eql(\"Spryker Systems GmbH\");",
+									"    pm.expect(companyBusinessUnit.email).to.be.eql(\"HQ@spryker.com\");",
+									"    pm.expect(companyBusinessUnit.phone).to.be.eql(\"4902890001\");",
+									"    pm.expect(companyBusinessUnit.externalUrl).to.be.eql(\"\");",
+									"    pm.expect(companyBusinessUnit.bic).to.be.eql(\"\");",
+									"    pm.expect(companyBusinessUnit.iban).to.be.eql(\"\");",
+									"});",
+									"",
+									"pm.test(\"Has company user correct business unit company attributes\", function() {",
+									"    let companyUser = _.first(response).attributes,",
+									"        companyBusinessUnit = companyUser.companyBusinessUnit;",
+									"",
+									"    pm.expect(companyBusinessUnit.company.isActive).to.be.a(\"boolean\");",
+									"    pm.expect(companyBusinessUnit.company.name).to.be.eql(\"Spryker Systems GmbH\");",
+									"    pm.expect(companyBusinessUnit.company.status).to.be.eql(\"approved\");",
+									"});",
+									"",
+									"pm.test(\"Has company user correct business unit billing addresses attributes\", function() {",
+									"    let companyUser = _.first(response).attributes,",
+									"        companyBusinessUnit = companyUser.companyBusinessUnit,",
+									"        billingAddresses = companyBusinessUnit.billingAddresses,",
+									"        billingAddress = _.first(billingAddresses);",
+									"",
+									"    pm.expect(billingAddress.address1).to.be.eql(\"Oderberger Str.\");",
+									"    pm.expect(billingAddress.address2).to.be.eql(\"57\");",
+									"    pm.expect(billingAddress.address3).to.be.eql(\"\");",
+									"    pm.expect(billingAddress.zipCode).to.be.eql(\"10115\");",
+									"    pm.expect(billingAddress.city).to.be.eql(\"Berlin\");",
+									"    pm.expect(billingAddress.phone).to.be.eql(\"4902890001\");",
+									"    pm.expect(billingAddress.iso2Code).to.be.eql(\"DE\");",
+									"    pm.expect(billingAddress.comment).to.be.eql(\"HQ\");",
+									"    pm.expect(billingAddress.isDefaultBilling).to.be.eql(null);",
+									"});",
+									"",
+									"pm.test(\"Has company user correct company roles attributes\", function() {",
+									"    let companyUser = _.first(response).attributes;",
+									"",
+									"    pm.expect(companyUser.companyRoles).to.be;",
+									"});",
+									"",
+									"pm.test(\"Has company user correct active attribute\", function() {",
+									"    let companyUser = _.first(response).attributes;",
+									"",
+									"    pm.expect(companyUser.isActive).to.be.eql(true);",
+									"});",
+									"",
+									"pm.test(\"Has company user correct company attributes\", function() {",
+									"    let companyUser = _.first(response).attributes;",
+									"    ",
+									"    pm.expect(companyUser.company.isActive).to.be.a(\"boolean\");",
+									"    pm.expect(companyUser.company.name).to.be.eql(\"Spryker Systems GmbH\");",
+									"    pm.expect(companyUser.company.status).to.be.eql(\"approved\");",
+									"});",
+									"",
+									"pm.test(\"Has company user correct self link\", function() {",
+									"    let companyUser = _.first(response);",
+									"    ",
+									"    pm.expect(companyUser.links.self).to.be.eql(selfLink + \"/\" + companyUser.id);",
+									"});",
+									"",
+									"pm.test(\"Has self link\", function() {",
+									"    pm.expect(links.self).to.eql(selfLink);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/company-users/",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"company-users",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Negative. Get company users with wrong url",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "7926c708-4216-4645-b014-dec8fd4235ef",
+								"exec": [
+									"pm.test(\"Status code is 404\", function() {",
+									"    pm.response.to.have.status(404);",
+									"});",
+									"",
+									"pm.test(\"Has correct type returned\", function() {",
+									"    var jsonData = pm.response.json(),",
+									"        error = _.first(jsonData.errors);",
+									"",
+									"    pm.expect(error.detail).to.eql(\"Not Found\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/company-userss/",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"company-userss",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Negative. Get company users without access token",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "7926c708-4216-4645-b014-dec8fd4235ef",
+								"exec": [
+									"pm.test(\"Status code is 403\", function() {",
+									"    pm.response.to.have.status(403);",
+									"});",
+									"",
+									"pm.test(\"Has correct type returned\", function() {",
+									"    var jsonData = pm.response.json(),",
+									"        error = _.first(jsonData.errors);",
+									"",
+									"    pm.expect(error.detail).to.eql(\"Missing access token.\");",
+									"    pm.expect(error.code).to.eql(\"002\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/company-users/",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"company-users",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Negative. Get company users with wrong POST method",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "7926c708-4216-4645-b014-dec8fd4235ef",
+								"exec": [
+									"pm.test(\"Status code is 404\", function() {",
+									"    pm.response.to.have.status(404);",
+									"});",
+									"",
+									"pm.test(\"Has correct type returned\", function() {",
+									"    var jsonData = pm.response.json(),",
+									"        error = _.first(jsonData.errors);",
+									"",
+									"    pm.expect(error.detail).to.eql(\"Not Found\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/company-users/",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"company-users",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Negative. Get company users with wrong PUT method",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "7926c708-4216-4645-b014-dec8fd4235ef",
+								"exec": [
+									"pm.test(\"Status code is 404\", function() {",
+									"    pm.response.to.have.status(404);",
+									"});",
+									"",
+									"pm.test(\"Has correct type returned\", function() {",
+									"    var jsonData = pm.response.json(),",
+									"        error = _.first(jsonData.errors);",
+									"",
+									"    pm.expect(error.detail).to.eql(\"Not Found\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/company-users/",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"company-users",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Negative. Get company users with wrong PATCH method",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "7926c708-4216-4645-b014-dec8fd4235ef",
+								"exec": [
+									"pm.test(\"Status code is 404\", function() {",
+									"    pm.response.to.have.status(404);",
+									"});",
+									"",
+									"pm.test(\"Has correct type returned\", function() {",
+									"    var jsonData = pm.response.json(),",
+									"        error = _.first(jsonData.errors);",
+									"",
+									"    pm.expect(error.detail).to.eql(\"Not Found\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/company-users/",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"company-users",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Negative. Get company users with wrong DELETE method",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "7926c708-4216-4645-b014-dec8fd4235ef",
+								"exec": [
+									"pm.test(\"Status code is 404\", function() {",
+									"    pm.response.to.have.status(404);",
+									"});",
+									"",
+									"pm.test(\"Has correct type returned\", function() {",
+									"    var jsonData = pm.response.json(),",
+									"        error = _.first(jsonData.errors);",
+									"",
+									"    pm.expect(error.detail).to.eql(\"Not Found\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/company-users/",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"company-users",
+								""
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "f4f57703-cb70-4e94-82fc-fa28437f38a4",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "3d2741a5-993b-417d-aad1-6a8888a65c02",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "b07c07a0-af99-4b64-b5fe-d0178d4851ef",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "f9076afc-a5aa-4c4b-8901-cb335851f622",
+				"type": "text/javascript",
+				"exec": [
+					"pm.test(\"Response is json\", function () {",
+					"    if (pm.request.method !== \"DELETE\") {",
+					"        pm.response.to.be.json;",
+					"    }",
+					"});"
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"id": "09317805-d7fe-44d7-9311-0445f6a01e9e",
+			"key": "salutation",
+			"value": "Mr",
+			"type": "string"
+		},
+		{
+			"id": "c31921d6-dc96-414f-b9c2-b9aa074a0480",
+			"key": "firstName",
+			"value": "Max",
+			"type": "string"
+		},
+		{
+			"id": "c0862458-a83b-491c-9a03-37fb9db39389",
+			"key": "lastName",
+			"value": "Musterman",
+			"type": "string"
+		},
+		{
+			"id": "b307e7db-7be7-4076-a016-57d1c49f8cbb",
+			"key": "email",
+			"value": "anne.boleyn@spryker.com",
+			"type": "string"
+		},
+		{
+			"id": "00468add-0137-4c74-b5de-06336b192daf",
+			"key": "password",
+			"value": "change123",
+			"type": "string"
+		},
+		{
+			"id": "15767cf9-a082-4e65-b6b1-6411ff751464",
+			"key": "customer_reference",
+			"value": "DE--7",
+			"type": "string"
+		},
+		{
+			"id": "b9e393a8-f353-4c44-a0d0-fd51ae48c39d",
+			"key": "refresh-token",
+			"value": "string",
+			"type": "string"
+		},
+		{
+			"id": "54562acd-bc77-4839-9e3c-5e5c242041d0",
+			"key": "token",
+			"value": "string",
+			"type": "string"
+		}
+	]
+}

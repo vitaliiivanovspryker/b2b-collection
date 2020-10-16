@@ -1,0 +1,617 @@
+{
+	"info": {
+		"_postman_id": "38c43c19-f792-47e8-af2d-b402cc9d9706",
+		"name": "cart-rest-api-manual",
+		"description": "1. In spy_product table unckeck is_active field where sku = 078_24602396.\n2. Go to page http://zed.de.suite-nonsplit.local/product-management/edit/variant?id-product=278&id-product-abstract=197&type=#tab-content-price and change quantity to 0.\n3. Go to page http://zed.de.suite-nonsplit.local/product-management/edit/variant?id-product=261&id-product-abstract=182&type=#tab-content-discontinue and press \"Discontinue\" button.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Add an item into existing regular cart ",
+			"item": [
+				{
+					"name": "Create new customer (helper)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "8ad8c317-2a5a-46a7-afee-92b8b26b9d20",
+								"exec": [
+									"var responseData = pm.response.json().data;",
+									"",
+									"pm.variables.set(\"customer_reference\", responseData.id);"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "51ba2b17-58f0-4abe-b0d8-d6e0f93ead8c",
+								"exec": [
+									"setTimeout(function() {}, 1000);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "X-Anonymous-Customer-Unique-Id",
+								"value": "{{anonymous_customer_id}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"data\": {\n    \"type\": \"customers\",\n    \"attributes\": {\n        \"salutation\": \"Mr\",\n        \"gender\": \"Male\",\n        \"firstName\":\"First Name\",\n        \"lastName\":\"test\",\n        \"email\":\"{{username}}\",\n        \"password\":\"{{password}}\",\n        \"passwordConfirmation\":\"{{password}}\",\n        \"acceptedTerms\":true\n    }\n  }\n}"
+						},
+						"url": {
+							"raw": "{{url}}/customers",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"customers"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Request access token (helper)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "09587067-e655-4e6c-9698-87148832d432",
+								"exec": [
+									"var responseData = pm.response.json().data;",
+									"",
+									"pm.variables.set(\"token\", responseData.attributes.accessToken);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"data\": {\n        \"type\": \"access-tokens\",\n        \"attributes\": {\n            \"username\": \"{{username}}\",\n            \"password\": \"{{password}}\"\n        }\n    }\n}"
+						},
+						"url": {
+							"raw": "{{url}}/access-tokens",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"access-tokens"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Request for getting the list of cart (helper)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "05370552-f35d-44b3-a690-1496fc7d0ad8",
+								"exec": [
+									"var responseData = pm.response.json().data[0];",
+									"",
+									"pm.variables.set(\"cart_id\", responseData.id);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/carts",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"carts"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Send the request with discontinued product",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "05370552-f35d-44b3-a690-1496fc7d0ad8",
+								"exec": [
+									"var responseJson = pm.response.json();",
+									"",
+									"pm.test(\"Status code is 422\", function () {",
+									"    pm.response.to.have.status(422);",
+									"});",
+									"",
+									"pm.test(\"Correct error status\", function() {",
+									"    pm.expect(responseJson.errors[0].status).to.eql(422);",
+									"});",
+									"",
+									"pm.test(\"Correct error code\", function() {",
+									"    pm.expect(responseJson.errors[0].code).to.eql(\"102\");",
+									"});",
+									"",
+									"pm.test(\"Correct error message\", function() {",
+									"    pm.expect(responseJson.errors[0].detail).to.eql(\"Product \" + pm.variables.get(\"discontinued_sku\") + \" is discontinued, please choose an alternative one.\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "X-Anonymous-Customer-Unique-Id",
+								"type": "text",
+								"value": "10"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"data\": {\n        \"type\": \"items\",\n        \"attributes\": {\n            \"sku\": \"{{discontinued_sku}}\",\n            \"quantity\": 1\n        }\n    }\n}"
+						},
+						"url": {
+							"raw": "{{url}}/carts/{{cart_id}}/items",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"carts",
+								"{{cart_id}}",
+								"items"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Send the request with inactive product",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "05370552-f35d-44b3-a690-1496fc7d0ad8",
+								"exec": [
+									"var responseJson = pm.response.json();",
+									"",
+									"pm.test(\"Status code is 422\", function () {",
+									"    pm.response.to.have.status(422);",
+									"});",
+									"",
+									"pm.test(\"Correct error status\", function() {",
+									"    pm.expect(responseJson.errors[0].status).to.eql(422);",
+									"});",
+									"",
+									"pm.test(\"Correct error code\", function() {",
+									"    pm.expect(responseJson.errors[0].code).to.eql(\"102\");",
+									"});",
+									"",
+									"pm.test(\"Correct error message\", function() {",
+									"    pm.expect(responseJson.errors[0].detail).to.eql(\"Product \" + pm.variables.get(\"not_available_sku\") + \" is not active.\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "X-Anonymous-Customer-Unique-Id",
+								"type": "text",
+								"value": "10"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"data\": {\n        \"type\": \"items\",\n        \"attributes\": {\n            \"sku\": \"{{not_available_sku}}\",\n            \"quantity\": 1\n        }\n    }\n}"
+						},
+						"url": {
+							"raw": "{{url}}/carts/{{cart_id}}/items",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"carts",
+								"{{cart_id}}",
+								"items"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Send the request with bundle product",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "05370552-f35d-44b3-a690-1496fc7d0ad8",
+								"exec": [
+									"var responseJson = pm.response.json();",
+									"",
+									"pm.test(\"Status code is 422\", function () {",
+									"    pm.response.to.have.status(422);",
+									"});",
+									"",
+									"pm.test(\"Correct error status\", function() {",
+									"    pm.expect(responseJson.errors[0].status).to.eql(422);",
+									"});",
+									"",
+									"pm.test(\"Correct error code\", function() {",
+									"    pm.expect(responseJson.errors[0].code).to.eql(\"102\");",
+									"});",
+									"",
+									"pm.test(\"Correct error message\", function() {",
+									"    pm.expect(responseJson.errors[0].detail).to.eql(\"Product 214_123 is not available at the moment.\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "X-Anonymous-Customer-Unique-Id",
+								"type": "text",
+								"value": "10"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"data\": {\n        \"type\": \"items\",\n        \"attributes\": {\n            \"sku\": \"214_123\",\n            \"quantity\": 1\n        }\n    }\n}"
+						},
+						"url": {
+							"raw": "{{url}}/carts/{{cart_id}}/items",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"carts",
+								"{{cart_id}}",
+								"items"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Send the request with low availability",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "05370552-f35d-44b3-a690-1496fc7d0ad8",
+								"exec": [
+									"var responseJson = pm.response.json();",
+									"",
+									"pm.test(\"Status code is 422\", function () {",
+									"    pm.response.to.have.status(422);",
+									"});",
+									"",
+									"pm.test(\"Correct error status\", function() {",
+									"    pm.expect(responseJson.errors[0].status).to.eql(422);",
+									"});",
+									"",
+									"pm.test(\"Correct error code\", function() {",
+									"    pm.expect(responseJson.errors[0].code).to.eql(\"102\");",
+									"});",
+									"",
+									"pm.test(\"Correct error message\", function() {",
+									"    pm.expect(responseJson.errors[0].detail).to.eql(\"Product 197_21421718 is not available at the moment.\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "X-Anonymous-Customer-Unique-Id",
+								"type": "text",
+								"value": "10"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"data\": {\n        \"type\": \"items\",\n        \"attributes\": {\n            \"sku\": \"197_21421718\",\n            \"quantity\": 1\n        }\n    }\n}"
+						},
+						"url": {
+							"raw": "{{url}}/carts/{{cart_id}}/items",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"carts",
+								"{{cart_id}}",
+								"items"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Request delete customer (helper)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "392dab97-c0fa-42bf-9de4-2f3fe7136abc",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/customers/{{customer_reference}}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"customers",
+								"{{customer_reference}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "328fd2aa-f299-4543-9797-9fb8153f3f12",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "d116d0b6-f647-4449-a70a-27dcd5f257b6",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"id": "c9c97ed4-b1fc-47ca-964e-a72a4353682c",
+			"key": "sku",
+			"value": "189_30150732",
+			"type": "string"
+		},
+		{
+			"id": "ae043db8-2238-4980-9fed-f812570bfc8c",
+			"key": "not_available_sku",
+			"value": "078_24602396",
+			"type": "string"
+		},
+		{
+			"id": "d45a0e34-cdda-4d65-bd8c-9e42933eba9b",
+			"key": "discontinued_sku",
+			"value": "182_30345097",
+			"type": "string"
+		},
+		{
+			"id": "ee8a0a57-55a0-473e-bab0-22b99cdbf787",
+			"key": "sku_2",
+			"value": "182_30345097",
+			"type": "string"
+		},
+		{
+			"id": "ee627d4e-b188-4447-8205-292d6651c904",
+			"key": "anonymous_customer_id",
+			"value": "10",
+			"type": "string"
+		},
+		{
+			"id": "0947eaf2-9602-46ff-8c55-af9dc6f7ee80",
+			"key": "expense_total",
+			"value": "string",
+			"type": "string"
+		},
+		{
+			"id": "96da75f8-0bd1-4946-86a5-824c348bbb97",
+			"key": "discount_total",
+			"value": "string",
+			"type": "string"
+		},
+		{
+			"id": "2229235a-0aeb-4457-b03a-3fc886c3a723",
+			"key": "tax_total",
+			"value": "string",
+			"type": "string"
+		},
+		{
+			"id": "d9cf0423-0856-428e-9e76-e63ac799292b",
+			"key": "subtotal",
+			"value": "string",
+			"type": "string"
+		},
+		{
+			"id": "0f8cad05-3efc-4957-99f8-e54d1185ccdc",
+			"key": "grand_total",
+			"value": "string",
+			"type": "string"
+		},
+		{
+			"id": "bb132335-1a82-46a0-8cdb-97112b55814d",
+			"key": "username",
+			"value": "test.customer@spryker.com",
+			"type": "string"
+		},
+		{
+			"id": "1cec0371-8cc2-4ee5-b1f5-9210999d7667",
+			"key": "password",
+			"value": "change123",
+			"type": "string"
+		},
+		{
+			"id": "10878905-66a4-4cd0-b773-fc43641f8c5f",
+			"key": "customer_reference",
+			"value": "string",
+			"type": "string"
+		},
+		{
+			"id": "a419b046-d873-4cad-ad44-103827d1a960",
+			"key": "token",
+			"value": "string",
+			"type": "string"
+		}
+	]
+}

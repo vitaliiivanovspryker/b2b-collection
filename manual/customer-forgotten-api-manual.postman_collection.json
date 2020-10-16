@@ -1,0 +1,2474 @@
+{
+	"info": {
+		"_postman_id": "6f1c2797-8b1c-4f07-bbd6-e0f89b05d2a0",
+		"name": "customer-forgotten-api-manual",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Customer - Forgotten password",
+			"item": [
+				{
+					"name": "Forgotten password/Create a customer",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "38253789-33ea-4604-8ead-703ba75bd2b9",
+								"exec": [
+									"if (pm.response.code == 422) {",
+									"    var email = pm.variables.get(\"email\");",
+									"    pm.variables.set(\"email\", new Date().getTime() + email);",
+									"    postman.setNextRequest(request.name);",
+									"} else {",
+									"    var responseData = pm.response.json().data; ",
+									"    ",
+									"    pm.variables.set(\"customer_reference\", responseData.id);",
+									"    pm.variables.set(\"customer_create_at\", responseData.attributes.createdAt);",
+									"    pm.variables.set(\"customer_update_at\", responseData.attributes.updatedAt);",
+									"    ",
+									"    pm.test(\"Status code is 201\", function () {",
+									"        pm.response.to.have.status(201);",
+									"    });",
+									"    ",
+									"    pm.test(\"Has correct type returned\", function () {",
+									"        pm.expect(responseData.type).to.eql(\"customers\");",
+									"    });",
+									"    ",
+									"    pm.test(\"Has correct first, lastname  and salution\"), function () {",
+									"        pm.expect(responseData.attributes.firstName).to.eql(pm.variables.get(\"firstName\"));",
+									"        pm.expect(responseData.attributes.lastName).to.eql(pm.variables.get(\"lastName\"));",
+									"        pm.expect(responseData.attributes.salutation).to.eql(pm.variables.get(\"salutation\"));",
+									"    };",
+									"    ",
+									"    pm.test(\"Create_at returned\"), function (){",
+									"        pm.expect(responseData.attributes.createdAt).to.eql(pm.variables.get(\"customer_create_at\"));",
+									"    };",
+									"    ",
+									"    pm.test(\"Create_at returned\"), function (){",
+									"        pm.expect(responseData.attributes.updatedAt).to.eql(pm.variables.get(\"customer_update_at\"));",
+									"    };",
+									"    ",
+									"    pm.test(\"Has self link\", function() {",
+									"        pm.expect(responseData.links.self).to.eql(pm.variables.get(\"url\") + \"/customers/\" + pm.variables.get(\"customer_reference\"));",
+									"    });",
+									"}",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/vnd.api+json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "de-DE, de;q=0.9, en;q=0.1"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"data\":{\"type\":\"register-customer\",\"attributes\":{\"salutation\":\"{{salutation}}\",\"firstName\":\"{{firstName}}\",\"lastName\":\"{{lastName}}\",\"email\":\"{{email}}\",\"password\":\"{{password}}\",\"passwordConfirmation\":\"{{password}}\",\"acceptedTerms\":true}}}"
+						},
+						"url": {
+							"raw": "{{url}}/customers",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"customers"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Request for forgotten password",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "e14c3b09-e43e-4067-ada7-431d2e640bda",
+								"exec": [
+									"pm.test(\"Status code is 204\", function () {",
+									"    pm.response.to.have.status(204);",
+									"});",
+									"",
+									"pm.test(\"Status code name has string\", function () {",
+									"    pm.response.to.have.status(\"No Content\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"data\":\n\t{\n\t\t\"type\":\"customer-forgotten-password\",\n\t\t\"attributes\":\n\t\t{\n\t\t\t\"email\":\"{{email}}\"\n\t\t}\n\t}\n}"
+						},
+						"url": {
+							"raw": "{{url}}/customer-forgotten-password",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"customer-forgotten-password"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Negative.Request for forgotten password with invalid type in the body",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "e14c3b09-e43e-4067-ada7-431d2e640bda",
+								"exec": [
+									"pm.test(\"Status code is 400\", function () {",
+									"    pm.response.to.have.status(400);",
+									"});",
+									"",
+									"pm.test(\"Has correct error message returned\", function() {",
+									"    var jsonData = pm.response.json(), error = jsonData.errors[0];",
+									"    ",
+									"    pm.expect(error.detail).to.not.be.empty;",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"data\":\n\t{\n\t\t\"type\":\"invalid-type\",\n\t\t\"attributes\":\n\t\t{\n\t\t\t\"email\":\"{{email}}\"\n\t\t}\n\t}\n}"
+						},
+						"url": {
+							"raw": "{{url}}/customer-forgotten-password",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"customer-forgotten-password"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Negative.Request for forgotten password without type in the body",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "e14c3b09-e43e-4067-ada7-431d2e640bda",
+								"exec": [
+									"pm.test(\"Status code is 400\", function () {",
+									"    pm.response.to.have.status(400);",
+									"});",
+									"",
+									"pm.test(\"Has correct error message returned\", function() {",
+									"    var jsonData = pm.response.json(), error = jsonData.errors[0];",
+									"    ",
+									"    pm.expect(error.detail).to.be.eql(\"Post data is invalid.\");",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"data\":\n\t{\n\t\t\"type\": ,\n\t\t\"attributes\":\n\t\t{\n\t\t\t\"email\":\"{{email}}\"\n\t\t}\n\t}\n}"
+						},
+						"url": {
+							"raw": "{{url}}/customer-forgotten-password",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"customer-forgotten-password"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Negative.Request for forgotten password with empty email in the body",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "e14c3b09-e43e-4067-ada7-431d2e640bda",
+								"exec": [
+									"pm.test(\"Status code is 400\", function () {",
+									"    pm.response.to.have.status(400);",
+									"});",
+									"",
+									"pm.test(\"Has correct error message returned\", function() {",
+									"    var jsonData = pm.response.json(), error = jsonData.errors[0];",
+									"    ",
+									"    pm.expect(error.detail).to.not.be.empty;",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"data\":\n\t{\n\t\t\"type\":\"customer-forgotten-password\",\n\t\t\"attributes\":\n\t\t{\n\t\t\t\"email\":\"\"\n\t\t}\n\t}\n}"
+						},
+						"url": {
+							"raw": "{{url}}/customer-forgotten-password",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"customer-forgotten-password"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Negative.Request for forgotten password  without email in the body",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "e14c3b09-e43e-4067-ada7-431d2e640bda",
+								"exec": [
+									"pm.test(\"Status code is 400\", function () {",
+									"    pm.response.to.have.status(400);",
+									"});",
+									"",
+									"pm.test(\"Has correct error message returned\", function() {",
+									"    var jsonData = pm.response.json(), error = jsonData.errors[0];",
+									"    ",
+									"    pm.expect(error.detail).to.not.be.empty;",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"data\":\n\t{\n\t\t\"type\":\"customer-forgotten-password\",\n\t\t\"attributes\":\n\t\t{\n\t\t\n\t\t}\n\t}\n}"
+						},
+						"url": {
+							"raw": "{{url}}/customer-forgotten-password",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"customer-forgotten-password"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Negative.Request for forgotten password with a broken endpoint in URL",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "e14c3b09-e43e-4067-ada7-431d2e640bda",
+								"exec": [
+									"pm.test(\"Status code is 404\", function () {",
+									"    pm.response.to.have.status(404);",
+									"});",
+									"",
+									"pm.test(\"Has correct error message returned\", function() {",
+									"    var jsonData = pm.response.json(), error = jsonData.errors[0];",
+									"    ",
+									"    pm.expect(error.detail).to.be.eql(\"Not Found\");",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"data\":\n\t{\n\t\t\"type\":\"customer-forgotten-password\",\n\t\t\"attributes\":\n\t\t{\n\t\t\t\"email\":\"{{email}}\"\n\t\t}\n\t}\n}"
+						},
+						"url": {
+							"raw": "{{url}}/customer-forgotten-passwordss",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"customer-forgotten-passwordss"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Negative.Request for forgotten password with the wrong method GET ",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "e14c3b09-e43e-4067-ada7-431d2e640bda",
+								"exec": [
+									"",
+									"pm.test(\"Status code is 404\", function () {",
+									"    pm.response.to.have.status(404);",
+									"});",
+									"",
+									"pm.test(\"Has correct detail\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.errors[0].detail).to.eql(\"Not Found\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/customer-forgotten-password",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"customer-forgotten-password"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Negative.Request for forgotten password with the wrong method PUT",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "e14c3b09-e43e-4067-ada7-431d2e640bda",
+								"exec": [
+									"",
+									"pm.test(\"Status code is 404\", function () {",
+									"    pm.response.to.have.status(404);",
+									"});",
+									"",
+									"pm.test(\"Has correct detail\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.errors[0].detail).to.eql(\"Not Found\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"data\":\n\t{\"type\":\"customer-forgotten-password\",\n\t\t\"attributes\":{\"email\":\"anne.boleyn@spryker.com\"}}}"
+						},
+						"url": {
+							"raw": "{{url}}/customer-forgotten-password",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"customer-forgotten-password"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Negative.Request for forgotten password with the wrong method PATCH",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "e14c3b09-e43e-4067-ada7-431d2e640bda",
+								"exec": [
+									"",
+									"pm.test(\"Status code is 404\", function () {",
+									"    pm.response.to.have.status(404);",
+									"});",
+									"",
+									"pm.test(\"Has correct detail\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.errors[0].detail).to.eql(\"Not Found\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"data\":\n\t{\"type\":\"customer-forgotten-password\",\n\t\t\"attributes\":{\"email\":\"anne.boleyn@spryker.com\"}}}"
+						},
+						"url": {
+							"raw": "{{url}}/customer-forgotten-password",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"customer-forgotten-password"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Negative.Update customer password with too long new password",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "e14c3b09-e43e-4067-ada7-431d2e640bda",
+								"exec": [
+									"pm.test(\"Status code is 400\", function () {",
+									"    pm.response.to.have.status(400);",
+									"});",
+									"",
+									"pm.test(\"Has correct detail\", function () {",
+									"    var jsonData = pm.response.json() , error = jsonData.errors[0];",
+									"    pm.expect(error.detail).to.not.be.empty();",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "48f37ad0-c46a-4558-9cea-d8ca6565d950",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n   \"data\":{\n      \"type\":\"customer-restore-password\",\n      \"attributes\":{\n         \"restorePasswordKey\":\"{{restorePasswordKey}}\",\n         \"password\":\"test123test123test123test123test123test123test123test123test123test123test123\",\n         \"confirmPassword\":\"test123test123test123test123test123test123test123test123test123test123test123\"\n      }\n   }\n}"
+						},
+						"url": {
+							"raw": "{{url}}/customer-restore-password",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"customer-restore-password"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Request for set new password",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "e14c3b09-e43e-4067-ada7-431d2e640bda",
+								"exec": [
+									"pm.test(\"Status code is 204\", function () {",
+									"    pm.response.to.have.status(204);",
+									"});",
+									"",
+									"pm.test(\"Status code name has string\", function () {",
+									"    pm.response.to.have.status(\"No Content\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "48f37ad0-c46a-4558-9cea-d8ca6565d950",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n   \"data\":{\n      \"type\":\"customer-restore-password\",\n      \"attributes\":{\n         \"restorePasswordKey\":\"{{restorePasswordKey}}\",\n         \"password\":\"{{new_password}}\",\n         \"confirmPassword\":\"{{new_password}}\"\n      }\n   }\n}"
+						},
+						"url": {
+							"raw": "{{url}}/customer-restore-password",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"customer-restore-password"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Negative.Request for the set new password with invalid restore password key",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "e14c3b09-e43e-4067-ada7-431d2e640bda",
+								"exec": [
+									"pm.test(\"Status code is 415\", function () {",
+									"    pm.response.to.have.status(422);",
+									"});",
+									"",
+									"pm.test(\"Has correct detail\", function () {",
+									"    var jsonData = pm.response.json() , error = jsonData.errors[0];",
+									"    pm.expect(error.detail).to.eql(\"Restore password key is not valid.\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "48f37ad0-c46a-4558-9cea-d8ca6565d950",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n   \"data\":{\n      \"type\":\"customer-restore-password\",\n      \"attributes\":{\n         \"restorePasswordKey\":\"invalid\",\n         \"password\":\"{{new_password}}\",\n         \"confirmPassword\":\"{{new_password}}\"\n      }\n   }\n}"
+						},
+						"url": {
+							"raw": "{{url}}/customer-restore-password",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"customer-restore-password"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Negative.Request for the set new password with a different password",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "e14c3b09-e43e-4067-ada7-431d2e640bda",
+								"exec": [
+									"pm.test(\"Status code is 400\", function () {",
+									"    pm.response.to.have.status(400);",
+									"});",
+									"",
+									"pm.test(\"Has correct detail\", function () {",
+									"    var jsonData = pm.response.json() , error = jsonData.errors[0];",
+									"    pm.expect(error.detail).to.not.be.empty;",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "48f37ad0-c46a-4558-9cea-d8ca6565d950",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n   \"data\":{\n      \"type\":\"customer-restore-password\",\n      \"attributes\":{\n         \"restorePasswordKey\":\"{{restorePasswordKey}}\",\n         \"password\":\"change0981\",\n         \"confirmPassword\":\"{{new_password}}\"\n      }\n   }\n}"
+						},
+						"url": {
+							"raw": "{{url}}/customer-restore-password",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"customer-restore-password"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Negative.Request for the set new password using the old",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "e14c3b09-e43e-4067-ada7-431d2e640bda",
+								"exec": [
+									"pm.test(\"Status code is 400\", function () {",
+									"    pm.response.to.have.status(400);",
+									"});",
+									"",
+									"pm.test(\"Has correct detail\", function () {",
+									"    var jsonData = pm.response.json() , error = jsonData.errors[0];",
+									"    pm.expect(error.detail).to.not.be.empty;",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "48f37ad0-c46a-4558-9cea-d8ca6565d950",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n   \"data\":{\n      \"type\":\"customer-restore-password\",\n      \"attributes\":{\n         \"restorePasswordKey\":\"{{restorePasswordKey}}\",\n         \"password\":\"{{password}}\",\n         \"confirmPassword\":\"{{password}}\"\n      }\n   }\n}"
+						},
+						"url": {
+							"raw": "{{url}}/customer-restore-password",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"customer-restore-password"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Negative.Request for the set new password with fewer symbols than needed",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "e14c3b09-e43e-4067-ada7-431d2e640bda",
+								"exec": [
+									"pm.test(\"Status code is 400\", function () {",
+									"    pm.response.to.have.status(400);",
+									"});",
+									"",
+									"pm.test(\"Has correct detail\", function () {",
+									"    var jsonData = pm.response.json() , error = jsonData.errors[0];",
+									"    pm.expect(error.detail).to.not.be.empty;",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "48f37ad0-c46a-4558-9cea-d8ca6565d950",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n   \"data\":{\n      \"type\":\"customer-restore-password\",\n      \"attributes\":{\n         \"restorePasswordKey\":\"{{restorePasswordKey}}\",\n         \"password\":\"abc\",\n         \"confirmPassword\":\"abc\"\n      }\n   }\n}"
+						},
+						"url": {
+							"raw": "{{url}}/customer-restore-password",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"customer-restore-password"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Negative.Request for the set new password with an empty body",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "e14c3b09-e43e-4067-ada7-431d2e640bda",
+								"exec": [
+									"pm.test(\"Status code is 400\", function () {",
+									"    pm.response.to.have.status(400);",
+									"});",
+									"",
+									"pm.test(\"Has correct detail\", function () {",
+									"    var jsonData = pm.response.json() , error = jsonData.errors[0];",
+									"    pm.expect(error.detail).to.be.eql(\"Post data is invalid.\")",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "48f37ad0-c46a-4558-9cea-d8ca6565d950",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/customer-restore-password",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"customer-restore-password"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Negative.Request for the set new password with the wrong type \"customer\" in the body",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "e14c3b09-e43e-4067-ada7-431d2e640bda",
+								"exec": [
+									"pm.test(\"Status code is 400\", function () {",
+									"    pm.response.to.have.status(400);",
+									"});",
+									"",
+									"pm.test(\"Has correct detail\", function () {",
+									"    var jsonData = pm.response.json() , error = jsonData.errors[0];",
+									"    pm.expect(error.detail).to.not.be.empty;",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "48f37ad0-c46a-4558-9cea-d8ca6565d950",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n   \"data\":{\n      \"type\":\"customer\",\n      \"attributes\":{\n         \"restorePasswordKey\":\"{{restorePasswordKey}}\",\n         \"password\":\"{{new_password}}\",\n         \"confirmPassword\":\"{{new_password}}\"\n      }\n   }\n}"
+						},
+						"url": {
+							"raw": "{{url}}/customer-restore-password",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"customer-restore-password"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Negative.Request for the set new password without type in the body",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "e14c3b09-e43e-4067-ada7-431d2e640bda",
+								"exec": [
+									"pm.test(\"Status code is 400\", function () {",
+									"    pm.response.to.have.status(400);",
+									"});",
+									"",
+									"pm.test(\"Has correct detail\", function () {",
+									"    var jsonData = pm.response.json() , error = jsonData.errors[0];",
+									"    pm.expect(error.detail).to.be.eql(\"Post data is invalid.\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "48f37ad0-c46a-4558-9cea-d8ca6565d950",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n   \"data\":{\n      \"attributes\":{\n         \"restorePasswordKey\":\"{{restorePasswordKey}}\",\n         \"password\":\"{{new_password}}\",\n         \"confirmPassword\":\"{{new_password}}\"\n      }\n   }\n}"
+						},
+						"url": {
+							"raw": "{{url}}/customer-restore-password",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"customer-restore-password"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Negative.Request for the set new password without type in the body Copy",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "e14c3b09-e43e-4067-ada7-431d2e640bda",
+								"exec": [
+									"pm.test(\"Status code is 400\", function () {",
+									"    pm.response.to.have.status(400);",
+									"});",
+									"",
+									"pm.test(\"Has correct detail\", function () {",
+									"    var jsonData = pm.response.json() , error = jsonData.errors[0];",
+									"    pm.expect(error.detail).to.be.not.empty;",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "48f37ad0-c46a-4558-9cea-d8ca6565d950",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n   \"data\":{\n   \t  \"type\":\"\",\n      \"attributes\":{\n         \"restorePasswordKey\":\"{{restorePasswordKey}}\",\n         \"password\":\"{{new_password}}\",\n         \"confirmPassword\":\"{{new_password}}\"\n      }\n   }\n}"
+						},
+						"url": {
+							"raw": "{{url}}/customer-restore-password",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"customer-restore-password"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Negative.Request for the set new password  with empty attributes in the body",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "e14c3b09-e43e-4067-ada7-431d2e640bda",
+								"exec": [
+									"pm.test(\"Status code is 422\", function () {",
+									"    pm.response.to.have.status(422);",
+									"});",
+									"",
+									"pm.test(\"Has correct detail\", function () {",
+									"    var jsonData = pm.response.json() , error = jsonData.errors[0];",
+									"    pm.expect(error.detail).to.be.eql(\"Restore password key is not valid.\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "48f37ad0-c46a-4558-9cea-d8ca6565d950",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n   \"data\":{\n   \t  \"type\":\"customer-restore-password\",\n      \"attributes\":{\n      }\n   }\n}"
+						},
+						"url": {
+							"raw": "{{url}}/customer-restore-password",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"customer-restore-password"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Negative.Request for the set new password with empty restorePasswordKey in the body",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "e14c3b09-e43e-4067-ada7-431d2e640bda",
+								"exec": [
+									"pm.test(\"Status code is 422\", function () {",
+									"    pm.response.to.have.status(422);",
+									"});",
+									"",
+									"pm.test(\"Has correct detail\", function () {",
+									"    var jsonData = pm.response.json() , error = jsonData.errors[0];",
+									"    pm.expect(error.detail).to.be.eql(\"Restore password key is not valid.\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "48f37ad0-c46a-4558-9cea-d8ca6565d950",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n   \"data\":{\n      \"type\":\"customer-restore-password\",\n      \"attributes\":{\n         \"restorePasswordKey\":\"\",\n         \"password\":\"{{new_password}}\",\n         \"confirmPassword\":\"{{new_password}}\"\n      }\n   }\n}"
+						},
+						"url": {
+							"raw": "{{url}}/customer-restore-password",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"customer-restore-password"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Negative.Request for the set new password  without restorePasswordKey in the body",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "e14c3b09-e43e-4067-ada7-431d2e640bda",
+								"exec": [
+									"pm.test(\"Status code is 422\", function () {",
+									"    pm.response.to.have.status(422);",
+									"});",
+									"",
+									"pm.test(\"Has correct detail\", function () {",
+									"    var jsonData = pm.response.json() , error = jsonData.errors[0];",
+									"    pm.expect(error.detail).to.be.eql(\"Restore password key is not valid.\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "48f37ad0-c46a-4558-9cea-d8ca6565d950",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n   \"data\":{\n      \"type\":\"customer-restore-password\",\n      \"attributes\":{\n         \"password\":\"{{new_password}}\",\n         \"confirmPassword\":\"{{new_password}}\"\n      }\n   }\n}"
+						},
+						"url": {
+							"raw": "{{url}}/customer-restore-password",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"customer-restore-password"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Negative.Request for the set new password   with an empty password field in body but with filled in confirmPassword",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "e14c3b09-e43e-4067-ada7-431d2e640bda",
+								"exec": [
+									"pm.test(\"Status code is 400\", function () {",
+									"    pm.response.to.have.status(400);",
+									"});",
+									"",
+									"pm.test(\"Has correct detail\", function () {",
+									"    var jsonData = pm.response.json() , error = jsonData.errors[0];",
+									"    pm.expect(error.detail).to.be.not.empty;",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "48f37ad0-c46a-4558-9cea-d8ca6565d950",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n   \"data\":{\n      \"type\":\"customer-restore-password\",\n      \"attributes\":{\n      \t\"restorePasswordKey\":\"{{restorePasswordKey}}\",\n         \"password\":\"\",\n         \"confirmPassword\":\"{{new_password}}\"\n      }\n   }\n}"
+						},
+						"url": {
+							"raw": "{{url}}/customer-restore-password",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"customer-restore-password"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Negative.Request for the set new password with an empty confirmPassword field in body but with filled in password",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "e14c3b09-e43e-4067-ada7-431d2e640bda",
+								"exec": [
+									"pm.test(\"Status code is 400\", function () {",
+									"    pm.response.to.have.status(400);",
+									"});",
+									"",
+									"pm.test(\"Has correct detail\", function () {",
+									"    var jsonData = pm.response.json() , error = jsonData.errors[0];",
+									"    pm.expect(error.detail).to.be.not.empty;",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "48f37ad0-c46a-4558-9cea-d8ca6565d950",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n   \"data\":{\n      \"type\":\"customer-restore-password\",\n      \"attributes\":{\n      \t\"restorePasswordKey\":\"{{restorePasswordKey}}\",\n         \"password\":\"{{new_password}}\",\n         \"confirmPassword\":\"\"\n      }\n   }\n}"
+						},
+						"url": {
+							"raw": "{{url}}/customer-restore-password",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"customer-restore-password"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Negative.Request for the set new password without password field in the body",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "e14c3b09-e43e-4067-ada7-431d2e640bda",
+								"exec": [
+									"pm.test(\"Status code is 400\", function () {",
+									"    pm.response.to.have.status(400);",
+									"});",
+									"",
+									"pm.test(\"Has correct detail\", function () {",
+									"    var jsonData = pm.response.json() , error = jsonData.errors[0];",
+									"    pm.expect(error.detail).to.be.not.empty;",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "48f37ad0-c46a-4558-9cea-d8ca6565d950",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n   \"data\":{\n      \"type\":\"customer-restore-password\",\n      \"attributes\":{\n      \t\"restorePasswordKey\":\"{{restorePasswordKey}}\",\n        \"confirmPassword\":\"{{new_password}}\"\n      }\n   }\n}"
+						},
+						"url": {
+							"raw": "{{url}}/customer-restore-password",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"customer-restore-password"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Negative.Request for the set new password without confirmPassword in the body",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "e14c3b09-e43e-4067-ada7-431d2e640bda",
+								"exec": [
+									"pm.test(\"Status code is 400\", function () {",
+									"    pm.response.to.have.status(400);",
+									"});",
+									"",
+									"pm.test(\"Has correct detail\", function () {",
+									"    var jsonData = pm.response.json() , error = jsonData.errors[0];",
+									"    pm.expect(error.detail).to.be.not.empty;",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "48f37ad0-c46a-4558-9cea-d8ca6565d950",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n   \"data\":{\n      \"type\":\"customer-restore-password\",\n      \"attributes\":{\n      \t\"restorePasswordKey\":\"{{restorePasswordKey}}\",\n      \t\"password\":\"{{new_password}}\"\n      }\n   }\n}"
+						},
+						"url": {
+							"raw": "{{url}}/customer-restore-password",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"customer-restore-password"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Request for set new password with a wrong METHOD",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "e14c3b09-e43e-4067-ada7-431d2e640bda",
+								"exec": [
+									"pm.test(\"Status code is 404\", function () {",
+									"    pm.response.to.have.status(404);",
+									"});",
+									"",
+									"pm.test(\"Has correct detail\", function () {",
+									"    var jsonData = pm.response.json() , error = jsonData.errors[0];",
+									"    pm.expect(error.detail).to.be.eql(\"Not Found\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "48f37ad0-c46a-4558-9cea-d8ca6565d950",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n   \"data\":{\n      \"type\":\"customer-restore-password\",\n      \"attributes\":{\n         \"restorePasswordKey\":\"{{restorePasswordKey}}\",\n         \"password\":\"{{new_password}}\",\n         \"confirmPassword\":\"{{new_password}}\"\n      }\n   }\n}"
+						},
+						"url": {
+							"raw": "{{url}}/customer-restore-password",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"customer-restore-password"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Request for set new password with a wrong METHOD",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "e14c3b09-e43e-4067-ada7-431d2e640bda",
+								"exec": [
+									"pm.test(\"Status code is 404\", function () {",
+									"    pm.response.to.have.status(404);",
+									"});",
+									"",
+									"pm.test(\"Has correct detail\", function () {",
+									"    var jsonData = pm.response.json() , error = jsonData.errors[0];",
+									"    pm.expect(error.detail).to.be.eql(\"Not Found\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "48f37ad0-c46a-4558-9cea-d8ca6565d950",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n   \"data\":{\n      \"type\":\"customer-restore-password\",\n      \"attributes\":{\n         \"restorePasswordKey\":\"{{restorePasswordKey}}\",\n         \"password\":\"{{new_password}}\",\n         \"confirmPassword\":\"{{new_password}}\"\n      }\n   }\n}"
+						},
+						"url": {
+							"raw": "{{url}}/customer-restore-password",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"customer-restore-password"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Request acces token",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "eb572f9f-e7e9-43ee-ad9c-8e6bdfafaa45",
+								"exec": [
+									"var responseData = pm.response.json().data;",
+									"pm.variables.set(\"token\", responseData.attributes.accessToken);",
+									"pm.variables.set(\"refresh_token\", responseData.attributes.refreshToken);",
+									"",
+									"pm.test(\"Has correct type\", function() {",
+									"    pm.expect(responseData.type).to.eql(\"access-tokens\");",
+									"});",
+									"",
+									"pm.test(\"Has id null\", function() {",
+									"    pm.expect(responseData.id).to.eql(null);",
+									"});",
+									"",
+									"pm.test(\"Has token type Bearer\", function(){",
+									"    pm.expect(responseData.attributes.tokenType).to.eql(\"Bearer\");",
+									"});",
+									"",
+									"pm.test(\"Has expiration time\", function() {",
+									"    pm.expect(responseData.attributes.expiresIn).to.eql(28800);",
+									"});",
+									"",
+									"pm.test(\"Has access_token returned\", function() {",
+									"    pm.expect(responseData.attributes.accessToken).to.not.be.empty;",
+									"    pm.expect(responseData.attributes.accessToken).to.eql(pm.variables.get(\"token\"));",
+									"});",
+									"",
+									"pm.test(\"Has refresh_token returned\", function() {",
+									"    pm.expect(responseData.attributes.refreshToken).to.not.be.empty;",
+									"    pm.expect(responseData.attributes.refreshToken).to.eql(pm.variables.get(\"refresh_token\"));",
+									"});",
+									"",
+									"pm.test(\"Has self link\", function() {",
+									"    pm.expect(responseData.links.self).to.eql(pm.variables.get(\"url\") + \"/access-tokens\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/vnd.api+json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "de-DE, en;q=0.9"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"data\":{\"type\":\"access-tokens\",\"attributes\":{\"username\":\"{{email}}\", \"password\": \"change098\"}}}"
+						},
+						"url": {
+							"raw": "{{url}}/access-tokens",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"access-tokens"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Negative. wrong confirm password",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "44d2b75e-20b7-4dd1-a163-20287d06315a",
+								"exec": [
+									"pm.test(\"Status code is 406\", function () {",
+									"    pm.response.to.have.status(400);",
+									"});",
+									"",
+									"pm.test(\"Has correct type returned\", function() {",
+									"    var jsonData = pm.response.json() , error = jsonData.errors[0];",
+									"    ",
+									"    pm.expect(error.detail).to.eql(\"Passwords don't match.\");",
+									"    pm.expect(error.code).to.eql(\"406\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"data\":\n\t{\"type\":\"customer-restore-password\",\n\t\t\"attributes\":{\n\t\t\t\"restorePasswordKey\": \"3D3c8ce610a45e8edaab1810a6ecba10d9\",\n\t\t\t\"password\": \"change1234\",\n\t\t\t\"confirmPassword\": \"change\"}}}"
+						},
+						"url": {
+							"raw": "{{url}}/customer-restore-password",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"customer-restore-password"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Negative. with old password",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "1b404002-07d8-480e-a81a-890ac5b8a761",
+								"exec": [
+									"pm.test(\"Status code is 400\", function () {",
+									"    pm.response.to.have.status(400);",
+									"});",
+									"",
+									"pm.test(\"Has correct type returned\", function() {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.errors[0].detail).to.eql(\"Invalid password\");",
+									"    pm.expect(jsonData.errors[0].code).to.eql(\"408\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"data\":\n\t{\"type\":\"customer-restore-password\",\n\t\t\"attributes\":{\n\t\t\t\"restorePasswordKey\": \"anne.boleyn@spryker.com\",\n\t\t\t\"password\": \"change123\",\n\t\t\t\"confirmPassword\": \"change123\"}}}"
+						},
+						"url": {
+							"raw": "{{url}}/customer-restore-password",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"customer-restore-password"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Negative. new password is blank",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "d3f052ed-5e81-457f-8e17-ef669cc848af",
+								"exec": [
+									"pm.test(\"Status code is 400\", function () {",
+									"    pm.response.to.have.status(400);",
+									"});",
+									"",
+									"pm.test(\"Has correct type returned\", function() {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.errors[0].detail).to.eql(\"Invalid password\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"data\":\n\t{\"type\":\"customer-restore-password\",\n\t\t\"attributes\":{\n\t\t\t\"restorePasswordKey\": \"anne.boleyn@spryker.com\",\n\t\t\t\"password\": \"\",\n\t\t\t\"confirmPassword\": \"change1234\"}}}"
+						},
+						"url": {
+							"raw": "{{url}}/customer-restore-password",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"customer-restore-password"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Negative. passwords don't match",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "08adfd8a-4fb9-4892-b913-a2a2fff3a884",
+								"exec": [
+									"pm.test(\"Status code is 406\", function () {",
+									"    pm.response.to.have.status(400);",
+									"});",
+									"",
+									"pm.test(\"Has correct type returned\", function() {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.errors[0].detail).to.eql(\"Passwords don't match.\");",
+									"    pm.expect(jsonData.errors[0].code).to.eql(\"406\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"data\":\n\t{\"type\":\"customer-restore-password\",\n\t\t\"attributes\":{\n\t\t\t\"restorePasswordKey\": \"anne.boleyn@spryker.com\",\n\t\t\t\"password\": \"change1234\",\n\t\t\t\"confirmPassword\": \"change1235\"}}}"
+						},
+						"url": {
+							"raw": "{{url}}/customer-restore-password",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"customer-restore-password"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Negative. with broken URL",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "831a747b-d627-4eee-9493-49cbe3dc68a5",
+								"exec": [
+									"pm.test(\"Status code is 404\", function () {",
+									"    pm.response.to.have.status(404);",
+									"});",
+									"",
+									"pm.test(\"Has correct type returned\", function() {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.errors[0].detail).to.eql(\"Not Found\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"data\":\n\t{\"type\":\"customer-restore-password\",\n\t\t\"attributes\":{\n\t\t\t\"restorePasswordKey\": \"anne.boleyn@spryker.com\",\n\t\t\t\"password\": \"change1234\",\n\t\t\t\"confirmPassword\": \"change1234\"}}}"
+						},
+						"url": {
+							"raw": "{{url}}/customer-restore-password",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"customer-restore-password"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Negative. with invalid passwors key",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "831a747b-d627-4eee-9493-49cbe3dc68a5",
+								"exec": [
+									"pm.test(\"Status code is 404\", function () {",
+									"    pm.response.to.have.status(404);",
+									"});",
+									"",
+									"pm.test(\"Has correct type returned\", function() {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.errors[0].detail).to.eql(\"Not Found\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"data\":\n\t{\"type\":\"customer-restore-password\",\n\t\t\"attributes\":{\n\t\t\t\"restorePasswordKey\": \"anne.boleyn@spryker.com\",\n\t\t\t\"password\": \"change1234\",\n\t\t\t\"confirmPassword\": \"change1234\"}}}"
+						},
+						"url": {
+							"raw": "{{url}}/customer-restore-password",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"customer-restore-password"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Negative. with broken URL",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "e14c3b09-e43e-4067-ada7-431d2e640bda",
+								"exec": [
+									"pm.test(\"Response time is less than 2000ms\", function () {",
+									"    pm.expect(pm.response.responseTime).to.be.below(2000);",
+									"});",
+									"",
+									"pm.test(\"Successful POST request\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([201,202]);",
+									"});",
+									"",
+									"pm.test(\"Status code name has string\", function () {",
+									"    pm.response.to.have.status(\"Created\");",
+									"});",
+									"",
+									"pm.test(\"Has type and id returned\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.data.type).to.eql(\"customer-forgotten-password\");",
+									"    pm.expect(jsonData.data.id).to.eql(null);",
+									"});",
+									"",
+									"pm.test(\"Has self-links returned\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.data.links.self).to.eql(pm.environment.get(\"url\") + \"/customer-forgotten-password\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"data\":\n\t{\"type\":\"customer-forgotten-password\",\n\t\t\"attributes\":{\n\t\t\t\"email\":\"anne.boleyn@spryker.com\"}}}"
+						},
+						"url": {
+							"raw": "{{url}}/cust/omer-forgotten-passwоrd",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"cust",
+								"omer-forgotten-passwоrd"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Negative. email is blank ",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "e14c3b09-e43e-4067-ada7-431d2e640bda",
+								"exec": [
+									"pm.test(\"Response time is less than 2000ms\", function () {",
+									"    pm.expect(pm.response.responseTime).to.be.below(2000);",
+									"});",
+									"",
+									"pm.test(\"Successful POST request\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([201,202]);",
+									"});",
+									"",
+									"pm.test(\"Status code name has string\", function () {",
+									"    pm.response.to.have.status(\"Created\");",
+									"});",
+									"",
+									"pm.test(\"Has type and id returned\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.data.type).to.eql(\"customer-forgotten-password\");",
+									"    pm.expect(jsonData.data.id).to.eql(null);",
+									"});",
+									"",
+									"pm.test(\"Has self-links returned\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.data.links.self).to.eql(pm.environment.get(\"url\") + \"/customer-forgotten-password\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"data\":\n\t{\"type\":\"customer-forgotten-password\",\n\t\t\"attributes\":\n\t\t\t{\"email\":\"\"}}}"
+						},
+						"url": {
+							"raw": "{{url}}/customer-forgotten-password",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"customer-forgotten-password"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Negative. email is null",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "e14c3b09-e43e-4067-ada7-431d2e640bda",
+								"exec": [
+									"pm.test(\"Response time is less than 2000ms\", function () {",
+									"    pm.expect(pm.response.responseTime).to.be.below(2000);",
+									"});",
+									"",
+									"pm.test(\"Successful POST request\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([201,202]);",
+									"});",
+									"",
+									"pm.test(\"Status code name has string\", function () {",
+									"    pm.response.to.have.status(\"Created\");",
+									"});",
+									"",
+									"pm.test(\"Has type and id returned\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.data.type).to.eql(\"customer-forgotten-password\");",
+									"    pm.expect(jsonData.data.id).to.eql(null);",
+									"});",
+									"",
+									"pm.test(\"Has self-links returned\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.data.links.self).to.eql(pm.environment.get(\"url\") + \"/customer-forgotten-password\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"data\":\n\t{\"type\":\"customer-forgotten-password\",\n\t\t\"attributes\":{\n\t\t\t\"email\":\"null\"}}}"
+						},
+						"url": {
+							"raw": "{{url}}/customer-forgotten-password",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"customer-forgotten-password"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Negative. without field email",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "e14c3b09-e43e-4067-ada7-431d2e640bda",
+								"exec": [
+									"pm.test(\"Response time is less than 2000ms\", function () {",
+									"    pm.expect(pm.response.responseTime).to.be.below(2000);",
+									"});",
+									"",
+									"pm.test(\"Successful POST request\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([201,202]);",
+									"});",
+									"",
+									"pm.test(\"Status code name has string\", function () {",
+									"    pm.response.to.have.status(\"Created\");",
+									"});",
+									"",
+									"pm.test(\"Has type and id returned\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.data.type).to.eql(\"customer-forgotten-password\");",
+									"    pm.expect(jsonData.data.id).to.eql(null);",
+									"});",
+									"",
+									"pm.test(\"Has self-links returned\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.data.links.self).to.eql(pm.environment.get(\"url\") + \"/customer-forgotten-password\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"data\":\n\t{\"type\":\"customer-forgotten-password\",\n\t\t\"attributes\":{\n\t\t\t}}}"
+						},
+						"url": {
+							"raw": "{{url}}/customer-forgotten-password",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"customer-forgotten-password"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Negative. DELETE",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "e14c3b09-e43e-4067-ada7-431d2e640bda",
+								"exec": [
+									"",
+									"pm.test(\"Status code is 404\", function () {",
+									"    pm.response.to.have.status(404);",
+									"});",
+									"",
+									"pm.test(\"Has correct detail\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.errors[0].detail).to.eql(\"Not Found\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"data\":\n\t{\"type\":\"customer-forgotten-password\",\n\t\t\"attributes\":{\"email\":\"anne.boleyn@spryker.com\"}}}"
+						},
+						"url": {
+							"raw": "{{url}}/customer-forgotten-password",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"customer-forgotten-password"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "23fc5f50-a65e-49a6-aab2-89c1ad952ef8",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "85d17c81-7fd1-453a-8c8a-b7c0b0a4c002",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "b07c07a0-af99-4b64-b5fe-d0178d4851ef",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "f9076afc-a5aa-4c4b-8901-cb335851f622",
+				"type": "text/javascript",
+				"exec": [
+					"pm.test(\"Response is json\", function () {",
+					"    if (pm.request.method !== \"DELETE\") {",
+					"        pm.response.to.be.json;",
+					"    }",
+					"});"
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"id": "e0ae777a-1be2-4b82-aeb4-5ce55ae72d75",
+			"key": "salutation",
+			"value": "Mr",
+			"type": "string"
+		},
+		{
+			"id": "0507a1b0-ed82-4191-b292-360045542f3a",
+			"key": "firstName",
+			"value": "Max",
+			"type": "string"
+		},
+		{
+			"id": "969b1ee2-6509-4a12-a40b-f67ae56fee74",
+			"key": "lastName",
+			"value": "Musterman",
+			"type": "string"
+		},
+		{
+			"id": "5da51b73-51a7-41c1-b75e-78a2362928c7",
+			"key": "email",
+			"value": "max.musterman@email.com",
+			"type": "string"
+		},
+		{
+			"id": "0f6cf18c-84a4-42c7-847e-ce8d09435d5b",
+			"key": "password",
+			"value": "change123",
+			"type": "string"
+		},
+		{
+			"id": "1d2ca543-5cb3-4244-9a8c-b14b76f67e66",
+			"key": "customer_reference",
+			"value": "DE--00",
+			"type": "string"
+		},
+		{
+			"id": "e212badf-9505-4cb0-afcc-6c3062470613",
+			"key": "wrong_email",
+			"value": "ivan.mustermanemail.com",
+			"type": "string"
+		},
+		{
+			"id": "a16dbb0d-6cc7-4fd0-8e0e-eaf2de900728",
+			"key": "refresh-token",
+			"value": "string",
+			"type": "string"
+		},
+		{
+			"id": "ce7276e6-53bc-4545-ba31-b279a239421f",
+			"key": "wishlist1_uuid",
+			"value": "string",
+			"type": "string"
+		},
+		{
+			"id": "47358e55-e3eb-417e-a514-f37f0f48ab15",
+			"key": "token",
+			"value": "string",
+			"type": "string"
+		},
+		{
+			"id": "071e8fd8-da6c-408d-9b6c-d48890284dd3",
+			"key": "customer_reference2",
+			"value": "string",
+			"type": "string"
+		},
+		{
+			"id": "4b67daed-53de-41ea-a786-9d185091d092",
+			"key": "email2",
+			"value": "max.musterman21@email.com",
+			"type": "string"
+		},
+		{
+			"id": "c116a1de-031f-457b-8d9f-cf41b142f39c",
+			"key": "token_2",
+			"value": "string",
+			"type": "string"
+		},
+		{
+			"id": "a475a522-0415-48fa-84c4-afb92787eda4",
+			"key": "refresh-token_2",
+			"value": "string",
+			"type": "string"
+		},
+		{
+			"id": "320e369f-a518-4823-bc07-3c93d66e1057",
+			"key": "updated_email",
+			"value": "string",
+			"type": "string"
+		},
+		{
+			"id": "72959dee-38b8-48b9-80e0-5a969dfee0a3",
+			"key": "restorePasswordKey",
+			"value": "string",
+			"type": "string"
+		},
+		{
+			"id": "1f59f574-0739-483a-8c70-f366dca87841",
+			"key": "new_password",
+			"value": "change98",
+			"type": "string"
+		}
+	]
+}

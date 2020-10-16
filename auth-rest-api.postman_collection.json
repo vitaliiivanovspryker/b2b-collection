@@ -1,0 +1,2583 @@
+{
+	"info": {
+		"_postman_id": "d19d4288-b917-4736-b09b-e09dac195b61",
+		"name": "auth-rest-api",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Request access token",
+			"item": [
+				{
+					"name": "Create new customer(helper)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "8ad8c317-2a5a-46a7-afee-92b8b26b9d20",
+								"exec": [
+									"if ('errors' in pm.response.json() && pm.response.json().errors[0].code == 400) {",
+									"    var email = pm.variables.get(\"username\");",
+									"    pm.variables.set(\"username\", new Date().getTime() + '@mail.com');",
+									"    postman.setNextRequest(request.name);",
+									"} else {",
+									"    var responseData = pm.response.json().data;",
+									"",
+									"    pm.variables.set(\"customer_reference\", responseData.id);",
+									"    pm.variables.set(\"customer_create_at\", responseData.attributes.createdAt);",
+									"    pm.variables.set(\"customer_update_at\", responseData.attributes.updatedAt);",
+									"    ",
+									"    pm.test(\"Status code is 201\", function () {",
+									"        pm.response.to.have.status(201);",
+									"    });",
+									"    ",
+									"    pm.test(\"Has correct type and id returned\", function () {",
+									"        pm.expect(responseData.type).to.eql(\"customers\");",
+									"        pm.expect(responseData.id).to.eql(pm.variables.get(\"customer_reference\"));",
+									"    });",
+									"    ",
+									"    pm.test(\"Has correct first, lastname  and salution\", function () {",
+									"        pm.expect(responseData.attributes.firstName).to.eql(pm.variables.get(\"first_name\"));",
+									"        pm.expect(responseData.attributes.lastName).to.eql(pm.variables.get(\"last_name\"));",
+									"        pm.expect(responseData.attributes.salutation).to.eql(pm.variables.get(\"salutation\"));",
+									"    });",
+									"    ",
+									"    pm.test(\"Create_at returned\", function (){",
+									"        // need to add the assert to check the null in the field ",
+									"        pm.expect(responseData.attributes.createdAt).to.eql(pm.variables.get(\"customer_create_at\"));",
+									"    });",
+									"    ",
+									"    pm.test(\"Create_at returned\", function (){",
+									"        // need to add the assert to check the null in the field ",
+									"        pm.expect(responseData.attributes.updatedAt).to.eql(pm.variables.get(\"customer_update_at\"));",
+									"    });",
+									"    ",
+									"    pm.test(\"Has self link\", function() {",
+									"        pm.expect(responseData.links.self).to.eql(pm.variables.get(\"url\") + \"/customers/\" + pm.variables.get(\"customer_reference\"));",
+									"    });",
+									"}",
+									"",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/vnd.api+json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "de-DE, de;q=0.9, en;q=0.1"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"data\": {\n    \"type\": \"customers\",\n    \"attributes\": {\n        \"salutation\": \"{{salutation}}\",\n        \"firstName\":\"{{first_name}}\",\n        \"lastName\":\"{{last_name}}\",\n        \"email\":\"{{username}}\",\n        \"password\":\"{{password}}\",\n        \"confirmPassword\":\"{{password}}\",\n        \"acceptedTerms\":true\n    }\n  }\n}"
+						},
+						"url": {
+							"raw": "{{url}}/customers",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"customers"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Request access token for deleted customer",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "392dab97-c0fa-42bf-9de4-2f3fe7136abc",
+								"exec": [
+									"var responseJson = pm.response.json();",
+									"",
+									"pm.test(\"Status code is 401\", function () {",
+									"    pm.response.to.have.status(401);",
+									"});",
+									"",
+									"pm.test(\"Correct error status\", function() {",
+									"    pm.expect(responseJson.errors[0].status).to.eql(401);",
+									"});",
+									"",
+									"pm.test(\"Correct error code\", function() {",
+									"    pm.expect(responseJson.errors[0].code).to.eql(\"003\");",
+									"});",
+									"",
+									"pm.test(\"Correct error message\", function() {",
+									"    pm.expect(responseJson.errors[0].detail).to.eql(\"Failed to authenticate user.\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "1dc6e526-1616-484d-8583-61fa60dc501c",
+								"exec": [
+									"setTimeout(function() {}, 2000);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"data\": {\n        \"type\": \"access-tokens\",\n        \"attributes\": {\n            \"username\": \"{{username}}\",\n            \"password\": \"{{password}}\"\n        }\n    }\n}"
+						},
+						"url": {
+							"raw": "{{url}}/access-tokens",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"access-tokens"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Request access token for existing customer",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "71697741-b089-45dc-9995-43714c41e10c",
+								"exec": [
+									"var responseData = pm.response.json().data;",
+									"",
+									"pm.variables.set(\"token\", responseData.attributes.accessToken);",
+									"",
+									"pm.test(\"Status code is 201\", function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"pm.test(\"Has correct type\", function() {",
+									"    pm.expect(responseData.type).to.eql(\"access-tokens\");",
+									"});",
+									"",
+									"pm.test(\"Has id null\", function() {",
+									"    pm.expect(responseData.id).to.eql(null);",
+									"});",
+									"",
+									"pm.test(\"Has token type Bearer\", function(){",
+									"    pm.expect(responseData.attributes.tokenType).to.eql(\"Bearer\");",
+									"});",
+									"",
+									"pm.test(\"Has expiration time\", function() {",
+									"    pm.expect(responseData.attributes.expiresIn).to.eql(Number(pm.variables.get(\"access_token_ttl\")));",
+									"});",
+									"",
+									"pm.test(\"Has access_token returned\", function() {",
+									"    pm.expect(responseData.attributes.accessToken).to.not.be.empty;",
+									"    pm.expect(responseData.attributes.accessToken).to.eql(pm.variables.get(\"token\"));",
+									"});",
+									"",
+									"pm.test(\"Has refresh_token returned\", function() {",
+									"    pm.expect(responseData.attributes.refreshToken).to.not.be.empty;",
+									"    pm.expect(responseData.attributes.refreshToken).to.eql(responseData.attributes.refreshToken);",
+									"});",
+									"",
+									"// This endpoint shouldn't return self link",
+									"pm.test.skip(\"Has self link\", function() {",
+									"    pm.expect(responseData.links.self).to.not.be.empty;",
+									"    pm.expect(responseData.links.self).to.eql(pm.environment.get(\"url\") + \"/access-tokens\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"data\": {\n        \"type\": \"access-tokens\",\n        \"attributes\": {\n            \"username\": \"{{username}}\",\n            \"password\": \"{{password}}\"\n        }\n    }\n}"
+						},
+						"url": {
+							"raw": "{{url}}/access-tokens",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"access-tokens"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Request change customer's password",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "09587067-e655-4e6c-9698-87148832d432",
+								"exec": [
+									"pm.test(\"Status code is 204\", function () {",
+									"    pm.response.to.have.status(204);",
+									"});",
+									"",
+									"pm.test(\"Status code name has string\", function () {",
+									"    pm.response.to.have.status(\"No Content\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"data\": {\n        \"type\": \"customer-password\",\n        \"attributes\": {\n            \"password\": \"{{password}}\",\n            \"newPassword\": \"{{new_password}}\",\n            \"confirmPassword\": \"{{new_password}}\"\n        }\n    }\n}"
+						},
+						"url": {
+							"raw": "{{url}}/customer-password",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"customer-password"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Request access token with new password",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "09587067-e655-4e6c-9698-87148832d432",
+								"exec": [
+									"var responseData = pm.response.json().data;",
+									"",
+									"pm.variables.set(\"token\", responseData.attributes.accessToken);",
+									"",
+									"pm.test(\"Status code is 201\", function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"pm.test(\"Has correct type\", function() {",
+									"    pm.expect(responseData.type).to.eql(\"access-tokens\");",
+									"});",
+									"",
+									"pm.test(\"Has id null\", function() {",
+									"    pm.expect(responseData.id).to.eql(null);",
+									"});",
+									"",
+									"pm.test(\"Has token type Bearer\", function(){",
+									"    pm.expect(responseData.attributes.tokenType).to.eql(\"Bearer\");",
+									"});",
+									"",
+									"pm.test(\"Has expiration time\", function() {",
+									"    pm.expect(responseData.attributes.expiresIn).to.eql(Number(pm.variables.get(\"access_token_ttl\")));",
+									"});",
+									"",
+									"pm.test(\"Has access_token returned\", function() {",
+									"    pm.expect(responseData.attributes.accessToken).to.not.be.empty;",
+									"    pm.expect(responseData.attributes.accessToken).to.eql(pm.variables.get(\"token\"));",
+									"});",
+									"",
+									"pm.test(\"Has refresh_token returned\", function() {",
+									"    pm.expect(responseData.attributes.refreshToken).to.not.be.empty;",
+									"    pm.expect(responseData.attributes.refreshToken).to.eql(responseData.attributes.refreshToken);",
+									"});",
+									"",
+									"// This endpoint shouldn't return self link",
+									"pm.test.skip(\"Has self link\", function() {",
+									"    pm.expect(responseData.links.self).to.not.be.empty;",
+									"    pm.expect(responseData.links.self).to.eql(pm.environment.get(\"url\") + \"/access-tokens\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/vnd.api+json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"data\": {\n        \"type\": \"access-tokens\",\n        \"attributes\": {\n            \"username\": \"{{username}}\",\n            \"password\": \"{{new_password}}\"\n        }\n    }\n}"
+						},
+						"url": {
+							"raw": "{{url}}/access-tokens",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"access-tokens"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Request access token with old password",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "09587067-e655-4e6c-9698-87148832d432",
+								"exec": [
+									"var responseJson = pm.response.json();",
+									"",
+									"pm.test(\"Status code is 401\", function () {",
+									"    pm.response.to.have.status(401);",
+									"});",
+									"",
+									"pm.test(\"Correct error status\", function() {",
+									"    pm.expect(responseJson.errors[0].status).to.eql(401);",
+									"});",
+									"",
+									"pm.test(\"Correct error code\", function() {",
+									"    pm.expect(responseJson.errors[0].code).to.eql(\"003\");",
+									"});",
+									"",
+									"pm.test(\"Correct error message\", function() {",
+									"    pm.expect(responseJson.errors[0].detail).to.eql(\"Failed to authenticate user.\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/vnd.api+json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"data\": {\n        \"type\": \"access-tokens\",\n        \"attributes\": {\n            \"username\": \"{{username}}\",\n            \"password\": \"{{password}}\"\n        }\n    }\n}"
+						},
+						"url": {
+							"raw": "{{url}}/access-tokens",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"access-tokens"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Request access token for not existing customer ",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "1338b8c2-eeca-4bde-b19d-d393bd70f222",
+								"exec": [
+									"var responseJson = pm.response.json();",
+									"",
+									"pm.test(\"Status code is 401\", function () {",
+									"    pm.response.to.have.status(401);",
+									"});",
+									"",
+									"pm.test(\"Correct error status\", function() {",
+									"    pm.expect(responseJson.errors[0].status).to.eql(401);",
+									"});",
+									"",
+									"pm.test(\"Correct error code\", function() {",
+									"    pm.expect(responseJson.errors[0].code).to.eql(\"003\");",
+									"});",
+									"",
+									"pm.test(\"Correct error message\", function() {",
+									"    pm.expect(responseJson.errors[0].detail).to.eql(\"Failed to authenticate user.\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"data\": {\n        \"type\": \"access-tokens\",\n        \"attributes\": {\n            \"username\": \"test@spryker.com\",\n            \"password\": \"{{password}}\"\n        }\n    }\n}"
+						},
+						"url": {
+							"raw": "{{url}}/access-tokens",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"access-tokens"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Request access token with wrong credentials",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "b5d7c39c-c162-46bc-bac5-f4b6de99c7c7",
+								"exec": [
+									"var responseJson = pm.response.json();",
+									"",
+									"pm.test(\"Status code is 401\", function () {",
+									"    pm.response.to.have.status(401);",
+									"});",
+									"",
+									"pm.test(\"Correct error status\", function() {",
+									"    pm.expect(responseJson.errors[0].status).to.eql(401);",
+									"});",
+									"",
+									"pm.test(\"Correct error code\", function() {",
+									"    pm.expect(responseJson.errors[0].code).to.eql(\"003\");",
+									"});",
+									"",
+									"pm.test(\"Correct error message\", function() {",
+									"    pm.expect(responseJson.errors[0].detail).to.eql(\"Failed to authenticate user.\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"data\": {\n        \"type\": \"access-tokens\",\n        \"attributes\": {\n            \"username\": \"{{username}}\",\n            \"password\": \"test\"\n        }\n    }\n}"
+						},
+						"url": {
+							"raw": "{{url}}/access-tokens",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"access-tokens"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Request access token with invalid credentials",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "392dab97-c0fa-42bf-9de4-2f3fe7136abc",
+								"exec": [
+									"var responseJson = pm.response.json();",
+									"",
+									"pm.test(\"Status code is 422\", function () {",
+									"    pm.response.to.have.status(422);",
+									"});",
+									"",
+									"pm.test(\"Correct error status\", function() {",
+									"    pm.expect(responseJson.errors[0].status).to.eql(422);",
+									"});",
+									"",
+									"pm.test(\"Correct error code\", function() {",
+									"    pm.expect(responseJson.errors[0].code).to.eql(\"901\");",
+									"});",
+									"",
+									"pm.test(\"Correct error message\", function() {",
+									"    pm.expect(responseJson.errors[0].detail).to.eql(\"username => This value is not a valid email address.\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"data\": {\n        \"type\": \"access-tokens\",\n        \"attributes\": {\n            \"username\": \"henry_spryker\",\n            \"password\": \"{{password}}\"\n        }\n    }\n}"
+						},
+						"url": {
+							"raw": "{{url}}/access-tokens",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"access-tokens"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Request delete customer",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "392dab97-c0fa-42bf-9de4-2f3fe7136abc",
+								"exec": [
+									"pm.test(\"Status code is 204\", function () {",
+									"    pm.response.to.have.status(204);",
+									"});",
+									"",
+									"pm.variables.unset(\"customer_reference\");",
+									"pm.variables.unset(\"token\");"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/customers/{{customer_reference}}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"customers",
+								"{{customer_reference}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create new customer(helper) Copy",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "8ad8c317-2a5a-46a7-afee-92b8b26b9d20",
+								"exec": [
+									"if ('errors' in pm.response.json() && pm.response.json().errors[0].code == 400) {",
+									"    var email = pm.variables.get(\"username\");",
+									"    pm.variables.set(\"username\", new Date().getTime() + '@mail.com');",
+									"    postman.setNextRequest(request.name);",
+									"} else {",
+									"    var responseData = pm.response.json().data;",
+									"",
+									"    pm.variables.set(\"customer_reference\", responseData.id);",
+									"    pm.variables.set(\"customer_create_at\", responseData.attributes.createdAt);",
+									"    pm.variables.set(\"customer_update_at\", responseData.attributes.updatedAt);",
+									"    ",
+									"    pm.test(\"Status code is 201\", function () {",
+									"        pm.response.to.have.status(201);",
+									"    });",
+									"    ",
+									"    pm.test(\"Has correct type and id returned\", function () {",
+									"        pm.expect(responseData.type).to.eql(\"customers\");",
+									"        pm.expect(responseData.id).to.eql(pm.variables.get(\"customer_reference\"));",
+									"    });",
+									"    ",
+									"    pm.test(\"Has correct first, lastname  and salution\", function () {",
+									"        pm.expect(responseData.attributes.firstName).to.eql(pm.variables.get(\"first_name\"));",
+									"        pm.expect(responseData.attributes.lastName).to.eql(pm.variables.get(\"last_name\"));",
+									"        pm.expect(responseData.attributes.salutation).to.eql(pm.variables.get(\"salutation\"));",
+									"    });",
+									"    ",
+									"    pm.test(\"Create_at returned\", function (){",
+									"        // need to add the assert to check the null in the field ",
+									"        pm.expect(responseData.attributes.createdAt).to.eql(pm.variables.get(\"customer_create_at\"));",
+									"    });",
+									"    ",
+									"    pm.test(\"Create_at returned\", function (){",
+									"        // need to add the assert to check the null in the field ",
+									"        pm.expect(responseData.attributes.updatedAt).to.eql(pm.variables.get(\"customer_update_at\"));",
+									"    });",
+									"    ",
+									"    pm.test(\"Has self link\", function() {",
+									"        pm.expect(responseData.links.self).to.eql(pm.variables.get(\"url\") + \"/customers/\" + pm.variables.get(\"customer_reference\"));",
+									"    });",
+									"}",
+									"",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/vnd.api+json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "de-DE, de;q=0.9, en;q=0.1"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"data\": {\n    \"type\": \"customers\",\n    \"attributes\": {\n        \"salutation\": \"{{salutation}}\",\n        \"firstName\":\"{{first_name}}\",\n        \"lastName\":\"{{last_name}}\",\n        \"email\":\"{{username}}\",\n        \"password\":\"{{password}}\",\n        \"confirmPassword\":\"{{password}}\",\n        \"acceptedTerms\":true\n    }\n  }\n}"
+						},
+						"url": {
+							"raw": "{{url}}/customers",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"customers"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Request access token with empty password",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "392dab97-c0fa-42bf-9de4-2f3fe7136abc",
+								"exec": [
+									"var responseJson = pm.response.json();",
+									"",
+									"pm.test(\"Status code is 422\", function () {",
+									"    pm.response.to.have.status(422);",
+									"});",
+									"",
+									"pm.test(\"Correct error status\", function() {",
+									"    pm.expect(responseJson.errors[0].status).to.eql(422);",
+									"});",
+									"",
+									"pm.test(\"Correct error code\", function() {",
+									"    pm.expect(responseJson.errors[0].code).to.eql(\"901\");",
+									"});",
+									"",
+									"pm.test(\"Correct error message\", function() {",
+									"    pm.expect(responseJson.errors[0].detail).to.eql(\"password => This value should not be blank.\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"data\": {\n        \"type\": \"access-tokens\",\n        \"attributes\": {\n            \"username\": \"henry.tudor@spryker.com\",\n            \"password\": \"\"\n        }\n    }\n}"
+						},
+						"url": {
+							"raw": "{{url}}/access-tokens",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"access-tokens"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Request access token with empty username",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "392dab97-c0fa-42bf-9de4-2f3fe7136abc",
+								"exec": [
+									"var responseJson = pm.response.json();",
+									"",
+									"pm.test(\"Status code is 422\", function () {",
+									"    pm.response.to.have.status(422);",
+									"});",
+									"",
+									"pm.test(\"Correct error status\", function() {",
+									"    pm.expect(responseJson.errors[0].status).to.eql(422);",
+									"});",
+									"",
+									"pm.test(\"Correct error code\", function() {",
+									"    pm.expect(responseJson.errors[0].code).to.eql(\"901\");",
+									"});",
+									"",
+									"pm.test(\"Correct error message\", function() {",
+									"    pm.expect(responseJson.errors[0].detail).to.eql(\"username => This value should not be blank.\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"data\": {\n        \"type\": \"access-tokens\",\n        \"attributes\": {\n            \"username\": \"\",\n            \"password\": \"{{password}}\"\n        }\n    }\n}"
+						},
+						"url": {
+							"raw": "{{url}}/access-tokens",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"access-tokens"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Invalid Access token request",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "392dab97-c0fa-42bf-9de4-2f3fe7136abc",
+								"exec": [
+									"var responseJson = pm.response.json();",
+									"",
+									"pm.test(\"Status code is 400\", function () {",
+									"    pm.response.to.have.status(400);",
+									"});",
+									"",
+									"pm.test(\"Correct error status\", function() {",
+									"    pm.expect(responseJson.errors[0].status).to.eql(400);",
+									"});",
+									"",
+									"pm.test(\"Correct error message\", function() {",
+									"    pm.expect(responseJson.errors[0].detail).to.eql(\"Post data is invalid.\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"data\": {\n        \"type\": \"access-tokens\",\n        \"attributes\": {\n            \"username\": {{username}},\n            \"password\": 123\n        }\n    }\n}"
+						},
+						"url": {
+							"raw": "{{url}}/access-tokens",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"access-tokens"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Invalid Access token request type",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "392dab97-c0fa-42bf-9de4-2f3fe7136abc",
+								"exec": [
+									"var responseJson = pm.response.json();",
+									"",
+									"pm.test(\"Status code is 400\", function () {",
+									"    pm.response.to.have.status(400);",
+									"});",
+									"",
+									"pm.test(\"Correct error status\", function() {",
+									"    pm.expect(responseJson.errors[0].status).to.eql(400);",
+									"});",
+									"",
+									"pm.test(\"Correct error message\", function() {",
+									"    pm.expect(responseJson.errors[0].detail).to.eql(\"Invalid type.\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"data\": {\n        \"type\": \"refresh-tokens\",\n        \"attributes\": {\n            \"username\": \"{{username}}\",\n            \"password\": \"{{password}}\"\n        }\n    }\n}"
+						},
+						"url": {
+							"raw": "{{url}}/access-tokens",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"access-tokens"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Empty Access token request type",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "392dab97-c0fa-42bf-9de4-2f3fe7136abc",
+								"exec": [
+									"var responseJson = pm.response.json();",
+									"",
+									"pm.test(\"Status code is 400\", function () {",
+									"    pm.response.to.have.status(400);",
+									"});",
+									"",
+									"pm.test(\"Correct error status\", function() {",
+									"    pm.expect(responseJson.errors[0].status).to.eql(400);",
+									"});",
+									"",
+									"pm.test(\"Correct error message\", function() {",
+									"    pm.expect(responseJson.errors[0].detail).to.eql(\"Invalid type.\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"data\": {\n        \"type\": \"\",\n        \"attributes\": {\n            \"username\": \"{{username}}\",\n            \"password\": \"{{password}}\"\n        }\n    }\n}"
+						},
+						"url": {
+							"raw": "{{url}}/access-tokens",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"access-tokens"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Request access token for existing customer",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "71697741-b089-45dc-9995-43714c41e10c",
+								"exec": [
+									"var responseData = pm.response.json().data;",
+									"",
+									"pm.variables.set(\"token\", responseData.attributes.accessToken);",
+									"",
+									"pm.test(\"Status code is 201\", function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"pm.test(\"Has correct type\", function() {",
+									"    pm.expect(responseData.type).to.eql(\"access-tokens\");",
+									"});",
+									"",
+									"pm.test(\"Has id null\", function() {",
+									"    pm.expect(responseData.id).to.eql(null);",
+									"});",
+									"",
+									"pm.test(\"Has token type Bearer\", function(){",
+									"    pm.expect(responseData.attributes.tokenType).to.eql(\"Bearer\");",
+									"});",
+									"",
+									"pm.test(\"Has expiration time\", function() {",
+									"    pm.expect(responseData.attributes.expiresIn).to.eql(Number(pm.variables.get(\"access_token_ttl\")));",
+									"});",
+									"",
+									"pm.test(\"Has access_token returned\", function() {",
+									"    pm.expect(responseData.attributes.accessToken).to.not.be.empty;",
+									"    pm.expect(responseData.attributes.accessToken).to.eql(pm.variables.get(\"token\"));",
+									"});",
+									"",
+									"pm.test(\"Has refresh_token returned\", function() {",
+									"    pm.expect(responseData.attributes.refreshToken).to.not.be.empty;",
+									"    pm.expect(responseData.attributes.refreshToken).to.eql(responseData.attributes.refreshToken);",
+									"});",
+									"",
+									"// This endpoint shouldn't return self link",
+									"pm.test.skip(\"Has self link\", function() {",
+									"    pm.expect(responseData.links.self).to.not.be.empty;",
+									"    pm.expect(responseData.links.self).to.eql(pm.environment.get(\"url\") + \"/access-tokens\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"data\": {\n        \"type\": \"access-tokens\",\n        \"attributes\": {\n            \"username\": \"{{username}}\",\n            \"password\": \"{{password}}\"\n        }\n    }\n}"
+						},
+						"url": {
+							"raw": "{{url}}/access-tokens",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"access-tokens"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Request delete customer (helper)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "392dab97-c0fa-42bf-9de4-2f3fe7136abc",
+								"exec": [
+									"pm.test(\"Status code is 204\", function () {",
+									"    pm.response.to.have.status(204);",
+									"});",
+									"",
+									"pm.variables.unset(\"customer_reference\");",
+									"pm.variables.unset(\"token\");"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/customers/{{customer_reference}}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"customers",
+								"{{customer_reference}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Refresh access token",
+			"item": [
+				{
+					"name": "Create new customer(helper)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "8ad8c317-2a5a-46a7-afee-92b8b26b9d20",
+								"exec": [
+									"if ('errors' in pm.response.json() && pm.response.json().errors[0].code == 400) {",
+									"    var email = pm.variables.get(\"username\");",
+									"    pm.variables.set(\"username\", new Date().getTime() + '@mail.com');",
+									"    postman.setNextRequest(request.name);",
+									"} else {",
+									"    var responseData = pm.response.json().data;",
+									"",
+									"    pm.variables.set(\"customer_reference\", responseData.id);",
+									"    pm.variables.set(\"customer_create_at\", responseData.attributes.createdAt);",
+									"    pm.variables.set(\"customer_update_at\", responseData.attributes.updatedAt);",
+									"    ",
+									"    pm.test(\"Status code is 201\", function () {",
+									"        pm.response.to.have.status(201);",
+									"    });",
+									"    ",
+									"    pm.test(\"Has correct type and id returned\", function () {",
+									"        pm.expect(responseData.type).to.eql(\"customers\");",
+									"        pm.expect(responseData.id).to.eql(pm.variables.get(\"customer_reference\"));",
+									"    });",
+									"    ",
+									"    pm.test(\"Has correct first, lastname  and salution\", function () {",
+									"        pm.expect(responseData.attributes.firstName).to.eql(pm.variables.get(\"first_name\"));",
+									"        pm.expect(responseData.attributes.lastName).to.eql(pm.variables.get(\"last_name\"));",
+									"        pm.expect(responseData.attributes.salutation).to.eql(pm.variables.get(\"salutation\"));",
+									"    });",
+									"    ",
+									"    pm.test(\"Create_at returned\", function (){",
+									"        // need to add the assert to check the null in the field ",
+									"        pm.expect(responseData.attributes.createdAt).to.eql(pm.variables.get(\"customer_create_at\"));",
+									"    });",
+									"    ",
+									"    pm.test(\"Create_at returned\", function (){",
+									"        // need to add the assert to check the null in the field ",
+									"        pm.expect(responseData.attributes.updatedAt).to.eql(pm.variables.get(\"customer_update_at\"));",
+									"    });",
+									"    ",
+									"    pm.test(\"Has self link\", function() {",
+									"        pm.expect(responseData.links.self).to.eql(pm.variables.get(\"url\") + \"/customers/\" + pm.variables.get(\"customer_reference\"));",
+									"    });",
+									"}",
+									"",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/vnd.api+json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "de-DE, de;q=0.9, en;q=0.1"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"data\": {\n    \"type\": \"customers\",\n    \"attributes\": {\n        \"salutation\": \"{{salutation}}\",\n        \"firstName\":\"{{first_name}}\",\n        \"lastName\":\"{{last_name}}\",\n        \"email\":\"{{username}}\",\n        \"password\":\"{{password}}\",\n        \"confirmPassword\":\"{{password}}\",\n        \"acceptedTerms\":true\n    }\n  }\n}"
+						},
+						"url": {
+							"raw": "{{url}}/customers",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"customers"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Request access token (helper)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "09587067-e655-4e6c-9698-87148832d432",
+								"exec": [
+									"var responseData = pm.response.json().data;",
+									"",
+									"pm.variables.set(\"token\", responseData.attributes.accessToken);",
+									"pm.variables.set(\"refresh_token\", responseData.attributes.refreshToken);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/vnd.api+json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"data\": {\n        \"type\": \"access-tokens\",\n        \"attributes\": {\n            \"username\": \"{{username}}\",\n            \"password\": \"{{password}}\"\n        }\n    }\n}"
+						},
+						"url": {
+							"raw": "{{url}}/access-tokens",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"access-tokens"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Refresh valid not expired access token with valid refresh token",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "09587067-e655-4e6c-9698-87148832d432",
+								"exec": [
+									"var responseData = pm.response.json().data;",
+									"",
+									"pm.variables.set(\"token\", responseData.attributes.accessToken);",
+									"pm.variables.set(\"refresh_token\", responseData.attributes.refreshToken);",
+									"",
+									"pm.test(\"Status code is 201\", function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"pm.test(\"Has correct type\", function() {",
+									"    pm.expect(responseData.type).to.eql(\"refresh-tokens\");",
+									"});",
+									"",
+									"pm.test(\"Has id null\", function() {",
+									"    pm.expect(responseData.id).to.eql(null);",
+									"});",
+									"",
+									"pm.test(\"Has token type Bearer\", function(){",
+									"    pm.expect(responseData.attributes.tokenType).to.eql(\"Bearer\");",
+									"});",
+									"",
+									"pm.test(\"Has expiration time\", function() {",
+									"    pm.expect(responseData.attributes.expiresIn).to.eql(Number(pm.variables.get(\"access_token_ttl\")));",
+									"});",
+									"",
+									"pm.test(\"Has access_token returned\", function() {",
+									"    pm.expect(responseData.attributes.accessToken).to.not.be.empty;",
+									"    pm.expect(responseData.attributes.accessToken).to.eql(pm.variables.get(\"token\"));",
+									"});",
+									"",
+									"pm.test(\"Has refresh_token returned\", function() {",
+									"    pm.expect(responseData.attributes.refreshToken).to.not.be.empty;",
+									"    pm.expect(responseData.attributes.refreshToken).to.eql(pm.variables.get(\"refresh_token\"));",
+									"});",
+									"",
+									"// This endpoint shouldn't return self link",
+									"pm.test.skip(\"Has self link\", function() {",
+									"    pm.expect(responseData.links.self).to.not.be.empty;",
+									"    pm.expect(responseData.links.self).to.eql(pm.variables.get(\"url\") + \"/refresh-tokens\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "dbb50b93-f17a-4a99-bbab-c8a1e9df7896",
+								"exec": [
+									"setTimeout(function(){}, 2000);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"data\": {\n        \"type\": \"refresh-tokens\",\n        \"attributes\": {\n            \"refreshToken\": \"{{refresh_token}}\"\n        }\n    }\n}"
+						},
+						"url": {
+							"raw": "{{url}}/refresh-tokens",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"refresh-tokens"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Refresh access token with invalid refresh token",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "09587067-e655-4e6c-9698-87148832d432",
+								"exec": [
+									"var responseJson = pm.response.json();",
+									"",
+									"pm.test(\"Status code is 401\", function () {",
+									"    pm.response.to.have.status(401);",
+									"});",
+									"",
+									"pm.test(\"Correct error status\", function() {",
+									"    pm.expect(responseJson.errors[0].status).to.eql(401);",
+									"});",
+									"",
+									"pm.test(\"Correct error code\", function() {",
+									"    pm.expect(responseJson.errors[0].code).to.eql(\"004\");",
+									"});",
+									"",
+									"pm.test(\"Correct error message\", function() {",
+									"    pm.expect(responseJson.errors[0].detail).to.eql(\"Failed to refresh token.\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "dbb50b93-f17a-4a99-bbab-c8a1e9df7896",
+								"exec": [
+									"setTimeout(function(){}, 2000);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"data\": {\n        \"type\": \"refresh-tokens\",\n        \"attributes\": {\n            \"refreshToken\": \"test123\"\n        }\n    }\n}"
+						},
+						"url": {
+							"raw": "{{url}}/refresh-tokens",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"refresh-tokens"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Refresh access token with empty value in refresh token",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "09587067-e655-4e6c-9698-87148832d432",
+								"exec": [
+									"var responseJson = pm.response.json();",
+									"",
+									"pm.test(\"Status code is 422\", function () {",
+									"    pm.response.to.have.status(422);",
+									"});",
+									"",
+									"pm.test(\"Correct error status\", function() {",
+									"    pm.expect(responseJson.errors[0].status).to.eql(422);",
+									"});",
+									"",
+									"pm.test(\"Correct error code\", function() {",
+									"    pm.expect(responseJson.errors[0].code).to.eql(\"901\");",
+									"});",
+									"",
+									"pm.test(\"Correct error message\", function() {",
+									"    pm.expect(responseJson.errors[0].detail).to.eql(\"refreshToken =\\u003E This value should not be blank.\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "dbb50b93-f17a-4a99-bbab-c8a1e9df7896",
+								"exec": [
+									"setTimeout(function(){}, 2000);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"data\": {\n        \"type\": \"refresh-tokens\",\n        \"attributes\": {\n            \"refreshToken\": \"\"\n        }\n    }\n}"
+						},
+						"url": {
+							"raw": "{{url}}/refresh-tokens",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"refresh-tokens"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Invalid Refresh token request",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "09587067-e655-4e6c-9698-87148832d432",
+								"exec": [
+									"var responseJson = pm.response.json();",
+									"",
+									"pm.test(\"Status code is 401\", function () {",
+									"    pm.response.to.have.status(401);",
+									"});",
+									"",
+									"pm.test(\"Correct error status\", function() {",
+									"    pm.expect(responseJson.errors[0].status).to.eql(401);",
+									"});",
+									"",
+									"pm.test(\"Correct error code\", function() {",
+									"    pm.expect(responseJson.errors[0].code).to.eql(\"004\");",
+									"});",
+									"",
+									"pm.test(\"Correct error message\", function() {",
+									"    pm.expect(responseJson.errors[0].detail).to.eql(\"Failed to refresh token.\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "dbb50b93-f17a-4a99-bbab-c8a1e9df7896",
+								"exec": [
+									"setTimeout(function(){}, 2000);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"data\": {\n        \"type\": \"refresh-tokens\",\n        \"attributes\": {\n            \"refreshToken\": \"qwe\"\n        }\n    }\n}"
+						},
+						"url": {
+							"raw": "{{url}}/refresh-tokens",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"refresh-tokens"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Invalid Access token request type",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "09587067-e655-4e6c-9698-87148832d432",
+								"exec": [
+									"var responseJson = pm.response.json();",
+									"",
+									"pm.test(\"Status code is 400\", function () {",
+									"    pm.response.to.have.status(400);",
+									"});",
+									"",
+									"pm.test(\"Correct error status\", function() {",
+									"    pm.expect(responseJson.errors[0].status).to.eql(400);",
+									"});",
+									"",
+									"pm.test(\"Correct error message\", function() {",
+									"    pm.expect(responseJson.errors[0].detail).to.eql(\"Invalid type.\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "dbb50b93-f17a-4a99-bbab-c8a1e9df7896",
+								"exec": [
+									"setTimeout(function(){}, 2000);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"data\": {\n        \"type\": \"access-tokens\",\n        \"attributes\": {\n            \"refreshToken\": \"{{refresh_token}}\"\n        }\n    }\n}"
+						},
+						"url": {
+							"raw": "{{url}}/refresh-tokens",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"refresh-tokens"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Empty Access token request type",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "09587067-e655-4e6c-9698-87148832d432",
+								"exec": [
+									"var responseJson = pm.response.json();",
+									"",
+									"pm.test(\"Status code is 400\", function () {",
+									"    pm.response.to.have.status(400);",
+									"});",
+									"",
+									"pm.test(\"Correct error status\", function() {",
+									"    pm.expect(responseJson.errors[0].status).to.eql(400);",
+									"});",
+									"",
+									"pm.test(\"Correct error message\", function() {",
+									"    pm.expect(responseJson.errors[0].detail).to.eql(\"Invalid type.\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "dbb50b93-f17a-4a99-bbab-c8a1e9df7896",
+								"exec": [
+									"setTimeout(function(){}, 2000);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"data\": {\n        \"type\": \"\",\n        \"attributes\": {\n            \"refreshToken\": \"{{refresh_token}}\"\n        }\n    }\n}"
+						},
+						"url": {
+							"raw": "{{url}}/refresh-tokens",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"refresh-tokens"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Request delete customer (helper)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "392dab97-c0fa-42bf-9de4-2f3fe7136abc",
+								"exec": [
+									"pm.test(\"Status code is 204\", function () {",
+									"    pm.response.to.have.status(204);",
+									"});",
+									"",
+									"pm.variables.unset(\"customer_reference\");",
+									"pm.variables.unset(\"token\");",
+									"pm.variables.unset(\"refresh_token\");"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/customers/{{customer_reference}}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"customers",
+								"{{customer_reference}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Request access token (helper)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "09587067-e655-4e6c-9698-87148832d432",
+								"exec": [
+									"var responseData = pm.response.json().data;",
+									"",
+									"pm.variables.set(\"token\", responseData.attributes.accessToken);",
+									"pm.variables.set(\"refresh_token\", responseData.attributes.refreshToken);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/vnd.api+json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"data\": {\n        \"type\": \"access-tokens\",\n        \"attributes\": {\n            \"username\": \"{{username}}\",\n            \"password\": \"{{password}}\"\n        }\n    }\n}"
+						},
+						"url": {
+							"raw": "{{url}}/access-tokens",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"access-tokens"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Access customer's profile with a valid access token",
+			"item": [
+				{
+					"name": "Create new customer(helper)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "8ad8c317-2a5a-46a7-afee-92b8b26b9d20",
+								"exec": [
+									"if ('errors' in pm.response.json() && pm.response.json().errors[0].code == 400) {",
+									"    var email = pm.variables.get(\"username\");",
+									"    pm.variables.set(\"username\", new Date().getTime() + '@mail.com');",
+									"    postman.setNextRequest(request.name);",
+									"} else {",
+									"    var responseData = pm.response.json().data;",
+									"",
+									"    pm.variables.set(\"customer_reference\", responseData.id);",
+									"    pm.variables.set(\"customer_create_at\", responseData.attributes.createdAt);",
+									"    pm.variables.set(\"customer_update_at\", responseData.attributes.updatedAt);",
+									"    ",
+									"    pm.test(\"Status code is 201\", function () {",
+									"        pm.response.to.have.status(201);",
+									"    });",
+									"    ",
+									"    pm.test(\"Has correct type and id returned\", function () {",
+									"        pm.expect(responseData.type).to.eql(\"customers\");",
+									"        pm.expect(responseData.id).to.eql(pm.variables.get(\"customer_reference\"));",
+									"    });",
+									"    ",
+									"    pm.test(\"Has correct first, lastname  and salution\", function () {",
+									"        pm.expect(responseData.attributes.firstName).to.eql(pm.variables.get(\"first_name\"));",
+									"        pm.expect(responseData.attributes.lastName).to.eql(pm.variables.get(\"last_name\"));",
+									"        pm.expect(responseData.attributes.salutation).to.eql(pm.variables.get(\"salutation\"));",
+									"    });",
+									"    ",
+									"    pm.test(\"Create_at returned\", function (){",
+									"        // need to add the assert to check the null in the field ",
+									"        pm.expect(responseData.attributes.createdAt).to.eql(pm.variables.get(\"customer_create_at\"));",
+									"    });",
+									"    ",
+									"    pm.test(\"Create_at returned\", function (){",
+									"        // need to add the assert to check the null in the field ",
+									"        pm.expect(responseData.attributes.updatedAt).to.eql(pm.variables.get(\"customer_update_at\"));",
+									"    });",
+									"    ",
+									"    pm.test(\"Has self link\", function() {",
+									"        pm.expect(responseData.links.self).to.eql(pm.variables.get(\"url\") + \"/customers/\" + pm.variables.get(\"customer_reference\"));",
+									"    });",
+									"}",
+									"",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/vnd.api+json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "de-DE, de;q=0.9, en;q=0.1"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"data\": {\n    \"type\": \"customers\",\n    \"attributes\": {\n        \"salutation\": \"{{salutation}}\",\n        \"firstName\":\"{{first_name}}\",\n        \"lastName\":\"{{last_name}}\",\n        \"email\":\"{{username}}\",\n        \"password\":\"{{password}}\",\n        \"confirmPassword\":\"{{password}}\",\n        \"acceptedTerms\":true\n    }\n  }\n}"
+						},
+						"url": {
+							"raw": "{{url}}/customers",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"customers"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Request access token (helper)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "09587067-e655-4e6c-9698-87148832d432",
+								"exec": [
+									"var responseData = pm.response.json().data;",
+									"",
+									"pm.variables.set(\"token\", responseData.attributes.accessToken);",
+									"pm.variables.set(\"refresh_token\", responseData.attributes.refreshToken);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/vnd.api+json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"data\": {\n        \"type\": \"access-tokens\",\n        \"attributes\": {\n            \"username\": \"{{username}}\",\n            \"password\": \"{{password}}\"\n        }\n    }\n}"
+						},
+						"url": {
+							"raw": "{{url}}/access-tokens",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"access-tokens"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Access customer's profile with a valid access token",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "09587067-e655-4e6c-9698-87148832d432",
+								"exec": [
+									"var responseData = pm.response.json().data;",
+									"",
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Has correct type returned\", function() {",
+									"    pm.expect(responseData.type).to.eql(\"customers\");",
+									"    pm.expect(responseData.type).to.be.a(\"string\");",
+									"});",
+									"",
+									"pm.test(\"Has id returned\", function() {",
+									"    pm.expect(responseData.id).to.be.a(\"string\");",
+									"    pm.expect(responseData.id).to.eql(pm.variables.get(\"customer_reference\"));",
+									"});",
+									"",
+									"pm.test(\"Has correct attributes\", function() {",
+									"    pm.expect(responseData.attributes.email).to.be.eql(pm.variables.get(\"username\"));",
+									"    pm.expect(responseData.attributes.firstName).to.be.eql(pm.variables.get(\"first_name\"));",
+									"    pm.expect(responseData.attributes.lastName).to.be.eql(pm.variables.get(\"last_name\"));",
+									"   pm.expect(responseData.attributes.gender).to.be.eql(null);",
+									"   pm.expect(responseData.attributes.dateOfBirth).to.be.eql(null);",
+									"   pm.expect(responseData.attributes.salutation).to.be.eql(pm.variables.get(\"salutation\"));",
+									"   pm.expect(responseData.attributes.createdAt).to.be.eql(pm.variables.get(\"customer_create_at\"));",
+									"    pm.expect(responseData.attributes.updatedAt).to.be.eql(pm.variables.get(\"customer_update_at\"));",
+									"});",
+									"",
+									"",
+									"pm.test(\"Has self link\", function() {",
+									"    pm.expect(responseData.links.self).to.eql(pm.variables.get(\"url\") + \"/customers/\" + pm.variables.get(\"customer_reference\"));",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/customers/{{customer_reference}}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"customers",
+								"{{customer_reference}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Request access token (helper)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "09587067-e655-4e6c-9698-87148832d432",
+								"exec": [
+									"var responseData = pm.response.json().data;",
+									"",
+									"pm.variables.set(\"first_token\", responseData.attributes.accessToken);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/vnd.api+json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"data\": {\n        \"type\": \"access-tokens\",\n        \"attributes\": {\n            \"username\": \"{{username}}\",\n            \"password\": \"{{password}}\"\n        }\n    }\n}"
+						},
+						"url": {
+							"raw": "{{url}}/access-tokens",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"access-tokens"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Request access token (helper)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "09587067-e655-4e6c-9698-87148832d432",
+								"exec": [
+									"var responseData = pm.response.json().data;",
+									"",
+									"pm.variables.set(\"second_token\", responseData.attributes.accessToken);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/vnd.api+json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"data\": {\n        \"type\": \"access-tokens\",\n        \"attributes\": {\n            \"username\": \"{{username}}\",\n            \"password\": \"{{password}}\"\n        }\n    }\n}"
+						},
+						"url": {
+							"raw": "{{url}}/access-tokens",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"access-tokens"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Request a new access token and try access to customer's account with old access token",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "09587067-e655-4e6c-9698-87148832d432",
+								"exec": [
+									"var responseData = pm.response.json().data;",
+									"",
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Has correct type returned\", function() {",
+									"    pm.expect(responseData.type).to.eql(\"customers\");",
+									"    pm.expect(responseData.type).to.be.a(\"string\");",
+									"});",
+									"",
+									"pm.test(\"Has id returned\", function() {",
+									"    pm.expect(responseData.id).to.be.a(\"string\");",
+									"    pm.expect(responseData.id).to.eql(pm.variables.get(\"customer_reference\"));",
+									"});",
+									"",
+									"pm.test(\"Has correct attributes\", function() {",
+									"    pm.expect(responseData.attributes.email).to.be.eql(pm.variables.get(\"username\"));",
+									"    pm.expect(responseData.attributes.firstName).to.be.eql(pm.variables.get(\"first_name\"));",
+									"    pm.expect(responseData.attributes.lastName).to.be.eql(pm.variables.get(\"last_name\"));",
+									"    pm.expect(responseData.attributes.gender).to.be.eql(null);",
+									"    pm.expect(responseData.attributes.dateOfBirth).to.be.eql(null);",
+									"    pm.expect(responseData.attributes.salutation).to.be.eql(pm.variables.get(\"salutation\"));",
+									"    pm.expect(responseData.attributes.createdAt).to.be.eql(pm.variables.get(\"customer_create_at\"));",
+									"    pm.expect(responseData.attributes.updatedAt).to.be.eql(pm.variables.get(\"customer_update_at\"));",
+									"});",
+									"",
+									"",
+									"pm.test(\"Has self link\", function() {",
+									"    pm.expect(responseData.links.self).to.eql(pm.variables.get(\"url\") + \"/customers/\" + pm.variables.get(\"customer_reference\"));",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{first_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/customers/{{customer_reference}}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"customers",
+								"{{customer_reference}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Request a new access token and try access to customer's account with old access token",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "09587067-e655-4e6c-9698-87148832d432",
+								"exec": [
+									"var responseData = pm.response.json().data;",
+									"",
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Has correct type returned\", function() {",
+									"    pm.expect(responseData.type).to.eql(\"customers\");",
+									"    pm.expect(responseData.type).to.be.a(\"string\");",
+									"});",
+									"",
+									"pm.test(\"Has id returned\", function() {",
+									"    pm.expect(responseData.id).to.be.a(\"string\");",
+									"    pm.expect(responseData.id).to.eql(pm.variables.get(\"customer_reference\"));",
+									"});",
+									"",
+									"pm.test(\"Has correct attributes\", function() {",
+									"    pm.expect(responseData.attributes.email).to.be.eql(pm.variables.get(\"username\"));",
+									"    pm.expect(responseData.attributes.firstName).to.be.eql(pm.variables.get(\"first_name\"));",
+									"    pm.expect(responseData.attributes.lastName).to.be.eql(pm.variables.get(\"last_name\"));",
+									"    pm.expect(responseData.attributes.gender).to.be.eql(null);",
+									"    pm.expect(responseData.attributes.dateOfBirth).to.be.eql(null);",
+									"    pm.expect(responseData.attributes.salutation).to.be.eql(pm.variables.get(\"salutation\"));",
+									"    pm.expect(responseData.attributes.createdAt).to.be.eql(pm.variables.get(\"customer_create_at\"));",
+									"    pm.expect(responseData.attributes.updatedAt).to.be.eql(pm.variables.get(\"customer_update_at\"));",
+									"});",
+									"",
+									"",
+									"pm.test(\"Has self link\", function() {",
+									"    pm.expect(responseData.links.self).to.eql(pm.variables.get(\"url\") + \"/customers/\" + pm.variables.get(\"customer_reference\"));",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{second_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/customers/{{customer_reference}}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"customers",
+								"{{customer_reference}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Access customer's profile with refresh token",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "09587067-e655-4e6c-9698-87148832d432",
+								"exec": [
+									"var responseJson = pm.response.json();",
+									"",
+									"pm.test(\"Status code is 401\", function () {",
+									"    pm.response.to.have.status(401);",
+									"});",
+									"",
+									"pm.test(\"Correct error status\", function() {",
+									"    pm.expect(responseJson.errors[0].status).to.eql(401);",
+									"});",
+									"",
+									"pm.test(\"Correct error code\", function() {",
+									"    pm.expect(responseJson.errors[0].code).to.eql(\"001\");",
+									"});",
+									"",
+									"pm.test(\"Correct error message\", function() {",
+									"    pm.expect(responseJson.errors[0].detail).to.eql(\"Invalid access token.\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{refresh_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/customers/{{customer_reference}}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"customers",
+								"{{customer_reference}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Request delete customer (helper)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "392dab97-c0fa-42bf-9de4-2f3fe7136abc",
+								"exec": [
+									"pm.test(\"Status code is 204\", function () {",
+									"    pm.response.to.have.status(204);",
+									"});",
+									"",
+									"pm.variables.unset(\"customer_reference\");",
+									"pm.variables.unset(\"created_at\");",
+									"pm.variables.unset(\"updated_at\");",
+									"pm.variables.unset(\"token\");",
+									"pm.variables.unset(\"refresh_token\");",
+									"pm.variables.unset(\"first_token\");",
+									"pm.variables.unset(\"second_token\");"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/customers/{{customer_reference}}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"customers",
+								"{{customer_reference}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "00fee7d0-e445-4c22-9dc6-f1d87355bc78",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "2b9cee6f-da74-403f-bfa0-d823d8afcae8",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"id": "bdab5bd2-23ab-456a-a2ae-2c43fb61192d",
+			"key": "username",
+			"value": "test11.customer@spryker.com",
+			"type": "string"
+		},
+		{
+			"id": "726c0e7e-02d6-4381-beb0-eeb7e3b1488c",
+			"key": "password",
+			"value": "change123",
+			"type": "string"
+		},
+		{
+			"id": "690af67e-af36-48f1-bb70-116e08989cc2",
+			"key": "new_password",
+			"value": "change111",
+			"type": "string"
+		},
+		{
+			"id": "b8906e4a-2549-434a-bcc8-ff2752abd890",
+			"key": "customer_reference",
+			"value": "DE--6",
+			"type": "string"
+		},
+		{
+			"id": "8024c4f7-7a65-4bc7-9e52-ddb48fc89682",
+			"key": "token",
+			"value": "string",
+			"type": "string"
+		},
+		{
+			"id": "bfd11da7-964d-4551-8848-552492eea189",
+			"key": "refresh_token",
+			"value": "string",
+			"type": "string"
+		},
+		{
+			"id": "0fe62077-3a9f-4d2c-81f9-e3401cc75385",
+			"key": "first_name",
+			"value": "First",
+			"type": "string"
+		},
+		{
+			"id": "bc2352de-2585-454a-8690-31657fae6230",
+			"key": "last_name",
+			"value": "Last",
+			"type": "string"
+		},
+		{
+			"id": "36418058-b1ec-4179-ad03-03ecdcad5f6e",
+			"key": "salutation",
+			"value": "Mr",
+			"type": "string"
+		},
+		{
+			"id": "92be9027-dabc-4982-ac4c-4b9ccd178196",
+			"key": "created_at",
+			"value": "string",
+			"type": "string"
+		},
+		{
+			"id": "82a819b7-c282-454f-9f66-bd27888eec3b",
+			"key": "updated_at",
+			"value": "string",
+			"type": "string"
+		},
+		{
+			"id": "a56caf0c-eddc-4771-8b12-057b9d9b18b1",
+			"key": "access_token_ttl",
+			"value": "28800",
+			"type": "string"
+		},
+		{
+			"id": "71b22e9f-1843-4a75-a131-0ceb1d4e7a78",
+			"key": "first_token",
+			"value": "string",
+			"type": "string"
+		},
+		{
+			"id": "f4085aa0-5cc4-4719-91ee-e3399b1dcb2f",
+			"key": "second_token",
+			"value": "string",
+			"type": "string"
+		}
+	]
+}

@@ -1,0 +1,905 @@
+{
+	"info": {
+		"_postman_id": "9f34efd7-d8c5-4765-a3df-3182a494b2c2",
+		"name": "categories-rest-api",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Category - Tree",
+			"item": [
+				{
+					"name": "Request category tree",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "d0272a07-50e8-4ec7-bee9-2fc5637a4756",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Has correct type returned\", function() {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.data[0].type).to.eql(\"category-trees\");",
+									"});",
+									"pm.test(\"Has id returned\", function() {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.data[0].id).to.eql(null);",
+									"});",
+									"pm.test(\"Has self link\", function() {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.data[0].links.self).to.eql(pm.environment.get(\"url\") + \"/category-trees\");",
+									"});",
+									"",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/vnd.api+json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/vnd.api+json"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "de-DE, en;q=0.9"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/category-trees",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"category-trees"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Negative. Request category tree with special characters",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "d0272a07-50e8-4ec7-bee9-2fc5637a4756",
+								"type": "text/javascript",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Has correct type returned\", function() {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.data.type).to.eql(\"category-trees\");",
+									"});",
+									"pm.test(\"Has id returned\", function() {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.data.id).to.eql(null);",
+									"});",
+									"pm.test(\"Has self link\", function() {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.data.links.self).to.eql(pm.environment.get(\"url\") + \"/category-trees\");",
+									"});",
+									"pm.test(\"Has attributes returned\", function() {",
+									"    var jsonData = pm.response.json();",
+									"    var attributes = pm.environment.get(\"attributes\");",
+									"    pm.expect(jsonData.data.attributes.attributes).to.be.eql(attributes);",
+									"});",
+									"",
+									""
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/vnd.api+json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/vnd.api+json"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "de-DE, en;q=0.9"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/category-trees/!@#$%^&*()",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"category-trees",
+								"!@"
+							],
+							"hash": "$%^&*()"
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Negative. Request category tree with a lot of space",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "d0272a07-50e8-4ec7-bee9-2fc5637a4756",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Has correct type returned\", function() {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.data[0].type).to.eql(\"category-trees\");",
+									"});",
+									"pm.test(\"Has id returned\", function() {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.data[0].id).to.eql(null);",
+									"});",
+									"pm.test(\"Has self link\", function() {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.data[0].links.self).to.eql(pm.environment.get(\"url\") + \"/category-trees\");",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/vnd.api+json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/vnd.api+json"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "de-DE, en;q=0.9"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/category-trees/",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"category-trees",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Negative. Request category tree using method Post",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "d0272a07-50e8-4ec7-bee9-2fc5637a4756",
+								"exec": [
+									"pm.test(\"Status code is 404\", function () {",
+									"    pm.response.to.have.status(404);",
+									"});",
+									"",
+									"pm.test(\"Has correct type returned\", function() {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.errors[0].detail).to.eql(\"Not Found\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/vnd.api+json"
+							},
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/x-www-form-urlencoded",
+								"type": "text"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "de-DE, en;q=0.9"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/category-trees",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"category-trees"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Negative. Request category tree using method Put",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "d0272a07-50e8-4ec7-bee9-2fc5637a4756",
+								"exec": [
+									"pm.test(\"Status code is 404\", function () {",
+									"    pm.response.to.have.status(404);",
+									"});",
+									"",
+									"pm.test(\"Has correct type returned\", function() {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.errors[0].detail).to.eql(\"Not Found\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/vnd.api+json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/vnd.api+json"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "de-DE, en;q=0.9"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/category-trees",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"category-trees"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Negative. Request category tree using method Delete",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "d0272a07-50e8-4ec7-bee9-2fc5637a4756",
+								"exec": [
+									"pm.test(\"Status code is 404\", function () {",
+									"    pm.response.to.have.status(404);",
+									"});",
+									"",
+									"pm.test(\"Has correct type returned\", function() {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.errors[0].detail).to.eql(\"Not Found\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/vnd.api+json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/vnd.api+json"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "de-DE, en;q=0.9"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/category-trees",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"category-trees"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Category - Nodes ",
+			"item": [
+				{
+					"name": "Request one category a lot of space ",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "bcefef9c-7a85-4be8-b8f8-e3066c48f92a",
+								"exec": [
+									"pm.test(\"Status code is 404\", function () {",
+									"    pm.response.to.have.status(400);",
+									"});",
+									"",
+									"pm.test(\"Has correct type returned\", function() {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.errors[0].detail).to.eql(\"Category node id has not been specified or invalid.\");",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/vnd.api+json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/vnd.api+json"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "de-DE, en;q=0.9"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/category-nodes/2    .   .             /",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"category-nodes",
+								"2    .   .             ",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Negative. Request one category using method Post",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "d6e8ce22-de7c-43d6-8b9c-9640cff72802",
+								"exec": [
+									"pm.test(\"Status code is 404\", function () {",
+									"    pm.response.to.have.status(404);",
+									"});",
+									"",
+									"pm.test(\"Has correct type returned\", function() {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.errors[0].detail).to.eql(\"Not Found\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/vnd.api+json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/vnd.api+json"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "de-DE, en;q=0.9"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/category-nodes/2",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"category-nodes",
+								"2"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Negative. Request one category using method Put",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "aa95800e-3e2c-43bb-867b-c23815472675",
+								"exec": [
+									"pm.test(\"Status code is 404\", function () {",
+									"    pm.response.to.have.status(404);",
+									"});",
+									"",
+									"pm.test(\"Has correct type returned\", function() {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.errors[0].detail).to.eql(\"Not Found\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/vnd.api+json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/vnd.api+json"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "de-DE, en;q=0.9"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/category-nodes/2",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"category-nodes",
+								"2"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Negative. Request one category using method Delete",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "ae5f4787-49e4-479a-9b2d-dfbec759599e",
+								"exec": [
+									"pm.test(\"Status code is 404\", function () {",
+									"    pm.response.to.have.status(404);",
+									"});",
+									"",
+									"pm.test(\"Has correct type returned\", function() {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.errors[0].detail).to.eql(\"Not Found\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/vnd.api+json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/vnd.api+json"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "de-DE, en;q=0.9"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/category-nodes/2",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"category-nodes",
+								"2"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Negative. Request one category with special chars",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "ea221b3b-3e07-4311-81f4-0c6cbfa9a035",
+								"exec": [
+									"",
+									"pm.test(\"Status code is 500\", function () {",
+									"    pm.response.to.have.status(400);",
+									"});",
+									"pm.test(\"Has correct type returned\", function() {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.errors[0].detail).to.eql(\"Category node id has not been specified or invalid.\");",
+									"});",
+									"",
+									"",
+									"",
+									"",
+									"",
+									"",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/vnd.api+json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/vnd.api+json"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "de-DE, en;q=0.9"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/category-nodes/*3*",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"category-nodes",
+								"*3*"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Request category node",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "d52fceac-0b0d-4375-ad10-754e034475bf",
+								"exec": [
+									"pm.test(\"Status code is 200\", function() {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Has correct type and id returned\", function() {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.data.type).to.eql(\"category-nodes\");",
+									"    pm.expect(jsonData.data.id).to.eql('2');",
+									"});",
+									"",
+									"pm.test(\"Has self link\", function() {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.data.links.self).to.eql(pm.environment.get(\"url\") + \"/category-nodes/2\");",
+									"});",
+									"",
+									"pm.test(\"Has correct attributes\", function() {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.data.type).to.eql(\"category-nodes\");",
+									"    pm.expect(jsonData.data.id).to.eql('2');",
+									"    pm.expect(jsonData.data.attributes.nodeId).to.eql(2);",
+									"    pm.expect(jsonData.data.attributes.name).to.eql('Cameras & Camcorders');",
+									"    pm.expect(jsonData.data.attributes.metaTitle).to.eql('Cameras & Camcorders');",
+									"    pm.expect(jsonData.data.attributes.metaKeywords).to.eql('Cameras & Camcorders');",
+									"    pm.expect(jsonData.data.attributes.metaDescription).to.eql('Cameras & Camcorders');",
+									"    pm.expect(jsonData.data.attributes.isActive).to.eql(true);",
+									"    pm.expect(jsonData.data.attributes.order).to.eql(90);",
+									"});",
+									"pm.test(\"Has correct child list\", function() {",
+									"    var jsonData = pm.response.json()",
+									"        children = jsonData.data.attributes.children",
+									"        hasCamcorders = false,",
+									"        hasDigitalCameras = false;",
+									"    for  (var i in children) {",
+									"        if (children[i].nodeId == 3) {",
+									"            pm.expect(children[i].name).to.eql('Camcorders');",
+									"            pm.expect(children[i].metaTitle).to.eql('Camcorders');",
+									"            pm.expect(children[i].metaKeywords).to.eql('Camcorders');",
+									"            pm.expect(children[i].metaDescription).to.eql('Camcorders');",
+									"            pm.expect(children[i].isActive).to.eql(true);",
+									"            pm.expect(children[i].order).to.eql(90);",
+									"            hasCamcorders = true;",
+									"        }",
+									"        if (children[i].nodeId == 4) {",
+									"            pm.expect(children[i].name).to.eql('Digital Cameras');",
+									"            pm.expect(children[i].metaTitle).to.eql('Digital Cameras');",
+									"            pm.expect(children[i].metaKeywords).to.eql('Digital Cameras');",
+									"            pm.expect(children[i].metaDescription).to.eql('Digital Cameras');",
+									"            pm.expect(children[i].isActive).to.eql(true);",
+									"            pm.expect(children[i].order).to.eql(100);",
+									"            hasDigitalCameras = true;",
+									"        }",
+									"    }",
+									"    ",
+									"    pm.expect(hasCamcorders).to.eql(true);",
+									"    pm.expect(hasDigitalCameras).to.eql(true);",
+									"});",
+									"",
+									"pm.test(\"Has correct parents list\", function() {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.data.attributes.parents[0].nodeId).to.eql(1);",
+									"    pm.expect(jsonData.data.attributes.parents[0].name).to.eql('Demoshop');",
+									"    pm.expect(jsonData.data.attributes.parents[0].metaTitle).to.eql('Demoshop');",
+									"    pm.expect(jsonData.data.attributes.parents[0].metaKeywords).to.eql('English version of Demoshop');",
+									"    pm.expect(jsonData.data.attributes.parents[0].metaDescription).to.eql('English version of Demoshop');",
+									"    pm.expect(jsonData.data.attributes.parents[0].isActive).to.eql(true);",
+									"});",
+									"",
+									"pm.test(\"Has attributes returned\", function() {",
+									"    var jsonData = pm.response.json();",
+									"    var attributes = pm.environment.get(\"attributes\");",
+									"    pm.expect(jsonData.data.attributes.attributes).to.be.eql(attributes);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/vnd.api+json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/vnd.api+json"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "de-DE, en;q=0.9"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/category-nodes/2",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"category-nodes",
+								"2"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Request category node without ID",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "d52fceac-0b0d-4375-ad10-754e034475bf",
+								"exec": [
+									"pm.test(\"Status code is 404\", function () {",
+									"    pm.response.to.have.status(400);",
+									"});",
+									"",
+									"pm.test(\"Has correct type returned\", function() {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.errors[0].detail).to.eql(\"Category node id has not been specified or invalid.\");",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/vnd.api+json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/vnd.api+json"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "de-DE, en;q=0.9"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/category-nodes/",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"category-nodes",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Request the no existing catogory node ",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "d52fceac-0b0d-4375-ad10-754e034475bf",
+								"exec": [
+									"pm.test(\"Status code is 404\", function () {",
+									"    pm.response.to.have.status(404);",
+									"});",
+									"",
+									"pm.test(\"Has correct type returned\", function() {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.errors[0].detail).to.eql(\"Can't find category node with the given id.\");",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/vnd.api+json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/vnd.api+json"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "de-DE, en;q=0.9"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/category-nodes/123123123",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"category-nodes",
+								"123123123"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "a838ed58-439e-48d0-98e5-7d0595c1c9f9",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "07d567c1-bf0a-4b0b-b0b8-5c846d999371",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		}
+	]
+}

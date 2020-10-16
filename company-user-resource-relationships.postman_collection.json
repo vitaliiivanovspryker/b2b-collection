@@ -1,0 +1,855 @@
+{
+	"info": {
+		"_postman_id": "3aafb08c-e6c6-4fe0-8734-035f091bed7b",
+		"name": "company-user-resource-relationships",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Get token (helper)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "c87ecda0-0958-4ce0-8eb9-73ab39d34830",
+						"exec": [
+							"pm.environment.set(\"token\", pm.response.json().data.attributes.accessToken);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/vnd.api+json",
+						"type": "text"
+					},
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Accept-Language",
+						"value": "de-DE, en;q=0.9",
+						"type": "text"
+					},
+					{
+						"key": "X-Company-User-Id",
+						"value": "88ac19e3-ca9c-539e-b1f1-9c3b7fd48718",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"data\": {\n        \"type\": \"access-tokens\",\n        \"attributes\": {\n            \"username\": \"anne.boleyn@spryker.com\",\n            \"password\": \"change123\"\n        }\n    }\n}"
+				},
+				"url": {
+					"raw": "{{url}}/access-tokens",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"access-tokens"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get relationships Anne Boleyn",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "b10bd11a-bc58-48f0-8de1-76a9abbf227d",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"var response = pm.response.json();",
+							"",
+							"pm.test(\"Has 4 company users returned\", function() {",
+							"    pm.expect(response.data).to.have.lengthOf(4);",
+							"});",
+							"",
+							"pm.test(\"Each company-user has correct relationships\", function() {",
+							"    pm.expect(response.data[0].relationships.companies.data[0].type).to.eql(\"companies\");",
+							"    pm.expect(response.data[0].relationships['company-business-units'].data[0].type).to.eql(\"company-business-units\");",
+							"});",
+							"",
+							"pm.test(\"Each company user has self-link\", function() {",
+							"    pm.expect(response.data[0].links.self).to.eql(pm.environment.get(\"url\") + \"/company-users/\" + response.data[0].id);",
+							"    pm.expect(response.data[1].links.self).to.eql(pm.environment.get(\"url\") + \"/company-users/\" + response.data[1].id);",
+							"    pm.expect(response.data[2].links.self).to.eql(pm.environment.get(\"url\") + \"/company-users/\" + response.data[2].id);",
+							"    pm.expect(response.data[3].links.self).to.eql(pm.environment.get(\"url\") + \"/company-users/\" + response.data[3].id);",
+							"});",
+							"",
+							"pm.test(\"Has selflink\", function() {",
+							"    pm.expect(response.links.self).to.eql(pm.environment.get(\"url\") + \"/company-users?include=companies,company-business-units,company-roles\");",
+							"});",
+							"",
+							"pm.test(\"Has correct companies included\", function() {",
+							"    pm.expect(response.included[0].attributes.name).to.eql(\"BoB-Hotel Jim\");",
+							"    pm.expect(response.included[2].attributes.name).to.eql(\"BoB-Hotel Mitte\");",
+							"    pm.expect(response.included[4].attributes.name).to.eql(\"BoB-Hotel Ku'damm\");",
+							"    pm.expect(response.included[6].attributes.name).to.eql(\"Spryker Systems GmbH\");",
+							"});",
+							"",
+							"pm.test(\"Has 8 includes returned\", function() {",
+							"    pm.expect(response.included).to.have.lengthOf(8);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/vnd.api+json",
+						"type": "text"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/vnd.api+json",
+						"type": "text"
+					},
+					{
+						"key": "Accept-Language",
+						"value": "de-DE, en;q=0.9",
+						"type": "text"
+					},
+					{
+						"key": "X-Company-User-Id",
+						"value": "88ac19e3-ca9c-539e-b1f1-9c3b7fd48718",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{url}}/company-users?include=companies,company-business-units,company-roles",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"company-users"
+					],
+					"query": [
+						{
+							"key": "include",
+							"value": "companies,company-business-units,company-roles"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get token (helper)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "c87ecda0-0958-4ce0-8eb9-73ab39d34830",
+						"exec": [
+							"pm.environment.set(\"token\", pm.response.json().data.attributes.accessToken);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Accept",
+						"type": "text",
+						"value": "application/vnd.api+json"
+					},
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					},
+					{
+						"key": "Accept-Language",
+						"type": "text",
+						"value": "de-DE, en;q=0.9"
+					},
+					{
+						"key": "X-Company-User-Id",
+						"type": "text",
+						"value": "88ac19e3-ca9c-539e-b1f1-9c3b7fd48718",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"data\": {\n        \"type\": \"access-tokens\",\n        \"attributes\": {\n            \"username\": \"maria.williams@spryker.com\",\n            \"password\": \"change123\"\n        }\n    }\n}"
+				},
+				"url": {
+					"raw": "{{url}}/access-tokens",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"access-tokens"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get relationships Maria Williams",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "b10bd11a-bc58-48f0-8de1-76a9abbf227d",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"var response = pm.response.json();",
+							"",
+							"pm.test(\"Has empty data array\", function() {",
+							"    pm.expect(response.data).to.be.empty;",
+							"});",
+							"",
+							"pm.test(\"Has selflink\", function() {",
+							"    pm.expect(response.links.self).to.eql(pm.environment.get(\"url\") + \"/company-users?include=companies,company-business-units,company-roles\");",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"type": "text",
+						"value": "application/vnd.api+json"
+					},
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/vnd.api+json"
+					},
+					{
+						"key": "Accept-Language",
+						"type": "text",
+						"value": "de-DE, en;q=0.9"
+					},
+					{
+						"key": "X-Company-User-Id",
+						"type": "text",
+						"value": "88ac19e3-ca9c-539e-b1f1-9c3b7fd48718",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{url}}/company-users?include=companies,company-business-units,company-roles",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"company-users"
+					],
+					"query": [
+						{
+							"key": "include",
+							"value": "companies,company-business-units,company-roles"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get token (helper)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "c87ecda0-0958-4ce0-8eb9-73ab39d34830",
+						"exec": [
+							"pm.environment.set(\"token\", pm.response.json().data.attributes.accessToken);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Accept",
+						"type": "text",
+						"value": "application/vnd.api+json"
+					},
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					},
+					{
+						"key": "Accept-Language",
+						"type": "text",
+						"value": "de-DE, en;q=0.9"
+					},
+					{
+						"key": "X-Company-User-Id",
+						"type": "text",
+						"value": "88ac19e3-ca9c-539e-b1f1-9c3b7fd48718",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"data\": {\n        \"type\": \"access-tokens\",\n        \"attributes\": {\n            \"username\": \"andrew@ottom.de\",\n            \"password\": \"change123\"\n        }\n    }\n}"
+				},
+				"url": {
+					"raw": "{{url}}/access-tokens",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"access-tokens"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get relationships Andrew ottom.de",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "b10bd11a-bc58-48f0-8de1-76a9abbf227d",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"var response = pm.response.json();",
+							"",
+							"pm.test(\"Has 1 company users returned\", function() {",
+							"    pm.expect(response.data).to.have.lengthOf(1);",
+							"});",
+							"",
+							"pm.test(\"Each company-user has correct relationships\", function() {",
+							"    pm.expect(response.data[0].relationships.companies.data[0].type).to.eql(\"companies\");",
+							"    pm.expect(response.data[0].relationships['company-business-units'].data[0].type).to.eql(\"company-business-units\");",
+							"});",
+							"",
+							"pm.test(\"Each company user has self-link\", function() {",
+							"    pm.expect(response.data[0].links.self).to.eql(pm.environment.get(\"url\") + \"/company-users/\" + response.data[0].id);",
+							"});",
+							"",
+							"pm.test(\"Has selflink\", function() {",
+							"    pm.expect(response.links.self).to.eql(pm.environment.get(\"url\") + \"/company-users?include=companies,company-business-units,company-roles\");",
+							"});",
+							"",
+							"pm.test(\"Has correct companies included\", function() {",
+							"    pm.expect(response.included[0].attributes.name).to.eql(\"Ottom ltd\");",
+							"});",
+							"",
+							"pm.test(\"Has 4 includes returned\", function() {",
+							"    pm.expect(response.included).to.have.lengthOf(4);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"type": "text",
+						"value": "application/vnd.api+json"
+					},
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/vnd.api+json"
+					},
+					{
+						"key": "Accept-Language",
+						"type": "text",
+						"value": "de-DE, en;q=0.9"
+					},
+					{
+						"key": "X-Company-User-Id",
+						"type": "text",
+						"value": "88ac19e3-ca9c-539e-b1f1-9c3b7fd48718",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{url}}/company-users?include=companies,company-business-units,company-roles",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"company-users"
+					],
+					"query": [
+						{
+							"key": "include",
+							"value": "companies,company-business-units,company-roles"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get relationships without token",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "b10bd11a-bc58-48f0-8de1-76a9abbf227d",
+						"exec": [
+							"pm.test(\"Status code is 403\", function () {",
+							"    pm.response.to.have.status(403);",
+							"});",
+							"",
+							"var response = pm.response.json();",
+							"",
+							"pm.test(\"Has correct error detail\", function() {",
+							"    pm.expect(response.errors[0].detail).to.eql(\"Missing access token.\");",
+							"});",
+							"",
+							"pm.test(\"Has correct status code in the body\", function() {",
+							"    pm.expect(response.errors[0].status).to.eql(403);",
+							"});",
+							"",
+							"pm.test(\"Has correct error code\", function() {",
+							"    pm.expect(response.errors[0].code).to.eql(\"002\");",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"type": "text",
+						"value": "application/vnd.api+json"
+					},
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/vnd.api+json"
+					},
+					{
+						"key": "Accept-Language",
+						"type": "text",
+						"value": "de-DE, en;q=0.9"
+					},
+					{
+						"key": "X-Company-User-Id",
+						"type": "text",
+						"value": "88ac19e3-ca9c-539e-b1f1-9c3b7fd48718",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{url}}/company-users?include=companies,company-business-units,company-roles",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"company-users"
+					],
+					"query": [
+						{
+							"key": "include",
+							"value": "companies,company-business-units,company-roles"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get relationships with incorrect token",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "b10bd11a-bc58-48f0-8de1-76a9abbf227d",
+						"exec": [
+							"pm.test(\"Status code is 401\", function () {",
+							"    pm.response.to.have.status(401);",
+							"});",
+							"",
+							"var response = pm.response.json();",
+							"",
+							"pm.test(\"Has correct error detail\", function() {",
+							"    pm.expect(response.errors[0].detail).to.eql(\"Invalid access token.\");",
+							"});",
+							"",
+							"pm.test(\"Has correct status code in the body\", function() {",
+							"    pm.expect(response.errors[0].status).to.eql(401);",
+							"});",
+							"",
+							"pm.test(\"Has correct error code\", function() {",
+							"    pm.expect(response.errors[0].code).to.eql(\"001\");",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "fgdsjlkhfgdsjhkfdgsjkhlgdfs",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"type": "text",
+						"value": "application/vnd.api+json"
+					},
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/vnd.api+json"
+					},
+					{
+						"key": "Accept-Language",
+						"type": "text",
+						"value": "de-DE, en;q=0.9"
+					},
+					{
+						"key": "X-Company-User-Id",
+						"type": "text",
+						"value": "88ac19e3-ca9c-539e-b1f1-9c3b7fd48718",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{url}}/company-users?include=companies,company-business-units,company-roles",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"company-users"
+					],
+					"query": [
+						{
+							"key": "include",
+							"value": "companies,company-business-units,company-roles"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get relationships with empty token",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "b10bd11a-bc58-48f0-8de1-76a9abbf227d",
+						"exec": [
+							"pm.test(\"Status code is 403\", function () {",
+							"    pm.response.to.have.status(403);",
+							"});",
+							"",
+							"var response = pm.response.json();",
+							"",
+							"pm.test(\"Has correct error detail\", function() {",
+							"    pm.expect(response.errors[0].detail).to.eql(\"Missing access token.\");",
+							"});",
+							"",
+							"pm.test(\"Has correct status code in the body\", function() {",
+							"    pm.expect(response.errors[0].status).to.eql(403);",
+							"});",
+							"",
+							"pm.test(\"Has correct error code\", function() {",
+							"    pm.expect(response.errors[0].code).to.eql(\"002\");",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"type": "text",
+						"value": "application/vnd.api+json"
+					},
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/vnd.api+json"
+					},
+					{
+						"key": "Accept-Language",
+						"type": "text",
+						"value": "de-DE, en;q=0.9"
+					},
+					{
+						"key": "X-Company-User-Id",
+						"type": "text",
+						"value": "88ac19e3-ca9c-539e-b1f1-9c3b7fd48718",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{url}}/company-users?include=companies,company-business-units,company-roles",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"company-users"
+					],
+					"query": [
+						{
+							"key": "include",
+							"value": "companies,company-business-units,company-roles"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get relationships wrong method",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "b10bd11a-bc58-48f0-8de1-76a9abbf227d",
+						"exec": [
+							"pm.test(\"Status code is 404\", function () {",
+							"    pm.response.to.have.status(404);",
+							"});",
+							"",
+							"var response = pm.response.json();",
+							"",
+							"pm.test(\"Has correct error detail\", function() {",
+							"    pm.expect(response.errors[0].detail).to.eql(\"Not Found\");",
+							"});",
+							"",
+							"pm.test(\"Has correct status code in the body\", function() {",
+							"    pm.expect(response.errors[0].status).to.eql(404);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Accept",
+						"type": "text",
+						"value": "application/vnd.api+json"
+					},
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/vnd.api+json"
+					},
+					{
+						"key": "Accept-Language",
+						"type": "text",
+						"value": "de-DE, en;q=0.9"
+					},
+					{
+						"key": "X-Company-User-Id",
+						"type": "text",
+						"value": "88ac19e3-ca9c-539e-b1f1-9c3b7fd48718",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{url}}/company-users?include=companies,company-business-units,company-roles",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"company-users"
+					],
+					"query": [
+						{
+							"key": "include",
+							"value": "companies,company-business-units,company-roles"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get relationships incorrect endpoint",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "b10bd11a-bc58-48f0-8de1-76a9abbf227d",
+						"exec": [
+							"pm.test(\"Status code is 404\", function () {",
+							"    pm.response.to.have.status(404);",
+							"});",
+							"",
+							"var response = pm.response.json();",
+							"",
+							"pm.test(\"Has correct error detail\", function() {",
+							"    pm.expect(response.errors[0].detail).to.eql(\"Not Found\");",
+							"});",
+							"",
+							"pm.test(\"Has correct status code in the body\", function() {",
+							"    pm.expect(response.errors[0].status).to.eql(404);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"type": "text",
+						"value": "application/vnd.api+json"
+					},
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/vnd.api+json"
+					},
+					{
+						"key": "Accept-Language",
+						"type": "text",
+						"value": "de-DE, en;q=0.9"
+					},
+					{
+						"key": "X-Company-User-Id",
+						"type": "text",
+						"value": "88ac19e3-ca9c-539e-b1f1-9c3b7fd48718",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{url}}/company-user?include=companies,company-business-units,company-roles",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"company-user"
+					],
+					"query": [
+						{
+							"key": "include",
+							"value": "companies,company-business-units,company-roles"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{token}}",
+				"type": "string"
+			}
+		]
+	}
+}

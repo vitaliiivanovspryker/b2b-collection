@@ -1,0 +1,1390 @@
+{
+	"info": {
+		"_postman_id": "09d0380b-6935-420c-bd7a-f97f8962e5cf",
+		"name": "product-labels-rest-api",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Label - Abstract relation",
+			"item": [
+				{
+					"name": "Request the abstract product with Standard and Sale Labels",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "9aea875a-39ec-4a0d-9f30-b3413f6669c0",
+								"exec": [
+									"let product_sku = pm.variables.get(\"standard_label_product\");",
+									"",
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200); // verify the correct status code = 200 is fine",
+									"});",
+									"",
+									"pm.test(\"Has correct type and id  returned\", function() {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.data.type).to.eql(\"abstract-products\");",
+									"    pm.expect(jsonData.data.id).to.eql(product_sku);",
+									"});",
+									"",
+									"pm.test(\"Has self link\", function() {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.data.links.self).to.eql(pm.variables.get(\"url\") + \"/abstract-products/\" +  product_sku);",
+									"});",
+									"",
+									"// Relations",
+									"",
+									"pm.test(\"Has product labels returned\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.data.relationships[\"product-labels\"].data[0].type).to.eql(\"product-labels\");",
+									"    pm.expect(jsonData.data.relationships[\"product-labels\"].data[0].id).to.eql(\"3\");",
+									"    pm.expect(jsonData.data.relationships[\"product-labels\"].data[1].type).to.eql(\"product-labels\");",
+									"    pm.expect(jsonData.data.relationships[\"product-labels\"].data[1].id).to.eql(\"5\");",
+									"});",
+									"",
+									"// Included ",
+									"",
+									"pm.test(\"Has standard label returned\", function () {",
+									"    var includedJsonData = pm.response.json().included;",
+									"    var found = false;",
+									"    for (var include in includedJsonData) {",
+									"        if (includedJsonData[include].type === \"product-labels\" && includedJsonData[include].id === \"3\") {",
+									"            pm.expect(includedJsonData[include].type).to.eql(\"product-labels\");",
+									"            pm.expect(includedJsonData[include].id).to.eql(\"3\");",
+									"            pm.expect(includedJsonData[include].attributes.name).to.eql(\"Standard Label\");",
+									"            pm.expect(includedJsonData[include].attributes.isExclusive).to.eql(false);",
+									"            pm.expect(includedJsonData[include].attributes.position).to.eql(3);",
+									"            pm.expect(includedJsonData[include].attributes.frontEndReference).to.eql(\"\");",
+									"            found = true;",
+									"        }",
+									"    }",
+									"    ",
+									"    pm.expect(found).to.eql(true);",
+									"});",
+									"",
+									"pm.test(\"Has sale label returned\", function () {",
+									"    var includedJsonData = pm.response.json().included;",
+									"    var found = false;",
+									"    for (var include in includedJsonData) {",
+									"        if (includedJsonData[include].type === \"product-labels\" && includedJsonData[include].id === \"5\") {",
+									"            pm.expect(includedJsonData[include].type).to.eql(\"product-labels\");",
+									"            pm.expect(includedJsonData[include].id).to.eql(\"5\");",
+									"            pm.expect(includedJsonData[include].attributes.name).to.eql(\"SALE %\");",
+									"            pm.expect(includedJsonData[include].attributes.isExclusive).to.eql(false);",
+									"            pm.expect(includedJsonData[include].attributes.position).to.eql(5);",
+									"            pm.expect(includedJsonData[include].attributes.frontEndReference).to.eql(\"highlight\");",
+									"            found = true;",
+									"        }",
+									"    }",
+									"    ",
+									"    pm.expect(found).to.eql(true);",
+									"});",
+									"",
+									"pm.test(\"Has standard label self link returned\", function () {",
+									"    var includedJsonData = pm.response.json().included;",
+									"    var found = false;",
+									"    for (var include in includedJsonData) {",
+									"        if (includedJsonData[include].type === \"product-labels\" && includedJsonData[include].id === \"3\") {",
+									"            pm.expect(includedJsonData[include].links.self).to.eql(pm.variables.get(\"url\") + \"/product-labels/\" +  \"3\");",
+									"            found = true;",
+									"        }",
+									"    }",
+									"    ",
+									"    pm.expect(found).to.eql(true);",
+									"});",
+									"",
+									"pm.test(\"Has sale label self link returned\", function () {",
+									"    var includedJsonData = pm.response.json().included;",
+									"    var found = false;",
+									"    for (var include in includedJsonData) {",
+									"        if (includedJsonData[include].type === \"product-labels\" && includedJsonData[include].id === \"5\") {",
+									"            pm.expect(includedJsonData[include].links.self).to.eql(pm.variables.get(\"url\") + \"/product-labels/\" +  \"5\");",
+									"            found = true;",
+									"        }",
+									"    }",
+									"    ",
+									"    pm.expect(found).to.eql(true);",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/vnd.api+json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "de-DE, en;q=0.9,*;q=0.5"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/abstract-products/{{standard_label_product}}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"abstract-products",
+								"{{standard_label_product}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Negative. Request the abstract product with label",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "e82c44d9-bf90-45d5-950c-568e31e52d92",
+								"exec": [
+									"let product_sku = pm.variables.get(\"no_labels_product\");",
+									"",
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200); // verify the correct status code = 200 is fine",
+									"});",
+									"",
+									"pm.test(\"Has correct type and id  returned\", function() {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.data.type).to.eql(\"abstract-products\"); // re-check the correct type in the response ",
+									"    pm.expect(jsonData.data.id).to.eql(product_sku);",
+									"});",
+									"",
+									"pm.test(\"Has self link\", function() {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.data.links.self).to.eql(pm.variables.get(\"url\") + \"/abstract-products/\" +  product_sku);",
+									"});",
+									"",
+									"// Relations",
+									"",
+									"pm.test(\"Has no relation to product labels returned\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.data.relationships.hasOwnProperty(\"product-labels\")).to.eql(false);",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/vnd.api+json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "de-DE, en;q=0.9,*;q=0.5"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/abstract-products/{{no_labels_product}}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"abstract-products",
+								"{{no_labels_product}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Negative. Request label with wrong method",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "8af00319-ff6b-4500-af78-ac6d8b75891f",
+								"exec": [
+									"pm.test(\"Status code is 404\", function () {",
+									"    pm.response.to.have.status(404);",
+									"});",
+									"",
+									"pm.test(\"Correct details message\", function(){",
+									"    pm.expect(pm.response.json().errors[0].detail).to.eql(\"Not Found\");",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/vnd.api+json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "de-DE, en;q=0.9,*;q=0.5"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/abstract-products/{{alternatives_label_product}}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"abstract-products",
+								"{{alternatives_label_product}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Negative. Request label with wrong method",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "8af00319-ff6b-4500-af78-ac6d8b75891f",
+								"exec": [
+									"pm.test(\"Status code is 404\", function () {",
+									"    pm.response.to.have.status(404);",
+									"});",
+									"",
+									"pm.test(\"Correct details message\", function(){",
+									"    pm.expect(pm.response.json().errors[0].detail).to.eql(\"Not Found\");",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/vnd.api+json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "de-DE, en;q=0.9,*;q=0.5"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/abstract-products/{{alternatives_label_product}}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"abstract-products",
+								"{{alternatives_label_product}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Negative. Request label with wrong method",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "8af00319-ff6b-4500-af78-ac6d8b75891f",
+								"exec": [
+									"pm.test(\"Status code is 404\", function () {",
+									"    pm.response.to.have.status(404);",
+									"});",
+									"",
+									"pm.test(\"Correct details message\", function(){",
+									"    pm.expect(pm.response.json().errors[0].detail).to.eql(\"Not Found\");",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/vnd.api+json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "de-DE, en;q=0.9,*;q=0.5"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/abstract-products/{{alternatives_label_product}}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"abstract-products",
+								"{{alternatives_label_product}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Label - All label",
+			"item": [
+				{
+					"name": "Request the label Alternatives by ID",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "6009bb32-fea1-4074-8728-9f62bd563bc2",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200); // verify the correct status code = 200 is fine",
+									"});",
+									"",
+									"pm.test(\"Has standard label returned\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.data.type).to.eql(\"product-labels\");",
+									"    pm.expect(jsonData.data.id).to.eql(\"1\");",
+									"    pm.expect(jsonData.data.attributes.name).to.eql(\"Alternatives available\");",
+									"    pm.expect(jsonData.data.attributes.isExclusive).to.eql(false);",
+									"    pm.expect(jsonData.data.attributes.position).to.eql(1);",
+									"    pm.expect(jsonData.data.attributes.frontEndReference === null).to.eql(true);",
+									"});",
+									"",
+									"pm.test(\"Has self link\", function() {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.data.links.self).to.eql(pm.variables.get(\"url\") + \"/product-labels/\" +  \"1\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/vnd.api+json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/product-labels/1",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"product-labels",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Request the label Discontinued by ID",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "269c4bf4-2781-41dd-846d-d0f6f08f9ce7",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200); // verify the correct status code = 200 is fine",
+									"});",
+									"",
+									"pm.test(\"Has standard label returned\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.data.type).to.eql(\"product-labels\");",
+									"    pm.expect(jsonData.data.id).to.eql(\"2\");",
+									"    pm.expect(jsonData.data.attributes.name).to.eql(\"Discontinued\");",
+									"    pm.expect(jsonData.data.attributes.isExclusive).to.eql(false);",
+									"    pm.expect(jsonData.data.attributes.position).to.eql(2);",
+									"    pm.expect(jsonData.data.attributes.frontEndReference === null).to.eql(true);",
+									"});",
+									"",
+									"pm.test(\"Has self link\", function() {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.data.links.self).to.eql(pm.variables.get(\"url\") + \"/product-labels/\" +  \"2\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/vnd.api+json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/product-labels/2",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"product-labels",
+								"2"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Request the label Standard by ID",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "2048b368-3bc6-47b3-8122-d36d47b85990",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200); // verify the correct status code = 200 is fine",
+									"});",
+									"",
+									"pm.test(\"Has standard label returned\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.data.type).to.eql(\"product-labels\");",
+									"    pm.expect(jsonData.data.id).to.eql(\"3\");",
+									"    pm.expect(jsonData.data.attributes.name).to.eql(\"Standard Label\");",
+									"    pm.expect(jsonData.data.attributes.isExclusive).to.eql(false);",
+									"    pm.expect(jsonData.data.attributes.position).to.eql(3);",
+									"    pm.expect(jsonData.data.attributes.frontEndReference).to.eql(\"\");",
+									"});",
+									"",
+									"pm.test(\"Has self link\", function() {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.data.links.self).to.eql(pm.variables.get(\"url\") + \"/product-labels/\" +  \"3\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/vnd.api+json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/product-labels/3",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"product-labels",
+								"3"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Request the label New by ID",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "8af00319-ff6b-4500-af78-ac6d8b75891f",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200); // verify the correct status code = 200 is fine",
+									"});",
+									"",
+									"pm.test(\"Has standard label returned\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.data.type).to.eql(\"product-labels\");",
+									"    pm.expect(jsonData.data.id).to.eql(\"4\");",
+									"    pm.expect(jsonData.data.attributes.name).to.eql(\"New\");",
+									"    pm.expect(jsonData.data.attributes.isExclusive).to.eql(false);",
+									"    pm.expect(jsonData.data.attributes.position).to.eql(4);",
+									"    pm.expect(jsonData.data.attributes.frontEndReference).to.eql(\"template:tag\");",
+									"});",
+									"",
+									"pm.test(\"Has self link\", function() {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.data.links.self).to.eql(pm.variables.get(\"url\") + \"/product-labels/\" +  \"4\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/vnd.api+json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/product-labels/4",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"product-labels",
+								"4"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Request the label Sale by ID",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "5887d652-ce4b-456a-8e46-b547b7b7031e",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200); // verify the correct status code = 200 is fine",
+									"});",
+									"",
+									"pm.test(\"Has standard label returned\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.data.type).to.eql(\"product-labels\");",
+									"    pm.expect(jsonData.data.id).to.eql(\"5\");",
+									"    pm.expect(jsonData.data.attributes.name).to.eql(\"SALE %\");",
+									"    pm.expect(jsonData.data.attributes.isExclusive).to.eql(false);",
+									"    pm.expect(jsonData.data.attributes.position).to.eql(5);",
+									"    pm.expect(jsonData.data.attributes.frontEndReference).to.eql(\"highlight\");",
+									"});",
+									"",
+									"pm.test(\"Has self link\", function() {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.data.links.self).to.eql(pm.variables.get(\"url\") + \"/product-labels/\" +  \"5\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/vnd.api+json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/product-labels/5",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"product-labels",
+								"5"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Negative. Request label without ID",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "5887d652-ce4b-456a-8e46-b547b7b7031e",
+								"exec": [
+									"pm.test(\"Status code is 404\", function () {",
+									"    pm.response.to.have.status(400);",
+									"});",
+									"",
+									"pm.test(\"Сode is 1201\", function () {",
+									"    pm.expect(pm.response.json().errors[0].code).to.eql(\"1202\");",
+									"});",
+									"pm.test(\"Correct details message\", function(){",
+									"    pm.expect(pm.response.json().errors[0].detail).to.eql(\"Product label id is missing.\");",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/vnd.api+json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/product-labels/",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"product-labels",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Negative. Request label with no exsistng ID",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "5887d652-ce4b-456a-8e46-b547b7b7031e",
+								"exec": [
+									"pm.test(\"Status code is 404\", function () {",
+									"    pm.response.to.have.status(404);",
+									"});",
+									"",
+									"pm.test(\"Сode is 1201\", function () {",
+									"    pm.expect(pm.response.json().errors[0].code).to.eql(\"1201\");",
+									"});",
+									"pm.test(\"Correct details message\", function(){",
+									"    pm.expect(pm.response.json().errors[0].detail).to.eql(\"Product label is not found.\");",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/vnd.api+json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/product-labels/123",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"product-labels",
+								"123"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Negative. Request label with not numeric ID",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "5887d652-ce4b-456a-8e46-b547b7b7031e",
+								"exec": [
+									"pm.test(\"Status code is 404\", function () {",
+									"    pm.response.to.have.status(404);",
+									"});",
+									"",
+									"pm.test(\"Сode is 1201\", function () {",
+									"    pm.expect(pm.response.json().errors[0].code).to.eql(\"1201\");",
+									"});",
+									"pm.test(\"Correct details message\", function(){",
+									"    pm.expect(pm.response.json().errors[0].detail).to.eql(\"Product label is not found.\");",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/vnd.api+json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/product-labels/test",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"product-labels",
+								"test"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Negative. Request label with wrong method",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "8af00319-ff6b-4500-af78-ac6d8b75891f",
+								"exec": [
+									"pm.test(\"Status code is 404\", function () {",
+									"    pm.response.to.have.status(404);",
+									"});",
+									"",
+									"pm.test(\"Correct details message\", function(){",
+									"    pm.expect(pm.response.json().errors[0].detail).to.eql(\"Not Found\");",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/vnd.api+json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"data\": \"asdasd\"}"
+						},
+						"url": {
+							"raw": "{{url}}/product-labels/5",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"product-labels",
+								"5"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Negative. Request label with wrong method",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "8af00319-ff6b-4500-af78-ac6d8b75891f",
+								"exec": [
+									"pm.test(\"Status code is 404\", function () {",
+									"    pm.response.to.have.status(404);",
+									"});",
+									"",
+									"pm.test(\"Correct details message\", function(){",
+									"    pm.expect(pm.response.json().errors[0].detail).to.eql(\"Not Found\");",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/vnd.api+json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"data\": \"asdasd\"}"
+						},
+						"url": {
+							"raw": "{{url}}/product-labels/5",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"product-labels",
+								"5"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Negative. Request label with wrong method",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "8af00319-ff6b-4500-af78-ac6d8b75891f",
+								"exec": [
+									"pm.test(\"Status code is 404\", function () {",
+									"    pm.response.to.have.status(404);",
+									"});",
+									"",
+									"pm.test(\"Correct details message\", function(){",
+									"    pm.expect(pm.response.json().errors[0].detail).to.eql(\"Not Found\");",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/vnd.api+json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/product-labels/5",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"product-labels",
+								"5"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Label - in the search",
+			"item": [
+				{
+					"name": "Request product by SKU in search with Standard and Sale labels",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "224ee700-ea9e-44d7-9762-ed30f47a1e87",
+								"exec": [
+									"let product_sku = pm.variables.get(\"standard_label_product\");",
+									"",
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Has correct id and type returned\", function() {",
+									"   var jsonData = pm.response.json();",
+									"   pm.expect(jsonData.data[0].type).to.eql(\"catalog-search\");",
+									"   pm.expect(jsonData.data[0].id).to.eql(null);",
+									"});",
+									"",
+									"pm.test(\"Has self link\", function() {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.links.self).to.eql(pm.variables.get(\"url\") + \"/catalog-search?q=\" + product_sku);",
+									"});",
+									"",
+									"// Included ",
+									"",
+									"pm.test(\"Has abstract-products returned\", function () {",
+									"    var includedJsonData = pm.response.json().included;",
+									"    var found = false;",
+									"    for (var include in includedJsonData) {",
+									"        if (includedJsonData[include].type === \"abstract-products\") {",
+									"            pm.expect(includedJsonData[include].type).to.eql(\"abstract-products\");",
+									"            pm.expect(includedJsonData[include].id).to.eql(product_sku);",
+									"            found = true;",
+									"        }",
+									"    }",
+									"    ",
+									"    pm.expect(found).to.eql(true);",
+									"});",
+									"",
+									"pm.test(\"Has reation in included returned\", function () {",
+									"    var includedJsonData = pm.response.json().included;",
+									"    var found = false;",
+									"    for (var include in includedJsonData) {",
+									"        if (includedJsonData[include].type === \"abstract-products\") {",
+									"            pm.expect(includedJsonData[include].relationships[\"product-labels\"].data[0].type).to.eql(\"product-labels\");",
+									"            pm.expect(includedJsonData[include].relationships[\"product-labels\"].data[0].id).to.eql(\"3\");",
+									"            found = true;",
+									"        }",
+									"    }",
+									"    ",
+									"    pm.expect(found).to.eql(true);",
+									"});",
+									"",
+									"pm.test(\"Has reation in included returned\", function () {",
+									"    var includedJsonData = pm.response.json().included;",
+									"    var found = false;",
+									"    for (var include in includedJsonData) {",
+									"        if (includedJsonData[include].type === \"abstract-products\") {",
+									"            pm.expect(includedJsonData[include].relationships[\"product-labels\"].data[1].type).to.eql(\"product-labels\");",
+									"            pm.expect(includedJsonData[include].relationships[\"product-labels\"].data[1].id).to.eql(\"5\");",
+									"            found = true;",
+									"        }",
+									"    }",
+									"    ",
+									"    pm.expect(found).to.eql(true);",
+									"});",
+									"",
+									"pm.test(\"Has standard label returned\", function () {",
+									"    var includedJsonData = pm.response.json().included;",
+									"    var found = false;",
+									"    for (var include in includedJsonData) {",
+									"        if (includedJsonData[include].type === \"product-labels\" && includedJsonData[include].id === \"3\") {",
+									"            pm.expect(includedJsonData[include].type).to.eql(\"product-labels\");",
+									"            pm.expect(includedJsonData[include].id).to.eql(\"3\");",
+									"            pm.expect(includedJsonData[include].attributes.name).to.eql(\"Standard Label\");",
+									"            pm.expect(includedJsonData[include].attributes.isExclusive).to.eql(false);",
+									"            pm.expect(includedJsonData[include].attributes.position).to.eql(3);",
+									"            pm.expect(includedJsonData[include].attributes.frontEndReference).to.eql(\"\");",
+									"            found = true;",
+									"        }",
+									"    }",
+									"    ",
+									"    pm.expect(found).to.eql(true);",
+									"});",
+									"",
+									"pm.test(\"Has sale label returned\", function () {",
+									"    var includedJsonData = pm.response.json().included;",
+									"    var found = false;",
+									"    for (var include in includedJsonData) {",
+									"        if (includedJsonData[include].type === \"product-labels\" && includedJsonData[include].id === \"5\") {",
+									"            pm.expect(includedJsonData[include].type).to.eql(\"product-labels\");",
+									"            pm.expect(includedJsonData[include].id).to.eql(\"5\");",
+									"            pm.expect(includedJsonData[include].attributes.name).to.eql(\"SALE %\");",
+									"            pm.expect(includedJsonData[include].attributes.isExclusive).to.eql(false);",
+									"            pm.expect(includedJsonData[include].attributes.position).to.eql(5);",
+									"            pm.expect(includedJsonData[include].attributes.frontEndReference).to.eql(\"highlight\");",
+									"            found = true;",
+									"        }",
+									"    }",
+									"    ",
+									"    pm.expect(found).to.eql(true);",
+									"});",
+									"",
+									"pm.test(\"Has standard label self link returned\", function () {",
+									"    var includedJsonData = pm.response.json().included;",
+									"    var found = false;",
+									"    for (var include in includedJsonData) {",
+									"        if (includedJsonData[include].type === \"product-labels\" && includedJsonData[include].id === \"3\") {",
+									"            pm.expect(includedJsonData[include].links.self).to.eql(pm.variables.get(\"url\") + \"/product-labels/\" +  \"3\");",
+									"            found = true;",
+									"        }",
+									"    }",
+									"    ",
+									"    pm.expect(found).to.eql(true);",
+									"});",
+									"",
+									"pm.test(\"Has sale label self link returned\", function () {",
+									"    var includedJsonData = pm.response.json().included;",
+									"    var found = false;",
+									"    for (var include in includedJsonData) {",
+									"        if (includedJsonData[include].type === \"product-labels\" && includedJsonData[include].id === \"5\") {",
+									"            pm.expect(includedJsonData[include].links.self).to.eql(pm.variables.get(\"url\") + \"/product-labels/\" +  \"5\");",
+									"            found = true;",
+									"        }",
+									"    }",
+									"    ",
+									"    pm.expect(found).to.eql(true);",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/vnd.api+json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "de-DE, en;q=0.9,*;q=0.5"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/catalog-search?q={{standard_label_product}}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"catalog-search"
+							],
+							"query": [
+								{
+									"key": "q",
+									"value": "{{standard_label_product}}"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Label - in search suggestion ",
+			"item": [
+				{
+					"name": "Request the abstract product by SKU in search suggestion with Standard and Sale labels",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "5f9279ec-df11-404b-8187-35542c758ab2",
+								"exec": [
+									"let product_sku = pm.variables.get(\"standard_label_product\");",
+									"let jsonData = pm.response.json();",
+									"",
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Has correct and id type returned\", function() {",
+									"    pm.expect(jsonData.data[0].type).to.eql(\"catalog-search-suggestions\");",
+									"    pm.expect(jsonData.data[0].id).to.eql(null);",
+									"});",
+									"",
+									"pm.test.skip(\"Has correct currency returned\", function() {",
+									"    pm.expect(jsonData.data[0].attributes.currency).to.eql(\"EUR\");",
+									"});",
+									"",
+									"pm.test(\"Has self link\", function() {",
+									"    pm.expect(jsonData.data[0].links.self).to.eql(pm.variables.get(\"url\") + \"/catalog-search-suggestions\");",
+									"});",
+									"",
+									"// Included ",
+									"",
+									"pm.test(\"Has abstract-products returned\", function () {",
+									"    var includedJsonData = pm.response.json().included;",
+									"    var found = false;",
+									"    for (var include in includedJsonData) {",
+									"        if (includedJsonData[include].type === \"abstract-products\") {",
+									"            pm.expect(includedJsonData[include].type).to.eql(\"abstract-products\");",
+									"            pm.expect(includedJsonData[include].id).to.eql(product_sku);",
+									"            found = true;",
+									"        }",
+									"    }",
+									"    ",
+									"    pm.expect(found).to.eql(true);",
+									"});",
+									"",
+									"pm.test(\"Has reation in included returned\", function () {",
+									"    var includedJsonData = pm.response.json().included;",
+									"    var found = false;",
+									"    for (var include in includedJsonData) {",
+									"        if (includedJsonData[include].type === \"abstract-products\") {",
+									"            pm.expect(includedJsonData[include].relationships[\"product-labels\"].data[0].type).to.eql(\"product-labels\");",
+									"            pm.expect(includedJsonData[include].relationships[\"product-labels\"].data[0].id).to.eql(\"3\");",
+									"            found = true;",
+									"        }",
+									"    }",
+									"    ",
+									"    pm.expect(found).to.eql(true);",
+									"});",
+									"",
+									"pm.test(\"Has reation in included returned\", function () {",
+									"    var includedJsonData = pm.response.json().included;",
+									"    var found = false;",
+									"    for (var include in includedJsonData) {",
+									"        if (includedJsonData[include].type === \"abstract-products\") {",
+									"            pm.expect(includedJsonData[include].relationships[\"product-labels\"].data[1].type).to.eql(\"product-labels\");",
+									"            pm.expect(includedJsonData[include].relationships[\"product-labels\"].data[1].id).to.eql(\"5\");",
+									"            found = true;",
+									"        }",
+									"    }",
+									"    ",
+									"    pm.expect(found).to.eql(true);",
+									"});",
+									"",
+									"pm.test(\"Has standard label returned\", function () {",
+									"    var includedJsonData = pm.response.json().included;",
+									"    var found = false;",
+									"    for (var include in includedJsonData) {",
+									"        if (includedJsonData[include].type === \"product-labels\" && includedJsonData[include].id === \"3\") {",
+									"            pm.expect(includedJsonData[include].type).to.eql(\"product-labels\");",
+									"            pm.expect(includedJsonData[include].id).to.eql(\"3\");",
+									"            pm.expect(includedJsonData[include].attributes.name).to.eql(\"Standard Label\");",
+									"            pm.expect(includedJsonData[include].attributes.isExclusive).to.eql(false);",
+									"            pm.expect(includedJsonData[include].attributes.position).to.eql(3);",
+									"            pm.expect(includedJsonData[include].attributes.frontEndReference).to.eql(\"\");",
+									"            found = true;",
+									"        }",
+									"    }",
+									"    ",
+									"    pm.expect(found).to.eql(true);",
+									"});",
+									"",
+									"pm.test(\"Has sale label returned\", function () {",
+									"    var includedJsonData = pm.response.json().included;",
+									"    var found = false;",
+									"    for (var include in includedJsonData) {",
+									"        if (includedJsonData[include].type === \"product-labels\" && includedJsonData[include].id === \"5\") {",
+									"            pm.expect(includedJsonData[include].type).to.eql(\"product-labels\");",
+									"            pm.expect(includedJsonData[include].id).to.eql(\"5\");",
+									"            pm.expect(includedJsonData[include].attributes.name).to.eql(\"SALE %\");",
+									"            pm.expect(includedJsonData[include].attributes.isExclusive).to.eql(false);",
+									"            pm.expect(includedJsonData[include].attributes.position).to.eql(5);",
+									"            pm.expect(includedJsonData[include].attributes.frontEndReference).to.eql(\"highlight\");",
+									"            found = true;",
+									"        }",
+									"    }",
+									"    ",
+									"    pm.expect(found).to.eql(true);",
+									"});",
+									"",
+									"pm.test(\"Has standard label self link returned\", function () {",
+									"    var includedJsonData = pm.response.json().included;",
+									"    var found = false;",
+									"    for (var include in includedJsonData) {",
+									"        if (includedJsonData[include].type === \"product-labels\" && includedJsonData[include].id === \"3\") {",
+									"            pm.expect(includedJsonData[include].links.self).to.eql(pm.variables.get(\"url\") + \"/product-labels/\" +  \"3\");",
+									"            found = true;",
+									"        }",
+									"    }",
+									"    ",
+									"    pm.expect(found).to.eql(true);",
+									"});",
+									"",
+									"pm.test(\"Has sale label self link returned\", function () {",
+									"    var includedJsonData = pm.response.json().included;",
+									"    var found = false;",
+									"    for (var include in includedJsonData) {",
+									"        if (includedJsonData[include].type === \"product-labels\" && includedJsonData[include].id === \"5\") {",
+									"            pm.expect(includedJsonData[include].links.self).to.eql(pm.variables.get(\"url\") + \"/product-labels/\" +  \"5\");",
+									"            found = true;",
+									"        }",
+									"    }",
+									"    ",
+									"    pm.expect(found).to.eql(true);",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/vnd.api+json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/catalog-search-suggestions?q={{standard_label_product}}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"catalog-search-suggestions"
+							],
+							"query": [
+								{
+									"key": "q",
+									"value": "{{standard_label_product}}"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "4f598eb8-5f60-4ff9-866c-1650e36702a6",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "21e8652e-06cb-45c0-a3a7-57d16df14abd",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"id": "6e148f7c-6e9f-4543-9216-d6cb9afc3294",
+			"key": "standard_label_product",
+			"value": "001",
+			"type": "string"
+		},
+		{
+			"id": "ad08f71d-5621-43c5-a58d-efe33d1bad02",
+			"key": "no_labels_product",
+			"value": "011",
+			"type": "string"
+		}
+	]
+}

@@ -1,0 +1,1427 @@
+{
+	"info": {
+		"_postman_id": "20dea962-16ef-42b6-aef9-cc579297458d",
+		"name": "catalog-search-rest-api-manual",
+		"description": "Preconditions:\n1. Deactivate concrete product with sku 114_29911081.\n2. Deactivate concrete product with sku 113_29885591.\n3. Deactivate category \"Food\" with id 16.\n4. Create an empty category, name it \"Pagers\", ensure that id of this category is 17.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Search for a product by SKU",
+			"item": [
+				{
+					"name": "Search a product - search by concrete sku - one concrete deactivated (use active concrete sku)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "224ee700-ea9e-44d7-9762-ed30f47a1e87",
+								"exec": [
+									"let jsonData = pm.response.json();",
+									"",
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Has correct type returned\", function() {",
+									"    pm.expect(jsonData.data).to.be.an('array');",
+									"    jsonData.data.forEach(function (data) {",
+									"        pm.expect(data.type).to.eql(\"catalog-search\");",
+									"    });",
+									"});",
+									"",
+									"pm.test(\"Has correct id returned\", function() {",
+									"    jsonData.data.forEach(function (data) {",
+									"        pm.expect(data.id).to.be.null;",
+									"    });",
+									"});",
+									"",
+									"pm.test(\"Has correct currency returned\", function() {",
+									"    jsonData.data.forEach(function (data) {",
+									"        pm.expect(data.attributes.currency).to.eql(pm.variables.get('currency_eur'));",
+									"    });",
+									"});",
+									"",
+									"pm.test(\"Has correct sorting returned\", function() {",
+									"    jsonData.data.forEach(function (data) {",
+									"        pm.expect(data.attributes.sort).is.an('object')",
+									"            .that.have.property('sortParamNames')",
+									"            .that.is.an('array')",
+									"            .that.have.members([",
+									"                'rating',",
+									"                'name_asc',",
+									"                'name_desc',",
+									"                'price_asc',",
+									"                'price_desc'",
+									"            ]);",
+									"    });",
+									"});",
+									"",
+									"pm.test(\"Has correct localized sorting returned\", function() {",
+									"    jsonData.data.forEach(function (data) {",
+									"        pm.expect(data.attributes.sort).is.an('object')",
+									"        .that.have.property('sortParamLocalizedNames')",
+									"        .that.is.an('object');",
+									"        let expectedKeys = [",
+									"            'rating',",
+									"            'name_asc',",
+									"            'name_desc',",
+									"            'price_asc',",
+									"            'price_desc'",
+									"        ];",
+									"        expectedKeys.each(function(key) {",
+									"            pm.expect(data.attributes.sort.sortParamLocalizedNames).to.have.own.property(key);",
+									"        });",
+									"    });",
+									"});",
+									"",
+									"pm.test(\"Has correct pagination returned\", function() {",
+									"    jsonData.data.forEach(function (data) {",
+									"        let paginationObj = data.attributes.pagination;",
+									"        pm.expect(paginationObj).to.be.an('object');",
+									"        pm.expect(paginationObj).to.have.property('numFound').that.is.a('number');",
+									"        pm.expect(paginationObj).to.have.property('currentPage').that.is.a('number');",
+									"        pm.expect(paginationObj).to.have.property('maxPage').that.is.a('number');",
+									"        pm.expect(paginationObj).to.have.property('currentItemsPerPage', parseInt(pm.variables.get('ipp_default')));",
+									"        pm.expect(paginationObj).to.have.property('config').that.is.an('object');",
+									"        pm.expect(paginationObj.config).to.have.a.property('parameterName', 'page');",
+									"        pm.expect(paginationObj.config).to.have.a.property('itemsPerPageParameterName', 'ipp');",
+									"        pm.expect(paginationObj.config).to.have.a.property('defaultItemsPerPage', parseInt(pm.variables.get('ipp_default')));",
+									"        pm.expect(paginationObj.config).to.have.a.property('validItemsPerPageOptions')",
+									"            .that.is.an('array').that.have.members([12, 24, 36]);",
+									"    });",
+									"});",
+									"",
+									"pm.test(\"Has correct product returned\", function() {",
+									"    jsonData.data.forEach(function (data) {",
+									"        pm.expect(data.attributes).to.have.property('products')",
+									"            .that.is.an(\"array\")",
+									"            .that.is.lengthOf(1);",
+									"        let productsObj = data.attributes.products[0];",
+									"        pm.expect(productsObj).to.have.property('images').that.is.an('array');",
+									"        pm.expect(productsObj).to.have.property('price').that.is.a('number');",
+									"        pm.expect(productsObj).to.have.property('abstractName').that.is.a('string');",
+									"        pm.expect(productsObj).to.have.property('prices').that.is.an('array');",
+									"        pm.expect(productsObj).to.have.property('abstractSku').that.is.equal(pm.variables.get('abstract_sku1'));",
+									"    });",
+									"});",
+									"",
+									"pm.test(\"Has correct relationships\", function() {",
+									"    jsonData.data.forEach(function (data) {",
+									"        pm.expect(data).to.have.property('relationships').that.is.an(\"object\");",
+									"        let relationshipsObj = data.relationships;",
+									"        pm.expect(Object.keys(relationshipsObj).length).to.be.equal(1);",
+									"        pm.expect(relationshipsObj).to.have.property('abstract-products').that.is.an('object');",
+									"    });",
+									"});",
+									"",
+									"pm.test(\"Has correct pagination config returned\", function() {",
+									"    jsonData.data.forEach(function (data) {",
+									"        pm.expect(data.attributes.pagination.config.parameterName).to.eql(\"page\");",
+									"        pm.expect(data.attributes.pagination.config.itemsPerPageParameterName).to.eql(\"ipp\");",
+									"        pm.expect(data.attributes.pagination.config.defaultItemsPerPage).to.eql(parseInt(pm.variables.get('ipp_default')));",
+									"    });",
+									"});",
+									"",
+									"pm.test(\"Has correct self link\", function() {",
+									"    pm.expect(jsonData.links.self).to.eql(pm.variables.get(\"url\") + \"/catalog-search?q=\" + pm.variables.get('concrete_sku1_active'));",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/vnd.api+json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/vnd.api+json"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "de-DE, de;q=0.9",
+								"disabled": true
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/catalog-search?q={{concrete_sku1_active}}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"catalog-search"
+							],
+							"query": [
+								{
+									"key": "q",
+									"value": "{{concrete_sku1_active}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Search a product - search by concrete sku - one concrete deactivated (use inactive concrete sku)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "224ee700-ea9e-44d7-9762-ed30f47a1e87",
+								"exec": [
+									"let jsonData = pm.response.json();",
+									"",
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Has correct type returned\", function() {",
+									"    pm.expect(jsonData.data).to.be.an('array');",
+									"    jsonData.data.forEach(function (data) {",
+									"        pm.expect(data.type).to.eql(\"catalog-search\");",
+									"    });",
+									"});",
+									"",
+									"pm.test(\"Has correct id returned\", function() {",
+									"    jsonData.data.forEach(function (data) {",
+									"        pm.expect(data.id).to.be.null;",
+									"    });",
+									"});",
+									"",
+									"pm.test(\"Has correct currency returned\", function() {",
+									"    jsonData.data.forEach(function (data) {",
+									"        pm.expect(data.attributes.currency).to.eql(pm.variables.get('currency_eur'));",
+									"    });",
+									"});",
+									"",
+									"pm.test(\"Has correct sorting returned\", function() {",
+									"    jsonData.data.forEach(function (data) {",
+									"        pm.expect(data.attributes.sort).is.an('object')",
+									"            .that.have.property('sortParamNames')",
+									"            .that.is.an('array')",
+									"            .that.have.members([",
+									"                'rating',",
+									"                'name_asc',",
+									"                'name_desc',",
+									"                'price_asc',",
+									"                'price_desc'",
+									"            ]);",
+									"    });",
+									"});",
+									"",
+									"pm.test(\"Has correct localized sorting returned\", function() {",
+									"    jsonData.data.forEach(function (data) {",
+									"        pm.expect(data.attributes.sort).is.an('object')",
+									"        .that.have.property('sortParamLocalizedNames')",
+									"        .that.is.an('object');",
+									"        let expectedKeys = [",
+									"            'rating',",
+									"            'name_asc',",
+									"            'name_desc',",
+									"            'price_asc',",
+									"            'price_desc'",
+									"        ];",
+									"        expectedKeys.each(function(key) {",
+									"            pm.expect(data.attributes.sort.sortParamLocalizedNames).to.have.own.property(key);",
+									"        });",
+									"    });",
+									"});",
+									"",
+									"pm.test(\"Has correct pagination returned\", function() {",
+									"    jsonData.data.forEach(function (data) {",
+									"        let paginationObj = data.attributes.pagination;",
+									"        pm.expect(paginationObj).to.be.an('object');",
+									"        pm.expect(paginationObj).to.have.property('numFound').that.is.a('number');",
+									"        pm.expect(paginationObj).to.have.property('currentPage').that.is.a('number');",
+									"        pm.expect(paginationObj).to.have.property('maxPage').that.is.a('number');",
+									"        pm.expect(paginationObj).to.have.property('currentItemsPerPage', parseInt(pm.variables.get('ipp_default')));",
+									"        pm.expect(paginationObj).to.have.property('config').that.is.an('object');",
+									"        pm.expect(paginationObj.config).to.have.a.property('parameterName', 'page');",
+									"        pm.expect(paginationObj.config).to.have.a.property('itemsPerPageParameterName', 'ipp');",
+									"        pm.expect(paginationObj.config).to.have.a.property('defaultItemsPerPage', parseInt(pm.variables.get('ipp_default')));",
+									"        pm.expect(paginationObj.config).to.have.a.property('validItemsPerPageOptions')",
+									"            .that.is.an('array').that.have.members([12, 24, 36]);",
+									"    });",
+									"});",
+									"",
+									"pm.test.skip(\"Has correct product returned\", function() {",
+									"    jsonData.data.forEach(function (data) {",
+									"        pm.expect(data.attributes).to.have.property('products')",
+									"            .that.is.an(\"array\")",
+									"            .that.is.empty;",
+									"    });",
+									"});",
+									"",
+									"pm.test(\"Has correct relationships\", function() {",
+									"    jsonData.data.forEach(function (data) {",
+									"        pm.expect(data.attributes).to.not.have.property('relationships');",
+									"    });",
+									"});",
+									"",
+									"pm.test(\"Has correct pagination config returned\", function() {",
+									"    jsonData.data.forEach(function (data) {",
+									"        pm.expect(data.attributes.pagination.config.parameterName).to.eql(\"page\");",
+									"        pm.expect(data.attributes.pagination.config.itemsPerPageParameterName).to.eql(\"ipp\");",
+									"        pm.expect(data.attributes.pagination.config.defaultItemsPerPage).to.eql(parseInt(pm.variables.get('ipp_default')));",
+									"    });",
+									"});",
+									"",
+									"pm.test(\"Has correct self link\", function() {",
+									"    pm.expect(jsonData.links.self).to.eql(pm.variables.get(\"url\") + \"/catalog-search?q=\" + pm.variables.get('concrete_sku1_inactive'));",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/vnd.api+json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/vnd.api+json"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "de-DE, de;q=0.9",
+								"disabled": true
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/catalog-search?q={{concrete_sku1_inactive}}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"catalog-search"
+							],
+							"query": [
+								{
+									"key": "q",
+									"value": "{{concrete_sku1_inactive}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Search a product - search by abstract sku - all concretes deactivated",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "224ee700-ea9e-44d7-9762-ed30f47a1e87",
+								"exec": [
+									"let jsonData = pm.response.json();",
+									"",
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Has correct type returned\", function() {",
+									"    pm.expect(jsonData.data).to.be.an('array');",
+									"    jsonData.data.forEach(function (data) {",
+									"        pm.expect(data.type).to.eql(\"catalog-search\");",
+									"    });",
+									"});",
+									"",
+									"pm.test(\"Has correct id returned\", function() {",
+									"    jsonData.data.forEach(function (data) {",
+									"        pm.expect(data.id).to.be.null;",
+									"    });",
+									"});",
+									"",
+									"pm.test(\"Has correct currency returned\", function() {",
+									"    jsonData.data.forEach(function (data) {",
+									"        pm.expect(data.attributes.currency).to.eql(pm.variables.get('currency_eur'));",
+									"    });",
+									"});",
+									"",
+									"pm.test(\"Has correct sorting returned\", function() {",
+									"    jsonData.data.forEach(function (data) {",
+									"        pm.expect(data.attributes.sort).is.an('object')",
+									"            .that.have.property('sortParamNames')",
+									"            .that.is.an('array')",
+									"            .that.have.members([",
+									"                'rating',",
+									"                'name_asc',",
+									"                'name_desc',",
+									"                'price_asc',",
+									"                'price_desc'",
+									"            ]);",
+									"    });",
+									"});",
+									"",
+									"pm.test(\"Has correct localized sorting returned\", function() {",
+									"    jsonData.data.forEach(function (data) {",
+									"        pm.expect(data.attributes.sort).is.an('object')",
+									"        .that.have.property('sortParamLocalizedNames')",
+									"        .that.is.an('object');",
+									"        let expectedKeys = [",
+									"            'rating',",
+									"            'name_asc',",
+									"            'name_desc',",
+									"            'price_asc',",
+									"            'price_desc'",
+									"        ];",
+									"        expectedKeys.each(function(key) {",
+									"            pm.expect(data.attributes.sort.sortParamLocalizedNames).to.have.own.property(key);",
+									"        });",
+									"    });",
+									"});",
+									"",
+									"pm.test(\"Has correct pagination returned\", function() {",
+									"    jsonData.data.forEach(function (data) {",
+									"        let paginationObj = data.attributes.pagination;",
+									"        pm.expect(paginationObj).to.be.an('object');",
+									"        pm.expect(paginationObj).to.have.property('numFound').that.is.a('number');",
+									"        pm.expect(paginationObj).to.have.property('currentPage').that.is.a('number');",
+									"        pm.expect(paginationObj).to.have.property('maxPage').that.is.a('number');",
+									"        pm.expect(paginationObj).to.have.property('currentItemsPerPage', parseInt(pm.variables.get('ipp_default')));",
+									"        pm.expect(paginationObj).to.have.property('config').that.is.an('object');",
+									"        pm.expect(paginationObj.config).to.have.a.property('parameterName', 'page');",
+									"        pm.expect(paginationObj.config).to.have.a.property('itemsPerPageParameterName', 'ipp');",
+									"        pm.expect(paginationObj.config).to.have.a.property('defaultItemsPerPage', parseInt(pm.variables.get('ipp_default')));",
+									"        pm.expect(paginationObj.config).to.have.a.property('validItemsPerPageOptions')",
+									"            .that.is.an('array').that.have.members([12, 24, 36]);",
+									"    });",
+									"});",
+									"",
+									"pm.test.skip(\"Has correct product returned\", function() {",
+									"    jsonData.data.forEach(function (data) {",
+									"        pm.expect(data.attributes).to.have.property('products')",
+									"            .that.is.an(\"array\")",
+									"            .that.is.empty;",
+									"    });",
+									"});",
+									"",
+									"pm.test(\"Has correct relationships\", function() {",
+									"    jsonData.data.forEach(function (data) {",
+									"        pm.expect(data.attributes).to.not.have.property('relationships');",
+									"    });",
+									"});",
+									"",
+									"pm.test(\"Has correct pagination config returned\", function() {",
+									"    jsonData.data.forEach(function (data) {",
+									"        pm.expect(data.attributes.pagination.config.parameterName).to.eql(\"page\");",
+									"        pm.expect(data.attributes.pagination.config.itemsPerPageParameterName).to.eql(\"ipp\");",
+									"        pm.expect(data.attributes.pagination.config.defaultItemsPerPage).to.eql(parseInt(pm.variables.get('ipp_default')));",
+									"    });",
+									"});",
+									"",
+									"pm.test(\"Has correct self link\", function() {",
+									"    pm.expect(jsonData.links.self).to.eql(pm.variables.get(\"url\") + \"/catalog-search?q=\" + pm.variables.get('abstract_sku2'));",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/vnd.api+json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/vnd.api+json"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "de-DE, de;q=0.9",
+								"disabled": true
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/catalog-search?q={{abstract_sku2}}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"catalog-search"
+							],
+							"query": [
+								{
+									"key": "q",
+									"value": "{{abstract_sku2}}"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Search for a product with category filters",
+			"item": [
+				{
+					"name": "Search a product - search by concrete sku - one concrete deactivated (use inactive concrete sku)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "224ee700-ea9e-44d7-9762-ed30f47a1e87",
+								"exec": [
+									"let jsonData = pm.response.json();",
+									"",
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Has correct type returned\", function() {",
+									"    pm.expect(jsonData.data).to.be.an('array');",
+									"    jsonData.data.forEach(function (data) {",
+									"        pm.expect(data.type).to.eql(\"catalog-search\");",
+									"    });",
+									"});",
+									"",
+									"pm.test(\"Has correct id returned\", function() {",
+									"    jsonData.data.forEach(function (data) {",
+									"        pm.expect(data.id).to.be.null;",
+									"    });",
+									"});",
+									"",
+									"pm.test(\"Has correct currency returned\", function() {",
+									"    jsonData.data.forEach(function (data) {",
+									"        pm.expect(data.attributes.currency).to.eql(pm.variables.get('currency_eur'));",
+									"    });",
+									"});",
+									"",
+									"pm.test(\"Has correct sorting returned\", function() {",
+									"    jsonData.data.forEach(function (data) {",
+									"        pm.expect(data.attributes.sort).is.an('object')",
+									"            .that.have.property('sortParamNames')",
+									"            .that.is.an('array')",
+									"            .that.have.members([",
+									"                'rating',",
+									"                'name_asc',",
+									"                'name_desc',",
+									"                'price_asc',",
+									"                'price_desc'",
+									"            ]);",
+									"    });",
+									"});",
+									"",
+									"pm.test(\"Has correct localized sorting returned\", function() {",
+									"    jsonData.data.forEach(function (data) {",
+									"        pm.expect(data.attributes.sort).is.an('object')",
+									"        .that.have.property('sortParamLocalizedNames')",
+									"        .that.is.an('object');",
+									"        let expectedKeys = [",
+									"            'rating',",
+									"            'name_asc',",
+									"            'name_desc',",
+									"            'price_asc',",
+									"            'price_desc'",
+									"        ];",
+									"        expectedKeys.each(function(key) {",
+									"            pm.expect(data.attributes.sort.sortParamLocalizedNames).to.have.own.property(key);",
+									"        });",
+									"    });",
+									"});",
+									"",
+									"pm.test(\"Has correct pagination returned\", function() {",
+									"    jsonData.data.forEach(function (data) {",
+									"        let paginationObj = data.attributes.pagination;",
+									"        pm.expect(paginationObj).to.be.an('object');",
+									"        pm.expect(paginationObj).to.have.property('numFound').that.is.a('number');",
+									"        pm.expect(paginationObj).to.have.property('currentPage').that.is.a('number');",
+									"        pm.expect(paginationObj).to.have.property('maxPage').that.is.a('number');",
+									"        pm.expect(paginationObj).to.have.property('currentItemsPerPage', parseInt(pm.variables.get('ipp_default')));",
+									"        pm.expect(paginationObj).to.have.property('config').that.is.an('object');",
+									"        pm.expect(paginationObj.config).to.have.a.property('parameterName', 'page');",
+									"        pm.expect(paginationObj.config).to.have.a.property('itemsPerPageParameterName', 'ipp');",
+									"        pm.expect(paginationObj.config).to.have.a.property('defaultItemsPerPage', parseInt(pm.variables.get('ipp_default')));",
+									"        pm.expect(paginationObj.config).to.have.a.property('validItemsPerPageOptions')",
+									"            .that.is.an('array').that.have.members([12, 24, 36]);",
+									"    });",
+									"});",
+									"",
+									"pm.test(\"Has correct product returned\", function() {",
+									"    jsonData.data.forEach(function (data) {",
+									"        pm.expect(data.attributes).to.have.property('products')",
+									"            .that.is.an(\"array\")",
+									"            .that.is.not.empty;",
+									"    });",
+									"});",
+									"",
+									"pm.test(\"Has correct relationships\", function() {",
+									"    jsonData.data.forEach(function (data) {",
+									"        pm.expect(data.attributes).to.not.have.property('relationships');",
+									"    });",
+									"});",
+									"",
+									"pm.test(\"Has correct pagination config returned\", function() {",
+									"    jsonData.data.forEach(function (data) {",
+									"        pm.expect(data.attributes.pagination.config.parameterName).to.eql(\"page\");",
+									"        pm.expect(data.attributes.pagination.config.itemsPerPageParameterName).to.eql(\"ipp\");",
+									"        pm.expect(data.attributes.pagination.config.defaultItemsPerPage).to.eql(parseInt(pm.variables.get('ipp_default')));",
+									"    });",
+									"});",
+									"",
+									"pm.test(\"Has correct self link\", function() {",
+									"    pm.expect(jsonData.links.self).to.eql(pm.variables.get(\"url\") + \"/catalog-search?category=\" + pm.variables.get('category_inactive'));",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/vnd.api+json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/vnd.api+json"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "de-DE, de;q=0.9",
+								"disabled": true
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/catalog-search?category={{category_inactive}}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"catalog-search"
+							],
+							"query": [
+								{
+									"key": "category",
+									"value": "{{category_inactive}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Search a product - empty category value",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "224ee700-ea9e-44d7-9762-ed30f47a1e87",
+								"exec": [
+									"let jsonData = pm.response.json();",
+									"",
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Has correct type returned\", function() {",
+									"    pm.expect(jsonData.data).to.be.an('array');",
+									"    jsonData.data.forEach(function (data) {",
+									"        pm.expect(data.type).to.eql(\"catalog-search\");",
+									"    });",
+									"});",
+									"",
+									"pm.test(\"Has correct id returned\", function() {",
+									"    jsonData.data.forEach(function (data) {",
+									"        pm.expect(data.id).to.be.null;",
+									"    });",
+									"});",
+									"",
+									"pm.test(\"Has correct currency returned\", function() {",
+									"    jsonData.data.forEach(function (data) {",
+									"        pm.expect(data.attributes.currency).to.eql(pm.variables.get('currency_eur'));",
+									"    });",
+									"});",
+									"",
+									"pm.test(\"Has correct sorting returned\", function() {",
+									"    jsonData.data.forEach(function (data) {",
+									"        pm.expect(data.attributes.sort).is.an('object')",
+									"            .that.have.property('sortParamNames')",
+									"            .that.is.an('array')",
+									"            .that.have.members([",
+									"                'rating',",
+									"                'name_asc',",
+									"                'name_desc',",
+									"                'price_asc',",
+									"                'price_desc'",
+									"            ]);",
+									"    });",
+									"});",
+									"",
+									"pm.test(\"Has correct localized sorting returned\", function() {",
+									"    jsonData.data.forEach(function (data) {",
+									"        pm.expect(data.attributes.sort).is.an('object')",
+									"        .that.have.property('sortParamLocalizedNames')",
+									"        .that.is.an('object');",
+									"        let expectedKeys = [",
+									"            'rating',",
+									"            'name_asc',",
+									"            'name_desc',",
+									"            'price_asc',",
+									"            'price_desc'",
+									"        ];",
+									"        expectedKeys.each(function(key) {",
+									"            pm.expect(data.attributes.sort.sortParamLocalizedNames).to.have.own.property(key);",
+									"        });",
+									"    });",
+									"});",
+									"",
+									"pm.test(\"Has correct pagination returned\", function() {",
+									"    jsonData.data.forEach(function (data) {",
+									"        let paginationObj = data.attributes.pagination;",
+									"        pm.expect(paginationObj).to.be.an('object');",
+									"        pm.expect(paginationObj).to.have.property('numFound').that.is.a('number');",
+									"        pm.expect(paginationObj).to.have.property('currentPage').that.is.a('number');",
+									"        pm.expect(paginationObj).to.have.property('maxPage').that.is.a('number');",
+									"        pm.expect(paginationObj).to.have.property('currentItemsPerPage', parseInt(pm.variables.get('ipp_default')));",
+									"        pm.expect(paginationObj).to.have.property('config').that.is.an('object');",
+									"        pm.expect(paginationObj.config).to.have.a.property('parameterName', 'page');",
+									"        pm.expect(paginationObj.config).to.have.a.property('itemsPerPageParameterName', 'ipp');",
+									"        pm.expect(paginationObj.config).to.have.a.property('defaultItemsPerPage', parseInt(pm.variables.get('ipp_default')));",
+									"        pm.expect(paginationObj.config).to.have.a.property('validItemsPerPageOptions')",
+									"            .that.is.an('array').that.have.members([12, 24, 36]);",
+									"    });",
+									"});",
+									"",
+									"pm.test.skip(\"Has correct product returned\", function() {",
+									"    jsonData.data.forEach(function (data) {",
+									"        pm.expect(data.attributes).to.have.property('products')",
+									"            .that.is.an(\"array\")",
+									"            .that.is.empty;",
+									"    });",
+									"});",
+									"",
+									"pm.test(\"Has correct relationships\", function() {",
+									"    jsonData.data.forEach(function (data) {",
+									"        pm.expect(data.attributes).to.not.have.property('relationships');",
+									"    });",
+									"});",
+									"",
+									"pm.test(\"Has correct pagination config returned\", function() {",
+									"    jsonData.data.forEach(function (data) {",
+									"        pm.expect(data.attributes.pagination.config.parameterName).to.eql(\"page\");",
+									"        pm.expect(data.attributes.pagination.config.itemsPerPageParameterName).to.eql(\"ipp\");",
+									"        pm.expect(data.attributes.pagination.config.defaultItemsPerPage).to.eql(parseInt(pm.variables.get('ipp_default')));",
+									"    });",
+									"});",
+									"",
+									"pm.test(\"Has correct self link\", function() {",
+									"    pm.expect(jsonData.links.self).to.eql(pm.variables.get(\"url\") + \"/catalog-search?category=\" + pm.variables.get('category_empty'));",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/vnd.api+json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/vnd.api+json"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "de-DE, de;q=0.9",
+								"disabled": true
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/catalog-search?category={{category_empty}}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"catalog-search"
+							],
+							"query": [
+								{
+									"key": "category",
+									"value": "{{category_empty}}"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Search suggestions by searchfor product by SKU",
+			"item": [
+				{
+					"name": "Search a product - search by concrete sku - one concrete deactivated (use active concrete sku)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "224ee700-ea9e-44d7-9762-ed30f47a1e87",
+								"exec": [
+									"let jsonData = pm.response.json();",
+									"let resourceType = 'catalog-search-suggestions';",
+									"",
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Has correct type returned\", function() {",
+									"    pm.expect(jsonData.data).to.be.an('array');",
+									"    jsonData.data.forEach(function (data) {",
+									"        pm.expect(data.type).to.eql(resourceType);",
+									"    });",
+									"});",
+									"",
+									"pm.test(\"Has correct id returned\", function() {",
+									"    jsonData.data.forEach(function (data) {",
+									"        pm.expect(data.id).to.be.null;",
+									"    });",
+									"});",
+									"",
+									"pm.test(\"Has correct currency returned\", function() {",
+									"    jsonData.data.forEach(function (data) {",
+									"        pm.expect(data.attributes.currency).to.eql(pm.variables.get('currency_eur'));",
+									"    });",
+									"});",
+									"",
+									"pm.test(\"Has correct completion returned\", function() {",
+									"    jsonData.data.forEach(function (data) {",
+									"        pm.expect(data.attributes).to.have.property('completion').that.is.an('array').that.is.empty;",
+									"    });",
+									"});",
+									"",
+									"pm.test(\"Has correct product returned\", function() {",
+									"    jsonData.data.forEach(function (data) {",
+									"        pm.expect(data.attributes).to.have.property('products')",
+									"            .that.is.an(\"array\")",
+									"            .that.is.lengthOf(1);",
+									"        let product = data.attributes.products[0];",
+									"        pm.expect(product).to.be.an('object');",
+									"        pm.expect(product).to.have.property('abstract_sku', pm.variables.get('abstract_sku1'));",
+									"        pm.expect(product).to.have.property('abstract_name').that.is.a('string');",
+									"        pm.expect(product).to.have.property('price').that.is.a('number');",
+									"        pm.expect(product).to.have.property('images').that.is.a('array');",
+									"        product.images.forEach(function (image) {",
+									"            pm.expect(image).to.have.property('external_url_small').that.is.a('string');",
+									"            pm.expect(image).to.have.property('external_url_large').that.is.a('string');",
+									"        });",
+									"    });",
+									"});",
+									"",
+									"pm.test(\"Has correct categories returned\", function() {",
+									"    jsonData.data.forEach(function (data) {",
+									"        pm.expect(data.attributes).to.have.property('categories').that.is.an('array');",
+									"    });",
+									"});",
+									"",
+									"pm.test(\"Has correct cmsPages returned\", function() {",
+									"    jsonData.data.forEach(function (data) {",
+									"        pm.expect(data.attributes).to.have.property('cmsPages').that.is.an('array');",
+									"    });",
+									"});",
+									"",
+									"pm.test(\"Has correct relationships\", function() {",
+									"    jsonData.data.forEach(function (data) {",
+									"        pm.expect(data).to.have.property('relationships').that.is.an(\"object\");",
+									"        let relationshipsObj = data.relationships;",
+									"        pm.expect(Object.keys(relationshipsObj).length).to.be.equal(1);",
+									"        pm.expect(relationshipsObj).to.have.property('abstract-products').that.is.an('object');",
+									"    });",
+									"});",
+									"",
+									"pm.test(\"Has correct included returned\", function() {",
+									"    jsonData.data.forEach(function (data) {",
+									"        pm.expect(jsonData).to.have.property('included').that.is.an('array');",
+									"        ",
+									"        let expectedResourceTypes = [",
+									"            'abstract-product-image-sets',",
+									"            'abstract-product-availabilities',",
+									"            'abstract-product-prices',",
+									"            'category-nodes',",
+									"            'product-tax-sets',",
+									"            'abstract-products',",
+									"            'product-labels',",
+									"        ];",
+									"        let resourceTypes = getIncludedResourceNames(jsonData.included);",
+									"        ",
+									"        pm.expect(resourceTypes).to.have.members(expectedResourceTypes);",
+									"    });",
+									"});",
+									"",
+									"pm.test(\"Has correct self link\", function() {",
+									"    pm.expect(jsonData.links.self).to.eql(pm.variables.get(\"url\") + \"/\" + resourceType + \"?q=\" + pm.variables.get('concrete_sku1_active'));",
+									"});",
+									"",
+									"function getIncludedResourceNames(included) {",
+									"    let resourceTypes = [];",
+									"    included.forEach(function (resource) {",
+									"        pm.expect(resource).to.be.an('object')",
+									"            .that.have.property('type')",
+									"            .that.is.a('string');",
+									"        if (!resourceTypes.includes(resource.type)) {",
+									"            resourceTypes.push(resource.type);",
+									"        }",
+									"    });",
+									"    ",
+									"    return resourceTypes;",
+									"}",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/vnd.api+json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/vnd.api+json"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "de-DE, de;q=0.9",
+								"disabled": true
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/catalog-search-suggestions?q={{concrete_sku1_active}}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"catalog-search-suggestions"
+							],
+							"query": [
+								{
+									"key": "q",
+									"value": "{{concrete_sku1_active}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Search a product - search by concrete sku - one concrete deactivated (use inactive concrete sku)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "224ee700-ea9e-44d7-9762-ed30f47a1e87",
+								"exec": [
+									"let jsonData = pm.response.json();",
+									"let resourceType = 'catalog-search-suggestions';",
+									"",
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Has correct type returned\", function() {",
+									"    pm.expect(jsonData.data).to.be.an('array');",
+									"    jsonData.data.forEach(function (data) {",
+									"        pm.expect(data.type).to.eql(resourceType);",
+									"    });",
+									"});",
+									"",
+									"pm.test(\"Has correct id returned\", function() {",
+									"    jsonData.data.forEach(function (data) {",
+									"        pm.expect(data.id).to.be.null;",
+									"    });",
+									"});",
+									"",
+									"pm.test(\"Has correct currency returned\", function() {",
+									"    jsonData.data.forEach(function (data) {",
+									"        pm.expect(data.attributes.currency).to.eql(pm.variables.get('currency_eur'));",
+									"    });",
+									"});",
+									"",
+									"pm.test(\"Has correct completion returned\", function() {",
+									"    jsonData.data.forEach(function (data) {",
+									"        pm.expect(data.attributes).to.have.property('completion')",
+									"            .that.is.an('array')",
+									"            .that.is.empty;",
+									"    });",
+									"});",
+									"",
+									"pm.test(\"Has correct product returned\", function() {",
+									"    jsonData.data.forEach(function (data) {",
+									"        pm.expect(data.attributes).to.have.property('products')",
+									"            .that.is.an('array')",
+									"            .that.is.empty;",
+									"    });",
+									"});",
+									"",
+									"pm.test(\"Has correct categories returned\", function() {",
+									"    jsonData.data.forEach(function (data) {",
+									"        pm.expect(data.attributes).to.have.property('categories')",
+									"            .that.is.an('array')",
+									"            .that.is.empty;",
+									"    });",
+									"});",
+									"",
+									"pm.test(\"Has correct cmsPages returned\", function() {",
+									"    jsonData.data.forEach(function (data) {",
+									"        pm.expect(data.attributes).to.have.property('cmsPages')",
+									"            .that.is.an('array')",
+									"            .that.is.empty;",
+									"    });",
+									"});",
+									"",
+									"pm.test(\"Has correct relationships\", function() {",
+									"    jsonData.data.forEach(function (data) {",
+									"        pm.expect(data).to.not.have.property('relationships');",
+									"    });",
+									"});",
+									"",
+									"pm.test(\"Has correct included returned\", function() {",
+									"    jsonData.data.forEach(function (data) {",
+									"        pm.expect(data).to.not.have.property('included');",
+									"    });",
+									"});",
+									"",
+									"pm.test(\"Has correct self link\", function() {",
+									"    pm.expect(jsonData.links.self).to.eql(pm.variables.get(\"url\") + \"/\" + resourceType + \"?q=\" + pm.variables.get('concrete_sku1_inactive'));",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/vnd.api+json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/vnd.api+json"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "de-DE, de;q=0.9",
+								"disabled": true
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/catalog-search-suggestions?q={{concrete_sku1_inactive}}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"catalog-search-suggestions"
+							],
+							"query": [
+								{
+									"key": "q",
+									"value": "{{concrete_sku1_inactive}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Search a product - search by abstract sku - all concretes deactivated",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "224ee700-ea9e-44d7-9762-ed30f47a1e87",
+								"exec": [
+									"let jsonData = pm.response.json();",
+									"let resourceType = 'catalog-search-suggestions';",
+									"",
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Has correct type returned\", function() {",
+									"    pm.expect(jsonData.data).to.be.an('array');",
+									"    jsonData.data.forEach(function (data) {",
+									"        pm.expect(data.type).to.eql(resourceType);",
+									"    });",
+									"});",
+									"",
+									"pm.test(\"Has correct id returned\", function() {",
+									"    jsonData.data.forEach(function (data) {",
+									"        pm.expect(data.id).to.be.null;",
+									"    });",
+									"});",
+									"",
+									"pm.test(\"Has correct currency returned\", function() {",
+									"    jsonData.data.forEach(function (data) {",
+									"        pm.expect(data.attributes.currency).to.eql(pm.variables.get('currency_eur'));",
+									"    });",
+									"});",
+									"",
+									"pm.test(\"Has correct completion returned\", function() {",
+									"    jsonData.data.forEach(function (data) {",
+									"        pm.expect(data.attributes).to.have.property('completion')",
+									"            .that.is.an('array')",
+									"            .that.is.empty;",
+									"    });",
+									"});",
+									"",
+									"pm.test(\"Has correct product returned\", function() {",
+									"    jsonData.data.forEach(function (data) {",
+									"        pm.expect(data.attributes).to.have.property('products')",
+									"            .that.is.an('array')",
+									"            .that.is.empty;",
+									"    });",
+									"});",
+									"",
+									"pm.test(\"Has correct categories returned\", function() {",
+									"    jsonData.data.forEach(function (data) {",
+									"        pm.expect(data.attributes).to.have.property('categories')",
+									"            .that.is.an('array')",
+									"            .that.is.empty;",
+									"    });",
+									"});",
+									"",
+									"pm.test(\"Has correct cmsPages returned\", function() {",
+									"    jsonData.data.forEach(function (data) {",
+									"        pm.expect(data.attributes).to.have.property('cmsPages')",
+									"            .that.is.an('array')",
+									"            .that.is.empty;",
+									"    });",
+									"});",
+									"",
+									"pm.test(\"Has correct relationships\", function() {",
+									"    jsonData.data.forEach(function (data) {",
+									"        pm.expect(data).to.not.have.property('relationships');",
+									"    });",
+									"});",
+									"",
+									"pm.test(\"Has correct included returned\", function() {",
+									"    jsonData.data.forEach(function (data) {",
+									"        pm.expect(data).to.not.have.property('included');",
+									"    });",
+									"});",
+									"",
+									"pm.test(\"Has correct self link\", function() {",
+									"    pm.expect(jsonData.links.self).to.eql(pm.variables.get(\"url\") + \"/\" + resourceType + \"?q=\" + pm.variables.get('abstract_sku2'));",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/vnd.api+json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/vnd.api+json"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "de-DE, de;q=0.9",
+								"disabled": true
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/catalog-search-suggestions?q={{abstract_sku2}}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"catalog-search-suggestions"
+							],
+							"query": [
+								{
+									"key": "q",
+									"value": "{{abstract_sku2}}"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Category in search suggestions results",
+			"item": [
+				{
+					"name": "Search a product - set category full name",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "5f9279ec-df11-404b-8187-35542c758ab2",
+								"exec": [
+									"let jsonData = pm.response.json();",
+									"let resourceType = 'catalog-search-suggestions';",
+									"",
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Has correct type returned\", function() {",
+									"    pm.expect(jsonData.data).to.be.an('array');",
+									"    jsonData.data.forEach(function (data) {",
+									"        pm.expect(data.type).to.eql(resourceType);",
+									"    });",
+									"});",
+									"",
+									"pm.test(\"Has correct id returned\", function() {",
+									"    jsonData.data.forEach(function (data) {",
+									"        pm.expect(data.id).to.be.null;",
+									"    });",
+									"});",
+									"",
+									"pm.test(\"Has correct currency returned\", function() {",
+									"    jsonData.data.forEach(function (data) {",
+									"        pm.expect(data.attributes.currency).to.eql(pm.variables.get('currency_eur'));",
+									"    });",
+									"});",
+									"",
+									"pm.test(\"Has correct completion returned\", function() {",
+									"    jsonData.data.forEach(function (data) {",
+									"        pm.expect(data.attributes).to.have.property('completion').that.is.an('array').that.is.not.empty;",
+									"        data.attributes.completion.forEach(function (completion) {",
+									"            pm.expect(completion).to.include(pm.variables.get('category_empty_name').toLowerCase());",
+									"        });",
+									"    });",
+									"});",
+									"",
+									"pm.test(\"Has correct product returned\", function() {",
+									"    jsonData.data.forEach(function (data) {",
+									"        pm.expect(data.attributes).to.have.property('products')",
+									"            .that.is.an(\"array\")",
+									"            .that.is.empty;",
+									"    });",
+									"});",
+									"",
+									"pm.test(\"Has correct categories returned\", function() {",
+									"    jsonData.data.forEach(function (data) {",
+									"        pm.expect(data.attributes).to.have.property('categories').that.is.an('array').that.is.not.empty;",
+									"        data.attributes.categories.forEach(function (category) {",
+									"            pm.expect(category).to.have.property('name').that.include(pm.variables.get('category_empty_name'));",
+									"        });",
+									"    });",
+									"});",
+									"",
+									"pm.test(\"Has correct cmsPages returned\", function() {",
+									"    jsonData.data.forEach(function (data) {",
+									"        pm.expect(data.attributes).to.have.property('cmsPages').that.is.an('array');",
+									"    });",
+									"});",
+									"",
+									"pm.test(\"Has correct relationships\", function() {",
+									"    jsonData.data.forEach(function (data) {",
+									"        pm.expect(data).to.not.have.property('relationships');",
+									"    });",
+									"});",
+									"",
+									"pm.test(\"Has correct included returned\", function() {",
+									"    jsonData.data.forEach(function (data) {",
+									"        pm.expect(jsonData).to.not.have.property('included');",
+									"    });",
+									"});",
+									"",
+									"pm.test(\"Has correct self link\", function() {",
+									"    pm.expect(jsonData.links.self).to.eql(pm.variables.get(\"url\") + \"/\" + resourceType + \"?q=\" + pm.variables.get('category_empty_name'));",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/vnd.api+json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/vnd.api+json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/catalog-search-suggestions?q={{category_empty_name}}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"catalog-search-suggestions"
+							],
+							"query": [
+								{
+									"key": "q",
+									"value": "{{category_empty_name}}"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "1d1871f6-2c0b-451c-aeac-45e051e71dce",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "f164789b-d7de-463e-936a-da75f4dbb3d7",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"id": "22e09c00-bca1-4826-8195-c0e8d16a2e9a",
+			"key": "abstract_sku1",
+			"value": "114",
+			"type": "string"
+		},
+		{
+			"id": "8035a7ed-7841-4ae6-ba90-9140ca4f9060",
+			"key": "concrete_sku1_inactive",
+			"value": "114_29885591",
+			"type": "string"
+		},
+		{
+			"id": "515813fb-ee01-4c28-b271-3b3f712e572a",
+			"key": "concrete_sku1_active",
+			"value": "114_30580483",
+			"type": "string"
+		},
+		{
+			"id": "ef8edd90-4ac2-46bf-bb6e-491070c7d45d",
+			"key": "abstract_sku2",
+			"value": "113",
+			"type": "string"
+		},
+		{
+			"id": "5c008bb3-b386-4ac2-a09b-6d50cfb60003",
+			"key": "concrete_sku2_inactive",
+			"value": "113_29885591",
+			"type": "string"
+		},
+		{
+			"id": "99f1b48c-4c2a-458a-992b-0b729f654c86",
+			"key": "currency_eur",
+			"value": "EUR",
+			"type": "string"
+		},
+		{
+			"id": "9eb15d26-9499-41c2-9bcb-4a862210030f",
+			"key": "ipp_default",
+			"value": "12",
+			"type": "string"
+		},
+		{
+			"id": "7995f254-8b8c-4ab1-aaf4-d6b4dad2c2d5",
+			"key": "abstract_sku_inactive_category",
+			"value": "218",
+			"type": "string"
+		},
+		{
+			"id": "f446e153-f046-4b21-bd6f-c8a6729d450f",
+			"key": "category_inactive",
+			"value": "16",
+			"type": "string"
+		},
+		{
+			"id": "347b98cb-cb04-413f-94af-db466e053453",
+			"key": "category_empty",
+			"value": "17",
+			"type": "string"
+		},
+		{
+			"id": "cf72c5da-d5d0-4e73-8eb0-dc98f0deea9e",
+			"key": "category_empty_name",
+			"value": "Pagers",
+			"type": "string"
+		}
+	]
+}

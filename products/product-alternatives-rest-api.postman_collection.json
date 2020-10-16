@@ -1,0 +1,1054 @@
+{
+	"info": {
+		"_postman_id": "2197c996-1835-4cce-8c5f-14fcb9a8a6bd",
+		"name": "product-alternatives-rest-api",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Get product alternative for concrete product (abstract alternatives)",
+			"item": [
+				{
+					"name": "Get abstract alternative product",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "f7a3e79f-fa61-48b3-bfdc-30eb26193091",
+								"exec": [
+									"var jsonData = pm.response.json(),",
+									"    relationships = pm.variables.get('include').split(\",\"),",
+									"    expectedSelfLink = pm.variables.get(\"url\") ",
+									"    + \"/concrete-products/\" + pm.variables.get(\"concrete_sku\") + \"/abstract-alternative-products\" + '?include='+ relationships.join(\",\");",
+									"",
+									"pm.test(\"Correct type returned\", function() {",
+									"    pm.expect(jsonData.data[0].type).to.eql(\"abstract-products\");",
+									"});",
+									"",
+									"pm.test(\"Correct abstractId returned\", function() {",
+									"    pm.expect(jsonData.data[0].id).to.eql(pm.variables.get(\"abstract_sku\"));",
+									"});",
+									"",
+									"pm.test(\"Contains correct fields in attributes\", function () {",
+									"    pm.expect(jsonData.data[0].attributes).to.include.keys('sku', 'name', 'description', 'attributes', 'superAttributesDefinition', 'superAttributes', 'attributeMap', 'metaTitle', 'metaKeywords', 'metaDescription', 'attributeNames');",
+									"});",
+									"",
+									"pm.test(\"Abstract alternative product has correct self-link\", function() {",
+									"    pm.expect(jsonData.data[0].links.self).to.eql(pm.variables.get(\"url\") + \"/abstract-products/\" + pm.variables.get(\"abstract_sku\"));",
+									"});",
+									"",
+									"pm.test(\"Contains correct fields in relationships\", function () {",
+									"    pm.expect(jsonData.data[0].relationships).to.include.keys(...relationships);",
+									"});",
+									"",
+									"pm.test(\"Has correct self-link\", function() {",
+									"    pm.expect(jsonData.links.self).to.eql(expectedSelfLink);",
+									"});",
+									"",
+									"pm.test(\"Has included not empty\", function() {",
+									"    pm.expect(jsonData.included).to.be.not.empty;",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/vnd.api+json",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/vnd.api+json",
+								"type": "text"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "de-DE, en;q=0.9",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/concrete-products/{{concrete_sku}}/abstract-alternative-products?include={{include}}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"concrete-products",
+								"{{concrete_sku}}",
+								"abstract-alternative-products"
+							],
+							"query": [
+								{
+									"key": "include",
+									"value": "{{include}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get product without abstract alternative products",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "b91023f5-777b-4556-bf52-7eda3f33c76a",
+								"exec": [
+									"var jsonData = pm.response.json();",
+									"",
+									"pm.test(\"Has empty data array returned\", function() {",
+									"    pm.expect(jsonData.data).to.be.empty;",
+									"});",
+									"",
+									"pm.test(\"Has correct self-link\", function() {",
+									"    pm.expect(jsonData.links.self).to.eql(pm.variables.get(\"url\") + \"/concrete-products/\" + pm.variables.get(\"concrete_sku_no_alternatives\") + \"/abstract-alternative-products\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/concrete-products/{{concrete_sku_no_alternatives}}/abstract-alternative-products",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"concrete-products",
+								"{{concrete_sku_no_alternatives}}",
+								"abstract-alternative-products"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "a54fa8d3-7863-4409-b68a-0fcd36711987",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "6b1b39c8-9025-46ee-a923-6bc8a99da275",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});"
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "Negative cases. For product alternatives.",
+			"item": [
+				{
+					"name": "Negative. Get product alternative for concrete product with an invalid endpoint",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "7926c708-4216-4645-b014-dec8fd4235ef",
+								"exec": [
+									"pm.test(\"Status code is 404\", function() {",
+									"    pm.response.to.have.status(404);",
+									"});",
+									"",
+									"pm.test(\"Has correct type returned\", function() {",
+									"    var jsonData = pm.response.json(),",
+									"        error = _.first(jsonData.errors);",
+									"",
+									"    pm.expect(error.detail).to.eql(\"Not Found\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/concrete-products/{{concrete_sku}}/alternative-productss",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"concrete-products",
+								"{{concrete_sku}}",
+								"alternative-productss"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Negative. Get product alternative for concrete product with invalid sku of product",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "7926c708-4216-4645-b014-dec8fd4235ef",
+								"exec": [
+									"pm.test(\"Status code is 404\", function() {",
+									"    pm.response.to.have.status(404);",
+									"});",
+									"",
+									"pm.test(\"Has correct type returned\", function() {",
+									"    var jsonData = pm.response.json(),",
+									"        error = _.first(jsonData.errors);",
+									"",
+									"    pm.expect(error.detail).to.eql(\"Concrete product is not found.\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/concrete-products/asdafsasd/concrete-alternative-products",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"concrete-products",
+								"asdafsasd",
+								"concrete-alternative-products"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Negative. Get product alternative for concrete product with abstract-product",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "7926c708-4216-4645-b014-dec8fd4235ef",
+								"exec": [
+									"pm.test(\"Status code is 404\", function() {",
+									"    pm.response.to.have.status(404);",
+									"});",
+									"",
+									"pm.test(\"Has correct type returned\", function() {",
+									"    var jsonData = pm.response.json(),",
+									"        error = _.first(jsonData.errors);",
+									"",
+									"    pm.expect(error.detail).to.eql(\"Concrete product is not found.\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/concrete-products/{{abstract_sku}}/abstract-alternative-products",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"concrete-products",
+								"{{abstract_sku}}",
+								"abstract-alternative-products"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Negative. Get product alternative for concrete product with wrong POST method",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "7926c708-4216-4645-b014-dec8fd4235ef",
+								"exec": [
+									"pm.test(\"Status code is 404\", function() {",
+									"    pm.response.to.have.status(404);",
+									"});",
+									"",
+									"pm.test(\"Has correct type returned\", function() {",
+									"    var jsonData = pm.response.json(),",
+									"        error = _.first(jsonData.errors);",
+									"",
+									"    pm.expect(error.detail).to.eql(\"Not Found\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/concrete-products/{{concrete_sku}}/abstract-alternative-products",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"concrete-products",
+								"{{concrete_sku}}",
+								"abstract-alternative-products"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Negative. Get product alternative for concrete product with wrong PUT method",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "7926c708-4216-4645-b014-dec8fd4235ef",
+								"exec": [
+									"pm.test(\"Status code is 404\", function() {",
+									"    pm.response.to.have.status(404);",
+									"});",
+									"",
+									"pm.test(\"Has correct type returned\", function() {",
+									"    var jsonData = pm.response.json(),",
+									"        error = _.first(jsonData.errors);",
+									"",
+									"    pm.expect(error.detail).to.eql(\"Not Found\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/concrete-products/{{concrete_sku}}/abstract-alternative-products",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"concrete-products",
+								"{{concrete_sku}}",
+								"abstract-alternative-products"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Negative. Get product alternative for concrete product with wrong PATCH method",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "7926c708-4216-4645-b014-dec8fd4235ef",
+								"exec": [
+									"pm.test(\"Status code is 404\", function() {",
+									"    pm.response.to.have.status(404);",
+									"});",
+									"",
+									"pm.test(\"Has correct type returned\", function() {",
+									"    var jsonData = pm.response.json(),",
+									"        error = _.first(jsonData.errors);",
+									"",
+									"    pm.expect(error.detail).to.eql(\"Not Found\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/concrete-products/{{concrete_sku}}/abstract-alternative-products",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"concrete-products",
+								"{{concrete_sku}}",
+								"abstract-alternative-products"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Negative. Get product alternative for concrete product with wrong DELETE method",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "7926c708-4216-4645-b014-dec8fd4235ef",
+								"exec": [
+									"pm.test(\"Status code is 404\", function() {",
+									"    pm.response.to.have.status(404);",
+									"});",
+									"",
+									"pm.test(\"Has correct type returned\", function() {",
+									"    var jsonData = pm.response.json(),",
+									"        error = _.first(jsonData.errors);",
+									"",
+									"    pm.expect(error.detail).to.eql(\"Not Found\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/concrete-products/{{concrete_sku}}/abstract-alternative-products",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"concrete-products",
+								"{{concrete_sku}}",
+								"abstract-alternative-products"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "bc2ce7e9-8d20-4be1-ad58-a556a7551997",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "0a86fa29-8aff-4abd-bccb-abff360ead3d",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "Get discontinued products",
+			"item": [
+				{
+					"name": "Get concrete product with flag discontinued",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "b91023f5-777b-4556-bf52-7eda3f33c76a",
+								"exec": [
+									"let expectedDataType = \"concrete-products\",",
+									"    concreteSku = pm.variables.get(\"concrete_sku\"),",
+									"    jsonData = pm.response.json().data,",
+									"    included = pm.response.json().included,",
+									"    selfLink = pm.variables.get(\"url\") + \"/concrete-products/\" + concreteSku;",
+									"",
+									"pm.test(\"Status code is 200\", function() {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Response type is correct\", function() {",
+									"    pm.expect(pm.response.to.have.jsonBody('data'));",
+									"    pm.expect(jsonData.type).to.equal(expectedDataType);",
+									"});",
+									"",
+									"pm.test(\"concreteSku is equal to the sku from url\", function() {",
+									"    pm.expect(jsonData.id).to.equal(concreteSku);",
+									"});",
+									"",
+									"pm.test(\"Has correct concrete product attributes\", function() {",
+									"    let attributes = jsonData.attributes,",
+									"        productAttributes = attributes.attributes,",
+									"        attributeNames = attributes.attributeNames,",
+									"        expectedAttributesKeys = ['form_factor', \"processor_cache\", \"stepping\", \"brand\", \"color\", \"processor_frequency\"],",
+									"        expectedSuperAttributesDefinition = [\"form_factor\", \"processor_cache\", \"color\", \"processor_frequency\"];",
+									"",
+									"    pm.expect(attributes).to.have.property(\"sku\").that.is.a(\"string\").to.be.not.empty;",
+									"    pm.expect(attributes).to.have.property(\"name\").that.is.a(\"string\").to.be.not.empty;",
+									"    pm.expect(attributes).to.have.property(\"description\").that.is.a(\"string\").to.be.not.empty;",
+									"    pm.expect(attributes).to.have.property(\"metaTitle\").that.is.a(\"string\").to.be.not.empty;",
+									"    pm.expect(attributes).to.have.property(\"metaKeywords\").that.is.a(\"string\").to.be.not.empty;",
+									"    pm.expect(attributes).to.have.property(\"metaDescription\").that.is.a(\"string\").to.be.not.empty;",
+									"    pm.expect(attributes).to.have.property(\"isDiscontinued\").that.is.a(\"boolean\", true);",
+									"    pm.expect(attributes).to.have.property(\"discontinuedNote\").that.is.a(\"string\");",
+									"    ",
+									"    pm.expect(attributes).to.have.property(\"attributes\")",
+									"        .that.is.an(\"object\")",
+									"        .that.has.all.keys(expectedAttributesKeys);",
+									"",
+									"    expectedAttributesKeys.forEach((property) => pm.expect(productAttributes)",
+									"        .to.have.property(property).that.is.a(\"string\")",
+									"    );",
+									"",
+									"    pm.expect(attributes).to.have.property(\"superAttributesDefinition\")",
+									"        .that.is.an(\"array\")",
+									"        .that.has.members(expectedSuperAttributesDefinition);",
+									"",
+									"    pm.expect(attributes).to.have.property(\"attributeNames\")",
+									"        .that.is.an(\"object\")",
+									"        .that.has.all.keys(expectedAttributesKeys);",
+									"",
+									"    expectedAttributesKeys.forEach((property) => pm.expect(attributeNames)",
+									"        .to.have.property(property).that.is.a(\"string\")",
+									"    );",
+									"",
+									"});",
+									"",
+									"pm.test(\"Has correct relationships\", function() {",
+									"    let relationships = jsonData.relationships,",
+									"        expectedRelationships = [",
+									"            \"concrete-product-image-sets\",",
+									"            \"concrete-product-availabilities\",",
+									"            \"concrete-product-prices\"",
+									"        ];",
+									"",
+									"    pm.expect(relationships).that.is.an(\"object\").that.has.all.keys(expectedRelationships);",
+									"",
+									"    expectedRelationships.forEach((relationName) => {",
+									"        pm.expect(relationships).to.have.property(relationName).that.is.an(\"object\");",
+									"",
+									"        let concreteRelations = relationships[relationName];",
+									"",
+									"        concreteRelations.data.forEach((concreteRelation) => {",
+									"            pm.expect(concreteRelation).to.be.an(\"object\").that.has.property(\"type\", relationName);",
+									"            pm.expect(concreteRelation).that.has.property(\"id\", concreteSku);",
+									"        });",
+									"    });",
+									"});",
+									"",
+									"pm.test(\"Has correct included\", function() {",
+									"    let expectedIncludedKeys = [\"type\", \"id\", \"attributes\", \"links\"];",
+									"    pm.expect(included).to.be.an(\"array\").that.is.not.empty;",
+									"",
+									"    included.forEach((include) => {",
+									"        pm.expect(include).to.be.an(\"object\").that.has.all.keys(expectedIncludedKeys);",
+									"    });",
+									"});",
+									"",
+									"pm.test(\"Has self link\", function() {",
+									"    pm.expect(jsonData.links.self).to.eql(selfLink);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/vnd.api+json",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/vnd.api+json",
+								"type": "text"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "de-DE, en;q=0.9",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/concrete-products/{{concrete_sku}}?include={{concrete-include}}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"concrete-products",
+								"{{concrete_sku}}"
+							],
+							"query": [
+								{
+									"key": "include",
+									"value": "{{concrete-include}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get concrete product without flag discontinued",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "b91023f5-777b-4556-bf52-7eda3f33c76a",
+								"exec": [
+									"let expectedDataType = \"concrete-products\",",
+									"    concreteSku = pm.variables.get(\"concrete_sku_no_alternatives\"),",
+									"    jsonData = pm.response.json().data,",
+									"    included = pm.response.json().included,",
+									"    selfLink = pm.variables.get(\"url\") + \"/concrete-products/\" + concreteSku;",
+									"",
+									"pm.test(\"Status code is 200\", function() {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Response type is correct\", function() {",
+									"    pm.expect(pm.response.to.have.jsonBody('data'));",
+									"    pm.expect(jsonData.type).to.equal(expectedDataType);",
+									"});",
+									"",
+									"pm.test(\"concreteSku is equal to the sku from url\", function() {",
+									"    pm.expect(jsonData.id).to.equal(concreteSku);",
+									"});",
+									"",
+									"pm.test(\"Has correct concrete product attributes\", function() {",
+									"    let attributes = jsonData.attributes,",
+									"        productAttributes = attributes.attributes,",
+									"        attributeNames = attributes.attributeNames,",
+									"        expectedAttributesKeys = [\"megapixel\", \"flash_range_tele\", \"memory_slots\", \"usb_version\", \"brand\", \"color\"],",
+									"        expectedSuperAttributesDefinition = [\"color\"];",
+									"",
+									"    pm.expect(attributes).to.have.property(\"sku\").that.is.a(\"string\").to.be.not.empty;",
+									"    pm.expect(attributes).to.have.property(\"name\").that.is.a(\"string\").to.be.not.empty;",
+									"    pm.expect(attributes).to.have.property(\"description\").that.is.a(\"string\").to.be.not.empty;",
+									"    pm.expect(attributes).to.have.property(\"metaTitle\").that.is.a(\"string\").to.be.not.empty;",
+									"    pm.expect(attributes).to.have.property(\"metaKeywords\").that.is.a(\"string\").to.be.not.empty;",
+									"    pm.expect(attributes).to.have.property(\"metaDescription\").that.is.a(\"string\").to.be.not.empty;",
+									"    pm.expect(attributes).to.have.property(\"isDiscontinued\").that.is.a(\"boolean\", false);",
+									"    pm.expect(attributes).to.have.property(\"discontinuedNote\").that.is.null;",
+									"    ",
+									"    pm.expect(attributes).to.have.property(\"attributes\")",
+									"        .that.is.an(\"object\")",
+									"        .that.has.all.keys(expectedAttributesKeys);",
+									"",
+									"    expectedAttributesKeys.forEach((property) => pm.expect(productAttributes)",
+									"        .to.have.property(property).that.is.a(\"string\")",
+									"    );",
+									"",
+									"    pm.expect(attributes).to.have.property(\"superAttributesDefinition\")",
+									"        .that.is.an(\"array\")",
+									"        .that.has.members(expectedSuperAttributesDefinition);",
+									"",
+									"    pm.expect(attributes).to.have.property(\"attributeNames\")",
+									"        .that.is.an(\"object\")",
+									"        .that.has.all.keys(expectedAttributesKeys);",
+									"",
+									"    expectedAttributesKeys.forEach((property) => pm.expect(attributeNames)",
+									"        .to.have.property(property).that.is.a(\"string\")",
+									"    );",
+									"",
+									"});",
+									"",
+									"pm.test(\"Has correct relationships\", function() {",
+									"    let relationships = jsonData.relationships,",
+									"        expectedRelationships = [",
+									"            \"concrete-product-image-sets\",",
+									"            \"concrete-product-availabilities\",",
+									"            \"concrete-product-prices\",",
+									"        ];",
+									"",
+									"    pm.expect(relationships).that.is.an(\"object\").that.has.all.keys(expectedRelationships);",
+									"",
+									"    expectedRelationships.forEach((relationName) => {",
+									"        pm.expect(relationships).to.have.property(relationName).that.is.an(\"object\");",
+									"",
+									"        let concreteRelations = relationships[relationName];",
+									"",
+									"        concreteRelations.data.forEach((concreteRelation) => {",
+									"            pm.expect(concreteRelation).to.be.an(\"object\").that.has.property(\"type\", relationName);",
+									"            pm.expect(concreteRelation).that.has.property(\"id\", concreteSku);",
+									"        });",
+									"    });",
+									"});",
+									"",
+									"pm.test(\"Has correct included\", function() {",
+									"    let expectedIncludedKeys = [\"type\", \"id\", \"attributes\", \"links\"];",
+									"    pm.expect(included).to.be.an(\"array\").that.is.not.empty;",
+									"",
+									"    included.forEach((include) => {",
+									"        pm.expect(include).to.be.an(\"object\").that.has.all.keys(expectedIncludedKeys);",
+									"    });",
+									"});",
+									"",
+									"pm.test(\"Has self link\", function() {",
+									"    pm.expect(jsonData.links.self).to.eql(selfLink);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/concrete-products/{{concrete_sku_no_alternatives}}?include={{concrete-include}}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"concrete-products",
+								"{{concrete_sku_no_alternatives}}"
+							],
+							"query": [
+								{
+									"key": "include",
+									"value": "{{concrete-include}}"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Get product alternative for concrete product (concrete alternatives)",
+			"item": [
+				{
+					"name": "Get concrete alternative product",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "f7a3e79f-fa61-48b3-bfdc-30eb26193091",
+								"exec": [
+									"var jsonData = pm.response.json();",
+									"",
+									"pm.test(\"Correct type returned\", function() {",
+									"    pm.expect(jsonData.data[0].type).to.eql(\"concrete-products\");",
+									"});",
+									"",
+									"pm.test(\"Correct concreteId returned\", function() {",
+									"    pm.expect(jsonData.data[0].id).to.eql(pm.variables.get(\"concrete_sku_alternative\"));",
+									"});",
+									"",
+									"pm.test(\"Contains correct fields in attributes\", function() {",
+									"    pm.expect(jsonData.data[0].attributes).to.include.keys('sku', 'isDiscontinued', 'discontinuedNote', 'name', 'description', 'attributes', 'superAttributesDefinition', 'metaTitle', 'metaKeywords', 'metaDescription', 'attributeNames');",
+									"});",
+									"",
+									"pm.test(\"Concrete alternative product has correct self-link\", function() {",
+									"    pm.expect(jsonData.data[0].links.self).to.eql(pm.variables.get(\"url\") + \"/concrete-products/\" + pm.variables.get(\"concrete_sku_alternative\"));",
+									"});",
+									"",
+									"pm.test(\"Contains correct fields in relationships\", function() {",
+									"    pm.expect(jsonData.data[0].relationships).to.include.keys(...pm.variables.get('concrete-include').split(','));",
+									"});",
+									"",
+									"pm.test(\"Correct concreteId returned\", function() {",
+									"    pm.expect(jsonData.data[1].id).to.eql(pm.variables.get(\"concrete_sku_alternative_1\"));",
+									"});",
+									"",
+									"pm.test(\"Contains correct fields in attributes\", function() {",
+									"    pm.expect(jsonData.data[1].attributes).to.include.keys('sku', 'isDiscontinued', 'discontinuedNote', 'name', 'description', 'attributes', 'superAttributesDefinition', 'metaTitle', 'metaKeywords', 'metaDescription', 'attributeNames');",
+									"});",
+									"",
+									"pm.test(\"Concrete alternative product has correct self-link\", function() {",
+									"    pm.expect(jsonData.data[1].links.self).to.eql(pm.variables.get(\"url\") + \"/concrete-products/\" + pm.variables.get(\"concrete_sku_alternative_1\"));",
+									"});",
+									"",
+									"pm.test(\"Has correct self-link\", function() {",
+									"    pm.expect(jsonData.links.self).to.eql(pm.variables.get(\"url\") + \"/concrete-products/\" + pm.variables.get(\"concrete_sku\") + \"/concrete-alternative-products\" + '?include=' + pm.variables.get('concrete-include'));",
+									"});",
+									"",
+									"pm.test(\"Has included not empty\", function() {",
+									"    pm.expect(jsonData.included).to.be.not.empty;",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/vnd.api+json",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/vnd.api+json",
+								"type": "text"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "de-DE, en;q=0.9",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/concrete-products/{{concrete_sku}}/concrete-alternative-products?include={{concrete-include}}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"concrete-products",
+								"{{concrete_sku}}",
+								"concrete-alternative-products"
+							],
+							"query": [
+								{
+									"key": "include",
+									"value": "{{concrete-include}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get product without concrete alternative product",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "f7a3e79f-fa61-48b3-bfdc-30eb26193091",
+								"exec": [
+									"var jsonData = pm.response.json();",
+									"",
+									"pm.test(\"Has empty data array returned\", function() {",
+									"    pm.expect(jsonData.data).to.be.empty;",
+									"});",
+									"",
+									"pm.test(\"Has correct self-link\", function() {",
+									"    pm.expect(jsonData.links.self).to.eql(pm.variables.get(\"url\") + \"/concrete-products/\" + pm.variables.get(\"concrete_sku_no_alternatives\") + \"/concrete-alternative-products\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/vnd.api+json",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/vnd.api+json",
+								"type": "text"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "de-DE, en;q=0.9",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/concrete-products/{{concrete_sku_no_alternatives}}/concrete-alternative-products",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"concrete-products",
+								"{{concrete_sku_no_alternatives}}",
+								"concrete-alternative-products"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "6628accd-15d8-492f-aff1-85d0b1e0c07f",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "8297d543-850a-47a5-b581-04d01492f4a2",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});"
+						]
+					}
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "94c5ac63-8fba-4a2c-bbb1-d9d1dda6a84d",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "062241f4-5d5b-4147-a83b-1f2ba34e368e",
+				"type": "text/javascript",
+				"exec": [
+					"pm.test(\"Content-Type is present\", function () {",
+					"    pm.response.to.have.header(\"Content-Type\");",
+					"});",
+					"",
+					"pm.test(\"access-control-allow-origin is present\", function () {",
+					"    pm.response.to.have.header(\"access-control-allow-origin\");",
+					"});"
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"id": "68c34d5f-8161-4e3f-9e77-0dad3967f751",
+			"key": "concrete_sku",
+			"value": "138_30046855",
+			"type": "string"
+		},
+		{
+			"id": "b6aeb18c-7ae4-49d4-b1b1-451933b9338a",
+			"key": "concrete_sku_no_alternatives",
+			"value": "001_25904006",
+			"type": "string"
+		},
+		{
+			"id": "742f6acf-1239-404a-b658-1f0c0b6ff1d9",
+			"key": "abstract_sku",
+			"value": "155",
+			"type": "string"
+		},
+		{
+			"id": "88dad7ac-7585-4e2e-8b67-a237b76dabb6",
+			"key": "concrete_sku_alternative",
+			"value": "142_30943081",
+			"type": "string"
+		},
+		{
+			"id": "eaf493ea-41bf-4696-a35a-0ad1d9f20790",
+			"key": "concrete_sku_alternative_1",
+			"value": "140_22766487",
+			"type": "string"
+		},
+		{
+			"id": "993292f2-d63a-4bc1-86f7-96ca6a10c9e8",
+			"key": "include",
+			"value": "abstract-product-image-sets,abstract-product-availabilities,abstract-product-prices,category-nodes,product-tax-sets,product-labels",
+			"type": "string"
+		},
+		{
+			"id": "096da8b5-5c31-4061-9c1c-782574e7e833",
+			"key": "concrete-include",
+			"value": "concrete-product-image-sets,concrete-product-availabilities,concrete-product-prices,concrete-product-prices",
+			"type": "string"
+		}
+	]
+}

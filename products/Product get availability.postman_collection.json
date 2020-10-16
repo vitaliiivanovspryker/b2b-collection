@@ -1,0 +1,1181 @@
+{
+	"info": {
+		"_postman_id": "92e759f8-6d88-4f34-af8b-d19b1172328a",
+		"name": "Product get availability",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Product - Get availability",
+			"item": [
+				{
+					"name": "Abstract availability GLUE-335",
+					"item": [
+						{
+							"name": "Request abstract availability by SKU with 1 concrete",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "950127dc-e8fe-4ddc-81f0-3bdfd9cb87f0",
+										"type": "text/javascript",
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test(\"Has type and id returned\", function() {",
+											"    var jsonData = pm.response.json();",
+											"    pm.expect(jsonData.data[0].type).to.eql(\"abstract-product-availabilities\"); ",
+											"    pm.expect(jsonData.data[0].id).to.eql(pm.environment.get(\"abstract_sku_with_1product\"));",
+											"});",
+											"",
+											"pm.test(\"Has correct attributes returned\", function() {",
+											"    var jsonData = pm.response.json();",
+											"    pm.expect(jsonData.data[0].attributes.availability).to.eql(true); ",
+											"    pm.expect(jsonData.data[0].attributes.quantity).to.eql(10);",
+											"});",
+											"",
+											"pm.test(\"Has self link\", function() {",
+											"    var jsonData = pm.response.json();",
+											"    pm.expect(jsonData.data[0].links.self).to.eql(pm.environment.get(\"url\") + \"/abstract-products/\" + (pm.environment.get(\"abstract_sku_with_1product\")) + \"/abstract-product-availabilities\");",
+											"}); "
+										]
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/vnd.api+json"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/vnd.api+json"
+									},
+									{
+										"key": "Accept-Language",
+										"value": "de-DE, en;q=0.9"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{url}}/abstract-products/{{abstract_sku_with_1product}}/abstract-product-availabilities",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"abstract-products",
+										"{{abstract_sku_with_1product}}",
+										"abstract-product-availabilities"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Request abstract availability by SKU with 3 concrete ",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "68498b71-c027-40d1-9cbf-806854496de7",
+										"type": "text/javascript",
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test(\"Has type and id returned\", function() {",
+											"    var jsonData = pm.response.json();",
+											"    pm.expect(jsonData.data[0].type).to.eql(\"abstract-product-availabilities\"); ",
+											"    pm.expect(jsonData.data[0].id).to.eql(pm.environment.get(\"abstract_sku_with_3product\"));",
+											"});",
+											"",
+											"pm.test(\"Has correct attributes returned\", function() {",
+											"    var jsonData = pm.response.json();",
+											"    pm.expect(jsonData.data[0].attributes.availability).to.eql(true); ",
+											"    pm.expect(jsonData.data[0].attributes.quantity).to.eql(60);",
+											"});",
+											"",
+											"pm.test(\"Has self link\", function() {",
+											"    var jsonData = pm.response.json();",
+											"    pm.expect(jsonData.data[0].links.self).to.eql(pm.environment.get(\"url\") + \"/abstract-products/\" + (pm.environment.get(\"abstract_sku_with_3product\")) + \"/abstract-product-availabilities\");",
+											"}); "
+										]
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/vnd.api+json"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/vnd.api+json"
+									},
+									{
+										"key": "Accept-Language",
+										"value": "de-DE, en;q=0.9"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{url}}/abstract-products/{{abstract_sku_with_3product}}/abstract-product-availabilities",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"abstract-products",
+										"{{abstract_sku_with_3product}}",
+										"abstract-product-availabilities"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Negative. Request  abstract availability  without SKU",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "48c21aed-e7b6-48c2-8d8a-d0b521b8e0c0",
+										"type": "text/javascript",
+										"exec": [
+											"pm.test(\"Status code is 400\", function () {",
+											"    pm.response.to.have.status(400);",
+											"});",
+											"pm.test(\"Error code is 311\", function() {",
+											"    pm.expect(pm.response.json().errors[0].code).to.eql(\"311\");",
+											"});",
+											"pm.test(\"Correct details message\", function(){",
+											"    pm.expect(pm.response.json().errors[0].detail).to.eql(\"Abstract product sku is not specified.\");",
+											"});",
+											""
+										]
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/vnd.api+json"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/vnd.api+json"
+									},
+									{
+										"key": "Accept-Language",
+										"value": "de-DE, en;q=0.9"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{url}}/abstract-products//abstract-product-availabilities",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"abstract-products",
+										"",
+										"abstract-product-availabilities"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Negative. Request  abstract availability by special characters",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "3bc6ca0f-8adf-4100-b1a8-495127d3df6a",
+										"type": "text/javascript",
+										"exec": [
+											"pm.test(\"Status code is 404\", function () {",
+											"    pm.response.to.have.status(404);",
+											"});",
+											"pm.test(\"Error code is 305\", function() {",
+											"    pm.expect(pm.response.json().errors[0].code).to.eql(\"305\");",
+											"});",
+											"pm.test(\"Correct details message\", function(){",
+											"    pm.expect(pm.response.json().errors[0].detail).to.eql(\"Availability is not found.\");",
+											"});",
+											""
+										]
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/vnd.api+json"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/vnd.api+json"
+									},
+									{
+										"key": "Accept-Language",
+										"value": "de-DE, en;q=0.9"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{url}}/abstract-products/*/abstract-product-availabilities",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"abstract-products",
+										"*",
+										"abstract-product-availabilities"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Negative. Request  abstract availability  using spaces",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "3e72643f-d26f-4c8b-a828-d7429f96f326",
+										"type": "text/javascript",
+										"exec": [
+											"pm.test(\"Status code is 404\", function () {",
+											"    pm.response.to.have.status(404);",
+											"});",
+											"pm.test(\"Error code is 302\", function() {",
+											"    pm.expect(pm.response.json().errors[0].code).to.eql(\"305\");",
+											"});",
+											"pm.test(\"Correct details message\", function(){",
+											"    pm.expect(pm.response.json().errors[0].detail).to.eql(\"Availability is not found.\");",
+											"});",
+											""
+										]
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/vnd.api+json"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/vnd.api+json"
+									},
+									{
+										"key": "Accept-Language",
+										"value": "de-DE, en;q=0.9"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{url}}/abstract-products/     /abstract-product-availabilities",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"abstract-products",
+										"     ",
+										"abstract-product-availabilities"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Negative. Request  abstract availability by  SKU of concrete",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "7671c545-d4e4-4f92-8f82-3d36d8246607",
+										"type": "text/javascript",
+										"exec": [
+											"pm.test(\"Status code is 404\", function () {",
+											"    pm.response.to.have.status(404);",
+											"});",
+											"pm.test(\"Error code is 302\", function() {",
+											"    pm.expect(pm.response.json().errors[0].code).to.eql(\"305\");",
+											"});",
+											"pm.test(\"Correct details message\", function(){",
+											"    pm.expect(pm.response.json().errors[0].detail).to.eql(\"Availability is not found.\");",
+											"});",
+											""
+										]
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/vnd.api+json"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/vnd.api+json"
+									},
+									{
+										"key": "Accept-Language",
+										"value": "de-DE, en;q=0.9"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{url}}/abstract-products/{{concrete_sku}}/abstract-product-availabilities",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"abstract-products",
+										"{{concrete_sku}}",
+										"abstract-product-availabilities"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Negative. Request  abstract availability by sku with broke URL",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "05a998d9-4479-4ed3-b443-c7cd84bcd4e8",
+										"type": "text/javascript",
+										"exec": [
+											"pm.test(\"Status code is 404\", function () {",
+											"    pm.response.to.have.status(404);",
+											"});",
+											"",
+											"pm.test(\"Correct details message\", function(){",
+											"    pm.expect(pm.response.json().errors[0].detail).to.eql(\"Not Found\");",
+											"});",
+											""
+										]
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/vnd.api+json"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/vnd.api+json"
+									},
+									{
+										"key": "Accept-Language",
+										"value": "de-DE, en;q=0.9"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{url}}/abstract-pro123ducts/{{concrete_sku}}/abstract-product-av123ilabilities",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"abstract-pro123ducts",
+										"{{concrete_sku}}",
+										"abstract-product-av123ilabilities"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Negative. Request abstract availability using the wrong method",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "f9a0e8e4-573b-457d-8984-1e3d9d35b73d",
+										"type": "text/javascript",
+										"exec": [
+											"pm.test(\"Status code is 404\", function () {",
+											"    pm.response.to.have.status(404);",
+											"});",
+											"",
+											"pm.test(\"Correct details message\", function(){",
+											"    pm.expect(pm.response.json().errors[0].detail).to.eql(\"Not Found\");",
+											"});",
+											""
+										]
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/vnd.api+json"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Accept-Language",
+										"value": "de-DE, en;q=0.9"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\"data\":{\"type\":\"access_tokens\",\"attributes\":{\"username\":\"spencor.hopkin@spryker.com\", \"password\": \"change123\"}}}"
+								},
+								"url": {
+									"raw": "{{url}}/abstract-products/{{abstract_sku_with_1product}}/abstract-product-availabilities",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"abstract-products",
+										"{{abstract_sku_with_1product}}",
+										"abstract-product-availabilities"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Negative. Request to Delete abstract availability by sku",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "ac54d977-a0ba-4905-ace9-afe71f7f703d",
+										"type": "text/javascript",
+										"exec": [
+											"pm.test(\"Status code is 404\", function () {",
+											"    pm.response.to.have.status(404);",
+											"});",
+											"",
+											"pm.test(\"Correct details message\", function(){",
+											"    pm.expect(pm.response.json().errors[0].detail).to.eql(\"Not Found\");",
+											"});"
+										]
+									}
+								}
+							],
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/vnd.api+json"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/vnd.api+json"
+									},
+									{
+										"key": "Accept-Language",
+										"value": "de-DE, en;q=0.9"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{url}}/abstract-products/{{abstract_sku_with_1product}}/abstract-product-availabilities",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"abstract-products",
+										"{{abstract_sku_with_1product}}",
+										"abstract-product-availabilities"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Negative. Request to Put abstract availability by SKU",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "92df54d9-747f-46b1-912c-27e179640096",
+										"type": "text/javascript",
+										"exec": [
+											"pm.test(\"Status code is 404\", function () {",
+											"    pm.response.to.have.status(404);",
+											"});",
+											"",
+											"pm.test(\"Correct details message\", function(){",
+											"    pm.expect(pm.response.json().errors[0].detail).to.eql(\"Not Found\");",
+											"});"
+										]
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"id": "5b63ce0b-4a0f-4c7d-880b-258e79de9deb",
+										"type": "text/javascript",
+										"exec": [
+											""
+										]
+									}
+								}
+							],
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/vnd.api+json"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Accept-Language",
+										"value": "de-DE, en;q=0.9"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\"data\":{\"type\":\"access_tokens\",\"attributes\":{\"username\":\"spencor.hopkin@spryker.com\", \"password\": \"change123\"}}}"
+								},
+								"url": {
+									"raw": "{{url}}/abstract-products/{{abstract_sku_with_1product}}/abstract-product-availabilities",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"abstract-products",
+										"{{abstract_sku_with_1product}}",
+										"abstract-product-availabilities"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Negative. Request abstract availability by sku witout type in body",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "22954e96-c950-41a2-9825-e956d34212d0",
+										"type": "text/javascript",
+										"exec": [
+											"pm.test(\"Status code is 400\", function () {",
+											"    pm.response.to.have.status(400);",
+											"});",
+											"pm.test(\"Error code is null\", function() {",
+											"    pm.expect(pm.response.json().errors[0].code).to.eql(null);",
+											"});",
+											"pm.test(\"Correct details message\", function(){",
+											"    pm.expect(pm.response.json().errors[0].detail).to.eql(\"Post data missing.\");",
+											"});"
+										]
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/vnd.api+json"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Accept-Language",
+										"value": "de-DE, en;q=0.9"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\"data\":{\"attributes\":{\"username\":\"spencor.hopkin@spryker.com\", \"password\": \"change123\"}}}"
+								},
+								"url": {
+									"raw": "{{url}}/abstract-products/{{abstract_sku_with_1product}}/abstract-product-availabilities",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"abstract-products",
+										"{{abstract_sku_with_1product}}",
+										"abstract-product-availabilities"
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"_postman_isSubFolder": true
+				},
+				{
+					"name": "Concrete availability GLUE-242",
+					"item": [
+						{
+							"name": "Request concrete availability by concrete SKU",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "86603909-e670-47bc-a4f8-64f4acf81a2e",
+										"type": "text/javascript",
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test(\"Has type and id returned\", function() {",
+											"    var jsonData = pm.response.json();",
+											"    pm.expect(jsonData.data[0].type).to.eql(\"concrete-product-availabilities\"); ",
+											"    pm.expect(jsonData.data[0].id).to.eql(pm.environment.get(\"concrete_sku\"));",
+											"});",
+											"",
+											"pm.test(\"Has correct attributes returned\", function() {",
+											"    var jsonData = pm.response.json();",
+											"    pm.expect(jsonData.data[0].attributes.availability).to.eql(true); ",
+											"    pm.expect(jsonData.data[0].attributes.quantity).to.eql(20);",
+											"    pm.expect(jsonData.data[0].attributes.isNeverOutOfStock).to.eql(false);",
+											"});",
+											"",
+											"pm.test(\"Has self link\", function() {",
+											"    var jsonData = pm.response.json();",
+											"    pm.expect(jsonData.data[0].links.self).to.eql(pm.environment.get(\"url\") + \"/concrete-products/\" + (pm.environment.get(\"concrete_sku\")) + \"/concrete-product-availabilities\");",
+											"}); "
+										]
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/vnd.api+json"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/vnd.api+json"
+									},
+									{
+										"key": "Accept-Language",
+										"value": "de-DE, en;q=0.9"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{url}}/concrete-products/{{concrete_sku}}/concrete-product-availabilities",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"concrete-products",
+										"{{concrete_sku}}",
+										"concrete-product-availabilities"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Negative. Request concrete availability by abstract SKU",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "99216f6a-3b1c-4990-adb1-f90ca50aaf34",
+										"type": "text/javascript",
+										"exec": [
+											"pm.test(\"Status code is 404\", function () {",
+											"    pm.response.to.have.status(404);",
+											"});",
+											"pm.test(\"Error code is 306\", function() {",
+											"    pm.expect(pm.response.json().errors[0].code).to.eql(\"306\");",
+											"});",
+											"",
+											"pm.test(\"Errors status is 404\", function() {",
+											"    pm.expect(pm.response.json().errors[0].status).to.eql(404);",
+											"});",
+											"",
+											"pm.test(\"Correct details message\", function(){",
+											"    pm.expect(pm.response.json().errors[0].detail).to.eql(\"Availability is not found.\");",
+											"});"
+										]
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/vnd.api+json"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/vnd.api+json"
+									},
+									{
+										"key": "Accept-Language",
+										"value": "de-DE, en;q=0.9"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{url}}/concrete-products/{{abstract_sku_with_1product}}/concrete-product-availabilities",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"concrete-products",
+										"{{abstract_sku_with_1product}}",
+										"concrete-product-availabilities"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Negative. Request concrete availability by special characters",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "ec53b55b-aa30-44a4-8278-a4eae88fc65e",
+										"type": "text/javascript",
+										"exec": [
+											"pm.test(\"Status code is 404\", function () {",
+											"    pm.response.to.have.status(404);",
+											"});",
+											"pm.test(\"Error code is 302\", function() {",
+											"    pm.expect(pm.response.json().errors[0].code).to.eql(\"302\");",
+											"});",
+											"pm.test(\"Correct details message\", function(){",
+											"    pm.expect(pm.response.json().errors[0].detail).to.eql(\"Concrete product is not found.\");",
+											"});"
+										]
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/vnd.api+json"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/vnd.api+json"
+									},
+									{
+										"key": "Accept-Language",
+										"value": "de-DE, en;q=0.9"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{url}}/concrete-products/±!@#$%^&*()/concrete-product-availabilities",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"concrete-products",
+										"±!@"
+									],
+									"hash": "$%^&*()/concrete-product-availabilities"
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Negative. Request concrete availability by spaces",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "06ec34ca-2189-4f16-864b-5b12bd8e701e",
+										"type": "text/javascript",
+										"exec": [
+											"pm.test(\"Status code is 404\", function () {",
+											"    pm.response.to.have.status(404);",
+											"});",
+											"pm.test(\"Error code is 306\", function() {",
+											"    pm.expect(pm.response.json().errors[0].code).to.eql(\"306\");",
+											"});",
+											"pm.test(\"Correct details message\", function(){",
+											"    pm.expect(pm.response.json().errors[0].detail).to.eql(\"Availability is not found.\");",
+											"});"
+										]
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/vnd.api+json"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/vnd.api+json"
+									},
+									{
+										"key": "Accept-Language",
+										"value": "de-DE, en;q=0.9"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{url}}/concrete-products/              /concrete-product-availabilities",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"concrete-products",
+										"              ",
+										"concrete-product-availabilities"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Negative. Request concrete availability by sku with broken URL",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "80547f1d-a564-41ea-81fe-4b374ffd0e96",
+										"type": "text/javascript",
+										"exec": [
+											"pm.test(\"Status code is 404\", function () {",
+											"    pm.response.to.have.status(404);",
+											"});",
+											"",
+											"pm.test(\"Correct details message\", function(){",
+											"    pm.expect(pm.response.json().errors[0].detail).to.eql(\"Not Found\");",
+											"});"
+										]
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/vnd.api+json"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/vnd.api+json"
+									},
+									{
+										"key": "Accept-Language",
+										"value": "de-DE, en;q=0.9"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{url}}/concrete-p123aroducts/{{concrete_sku}}/concrete-product-availassbilities",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"concrete-p123aroducts",
+										"{{concrete_sku}}",
+										"concrete-product-availassbilities"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Negative. Request concrete availability by sku  using wrong method",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "75b75055-24ef-4357-a058-afc4b6b4dd56",
+										"type": "text/javascript",
+										"exec": [
+											"pm.test(\"Status code is 404\", function () {",
+											"    pm.response.to.have.status(404);",
+											"});",
+											"",
+											"pm.test(\"Correct details message\", function(){",
+											"    pm.expect(pm.response.json().errors[0].detail).to.eql(\"Not Found\");",
+											"});"
+										]
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/vnd.api+json"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Accept-Language",
+										"value": "de-DE, en;q=0.9"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\"data\":{\"type\":\"access_tokens\",\"attributes\":{\"username\":\"spencor.hopkin@spryker.com\", \"password\": \"change123\"}}}"
+								},
+								"url": {
+									"raw": "{{url}}/product-concrete-availability/{{concrete_sku}}",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"product-concrete-availability",
+										"{{concrete_sku}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Negative. Request to Delete concrete availability by SKU using wrong method",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "91610dc4-817f-4792-ba86-321f3f6bdfab",
+										"type": "text/javascript",
+										"exec": [
+											"pm.test(\"Status code is 404\", function () {",
+											"    pm.response.to.have.status(404);",
+											"});",
+											"",
+											"pm.test(\"Correct details message\", function(){",
+											"    pm.expect(pm.response.json().errors[0].detail).to.eql(\"Not Found\");",
+											"});"
+										]
+									}
+								}
+							],
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/vnd.api+json"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/vnd.api+json"
+									},
+									{
+										"key": "Accept-Language",
+										"value": "de-DE, en;q=0.9"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{url}}/product-concrete-availability/{{concrete_id}}",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"product-concrete-availability",
+										"{{concrete_id}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Negative. Request to Put concrete availability by SKU using wrong method",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "01c4d8be-94ec-4ccd-afa4-15b770687eb4",
+										"type": "text/javascript",
+										"exec": [
+											"pm.test(\"Status code is 404\", function () {",
+											"    pm.response.to.have.status(404);",
+											"});",
+											"",
+											"pm.test(\"Correct details message\", function(){",
+											"    pm.expect(pm.response.json().errors[0].detail).to.eql(\"Not Found\");",
+											"});"
+										]
+									}
+								}
+							],
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/vnd.api+json"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Accept-Language",
+										"value": "de-DE, en;q=0.9"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\"data\":{\"type\":\"access_tokens\",\"attributes\":{\"username\":\"spencor.hopkin@spryker.com\", \"password\": \"change123\"}}}"
+								},
+								"url": {
+									"raw": "{{url}}/product-concrete-availability/{{concrete_sku}}",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"product-concrete-availability",
+										"{{concrete_sku}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Negative. Request concrete availability by sku  using wrong method and without type in body",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "22954e96-c950-41a2-9825-e956d34212d0",
+										"type": "text/javascript",
+										"exec": [
+											"pm.test(\"Status code is 400\", function () {",
+											"    pm.response.to.have.status(400);",
+											"});",
+											"pm.test(\"Error code is null\", function() {",
+											"    pm.expect(pm.response.json().errors[0].code).to.eql(null);",
+											"});",
+											"pm.test(\"Correct details message\", function(){",
+											"    pm.expect(pm.response.json().errors[0].detail).to.eql(\"Post data missing.\");",
+											"});"
+										]
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/vnd.api+json"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Accept-Language",
+										"value": "de-DE, en;q=0.9"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\"data\":{ \"attributes\":{\"username\":\"spencor.hopkin@spryker.com\", \"password\": \"change123\"}}}"
+								},
+								"url": {
+									"raw": "{{url}}/product-concrete-availability/{{concrete_sku}}",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"product-concrete-availability",
+										"{{concrete_sku}}"
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"_postman_isSubFolder": true
+				}
+			]
+		}
+	]
+}

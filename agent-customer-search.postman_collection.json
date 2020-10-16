@@ -1,0 +1,979 @@
+{
+	"info": {
+		"_postman_id": "ee1c8604-60bb-4430-af13-dd4b7a4e63b5",
+		"name": "agent-customer-search",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Positive",
+			"item": [
+				{
+					"name": "Create a customer (helper)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "d87470ec-d168-4070-9b57-2e7096516aea",
+								"exec": [
+									"var responseData = pm.response.json().data;",
+									"",
+									"pm.collectionVariables.set(\"customerReference\", responseData.id);",
+									"",
+									"pm.test(\"Status code is 201\", function () {",
+									"    pm.response.to.have.status(201);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "c6176caa-53e4-4fce-8596-75e8a8e83744",
+								"exec": [
+									"var random = Math.floor(Math.random() * 1000);",
+									"var email = pm.collectionVariables.get('emailName')+\".\"+random+pm.collectionVariables.get('emailDomain');",
+									"pm.collectionVariables.set('random', random);",
+									"pm.collectionVariables.set('customerEmail', email);",
+									"pm.collectionVariables.set('lastName', \"User\"+random);",
+									"pm.collectionVariables.set('firstName', \"Test\"+random);",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/vnd.api+json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "de-DE, de;q=0.9, en;q=0.1"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"data\": {\n    \"type\": \"customers\",\n    \"attributes\": {\n        \"salutation\": \"Mr\",\n        \"gender\": \"Male\",\n        \"firstName\":\"{{firstName}}\",\n        \"lastName\":\"{{lastName}}\",\n        \"email\":\"{{customerEmail}}\",\n        \"password\":\"{{password}}\",\n        \"confirmPassword\":\"{{password}}\",\n        \"acceptedTerms\":true\n    }\n  }\n}"
+						},
+						"url": {
+							"raw": "{{url}}/customers",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"customers"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Login as agent (helper)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "50f8fdce-d632-4d9d-b055-35986c970db8",
+								"exec": [
+									"var responseData = pm.response.json().data;",
+									"",
+									"pm.collectionVariables.set(\"token\", responseData.attributes.accessToken)",
+									"",
+									"pm.test(\"Status code is 201\", function () {",
+									"    pm.response.to.have.status(201);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"data\": {\n        \"type\": \"agent-access-tokens\",\n        \"attributes\": {\n            \"username\": \"{{email}}\",\n            \"password\": \"{{password}}\"\n        }\n    }\n}"
+						},
+						"url": {
+							"raw": "{{url}}/agent-access-tokens",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"agent-access-tokens"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Find a customer by email",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "8936a0f3-78ce-4265-8a57-f1726c895129",
+								"exec": [
+									"var responseData = pm.response.json().data;",
+									"",
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Response has correct content\", function () {",
+									"    pm.expect(responseData[0]).to.have.property(\"type\").that.is.eql(\"agent-customer-search\");",
+									"    pm.expect(responseData[0]).to.have.property(\"attributes\").that.is.not.eql(null);",
+									"    pm.expect(responseData[0].attributes.customers[0]).to.have.property(\"customerReference\").that.is.eql(pm.collectionVariables.get(\"customerReference\"));",
+									"    pm.expect(responseData[0].attributes.customers[0]).to.have.property(\"email\").that.is.eql(pm.collectionVariables.get(\"customerEmail\"));",
+									"    pm.expect(responseData[0].attributes.customers[0]).to.have.property(\"firstName\").that.is.eql(pm.collectionVariables.get(\"firstName\"));",
+									"    pm.expect(responseData[0].attributes.customers[0]).to.have.property(\"lastName\").that.is.eql(pm.collectionVariables.get(\"lastName\"));",
+									"    pm.expect(responseData[0]).to.have.property(\"links\").that.is.not.eql(null);",
+									"    pm.expect(responseData[0].links).to.have.property(\"self\").that.have.string(\"agent-customer-search\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/agent-customer-search?q={{customerEmail}}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"agent-customer-search"
+							],
+							"query": [
+								{
+									"key": "q",
+									"value": "{{customerEmail}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Find a customer by customer reference",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "36bd081e-058f-426f-8078-562dd4f89f8d",
+								"exec": [
+									"var responseData = pm.response.json().data;",
+									"",
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Response has correct content\", function () {",
+									"    pm.expect(responseData[0]).to.have.property(\"type\").that.is.eql(\"agent-customer-search\");",
+									"    pm.expect(responseData[0]).to.have.property(\"attributes\").that.is.not.eql(null);",
+									"    pm.expect(responseData[0].attributes.customers[0]).to.have.property(\"customerReference\").that.is.eql(pm.collectionVariables.get(\"customerReference\"));",
+									"    pm.expect(responseData[0].attributes.customers[0]).to.have.property(\"email\").that.is.eql(pm.collectionVariables.get(\"customerEmail\"));",
+									"    pm.expect(responseData[0].attributes.customers[0]).to.have.property(\"firstName\").that.is.eql(pm.collectionVariables.get(\"firstName\"));",
+									"    pm.expect(responseData[0].attributes.customers[0]).to.have.property(\"lastName\").that.is.eql(pm.collectionVariables.get(\"lastName\"));",
+									"    pm.expect(responseData[0]).to.have.property(\"links\").that.is.not.eql(null);",
+									"    pm.expect(responseData[0].links).to.have.property(\"self\").that.have.string(\"agent-customer-search\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/agent-customer-search?q={{customerReference}}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"agent-customer-search"
+							],
+							"query": [
+								{
+									"key": "q",
+									"value": "{{customerReference}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Find a customer by name",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "b8f25d02-7506-4658-a872-0aad2c74e430",
+								"exec": [
+									"var responseData = pm.response.json().data;",
+									"",
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Response has correct content\", function () {",
+									"    pm.expect(responseData[0]).to.have.property(\"type\").that.is.eql(\"agent-customer-search\");",
+									"    pm.expect(responseData[0]).to.have.property(\"attributes\").that.is.not.eql(null);",
+									"    pm.expect(responseData[0].attributes.customers[0]).to.have.property(\"customerReference\").that.is.eql(pm.collectionVariables.get(\"customerReference\"));",
+									"    pm.expect(responseData[0].attributes.customers[0]).to.have.property(\"email\").that.is.eql(pm.collectionVariables.get(\"customerEmail\"));",
+									"    pm.expect(responseData[0].attributes.customers[0]).to.have.property(\"firstName\").that.is.eql(pm.collectionVariables.get(\"firstName\"));",
+									"    pm.expect(responseData[0].attributes.customers[0]).to.have.property(\"lastName\").that.is.eql(pm.collectionVariables.get(\"lastName\"));",
+									"    pm.expect(responseData[0]).to.have.property(\"links\").that.is.not.eql(null);",
+									"    pm.expect(responseData[0].links).to.have.property(\"self\").that.have.string(\"agent-customer-search\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/agent-customer-search?q={{firstName}}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"agent-customer-search"
+							],
+							"query": [
+								{
+									"key": "q",
+									"value": "{{firstName}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get list of all existing customers",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "d0810a2a-ccc6-4054-8881-92bb69bb54c9",
+								"exec": [
+									"var responseData = pm.response.json().data;",
+									"",
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Return list of customers on the second page\", function() {",
+									"    pm.expect(responseData[0]).to.have.property(\"attributes\").that.is.not.eql(null);",
+									"    pm.expect(responseData[0].attributes).to.have.property(\"customers\").that.is.not.eql(null);",
+									"    var customers = responseData[0].attributes.customers;",
+									"    pm.expect(customers.length).to.eql(10);",
+									"    for (var index=0; index < customers.length; index++) {",
+									"        pm.expect(customers[index]).to.have.property(\"customerReference\").that.is.not.eql(null);",
+									"        pm.expect(customers[index]).to.have.property(\"email\").that.is.not.eql(null);",
+									"        pm.expect(customers[index]).to.have.property(\"firstName\").that.is.not.eql(null);",
+									"        pm.expect(customers[index]).to.have.property(\"lastName\").that.is.not.eql(null);",
+									"    }",
+									"});",
+									"",
+									"pm.test(\"Response has a pagination\", function() {",
+									"    pm.expect(pm.response.json()).to.have.property(\"links\").that.is.not.eql(null);",
+									"    pm.expect(pm.response.json().links).to.have.property(\"self\").that.is.eql(\"http://glue.de.spryker.local/agent-customer-search?q=\");",
+									"    pm.expect(pm.response.json().links).to.have.property(\"last\").that.is.not.eql(null);",
+									"   pm.expect(pm.response.json().links).to.have.property(\"first\").that.is.eql(\"http://glue.de.spryker.local/agent-customer-search?q=&page[offset]=0&page[limit]=10\");",
+									"    pm.expect(pm.response.json().links).to.have.property(\"next\").that.is.eql(\"http://glue.de.spryker.local/agent-customer-search?q=&page[offset]=10&page[limit]=10\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/agent-customer-search?q=",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"agent-customer-search"
+							],
+							"query": [
+								{
+									"key": "q",
+									"value": ""
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get list of all existing customers - bigger page limit",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "bdb47710-88e9-4bb6-b30a-173f9ef9a627",
+								"exec": [
+									"// Please note, we assume in this test that demo users are imported and together with other created users there is no more than 50. Please adjust the reuest if you have a different setup",
+									"",
+									"var responseData = pm.response.json().data;",
+									"",
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Return list of customers on the second page\", function() {",
+									"    pm.expect(responseData[0]).to.have.property(\"attributes\").that.is.not.eql(null);",
+									"    pm.expect(responseData[0].attributes).to.have.property(\"customers\").that.is.not.eql(null);",
+									"    var customers = responseData[0].attributes.customers;",
+									"    pm.expect(customers.length).to.be.above(10);",
+									"    for (var index=0; index < customers.length; index++) {",
+									"        pm.expect(customers[index]).to.have.property(\"customerReference\").that.is.not.eql(null);",
+									"        pm.expect(customers[index]).to.have.property(\"email\").that.is.not.eql(null);",
+									"        pm.expect(customers[index]).to.have.property(\"firstName\").that.is.not.eql(null);",
+									"        pm.expect(customers[index]).to.have.property(\"lastName\").that.is.not.eql(null);",
+									"    }",
+									"});",
+									"",
+									"pm.test(\"Response has a pagination\", function() {",
+									"    pm.expect(pm.response.json()).to.have.property(\"links\").that.is.not.eql(null);",
+									"    pm.expect(pm.response.json().links).to.have.property(\"self\").that.is.eql(\"http://glue.de.spryker.local/agent-customer-search?q=&page[offset]=0&page[limit]=50\");",
+									"    pm.expect(pm.response.json().links).to.have.property(\"last\").that.is.eql(\"http://glue.de.spryker.local/agent-customer-search?q=&page[offset]=0&page[limit]=50\");",
+									"    pm.expect(pm.response.json().links).to.have.property(\"first\").that.is.eql(\"http://glue.de.spryker.local/agent-customer-search?q=&page[offset]=0&page[limit]=50\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/agent-customer-search?q=&page[offset]=0&page[limit]=50",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"agent-customer-search"
+							],
+							"query": [
+								{
+									"key": "q",
+									"value": ""
+								},
+								{
+									"key": "page[offset]",
+									"value": "0"
+								},
+								{
+									"key": "page[limit]",
+									"value": "50"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get list of all existing customers with pagination",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "1b717f9e-3bc6-4f25-b943-63db860701b8",
+								"exec": [
+									"// Please note, we assume in this test that demo users are imported and together with other created users there is no more than 50. Please adjust the reuest if you have a different setup",
+									"",
+									"var responseData = pm.response.json().data;",
+									"",
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Return list of customers on the second page\", function() {",
+									"    pm.expect(responseData[0]).to.have.property(\"attributes\").that.is.not.eql(null);",
+									"    pm.expect(responseData[0].attributes).to.have.property(\"customers\").that.is.not.eql(null);",
+									"    var customers = responseData[0].attributes.customers;",
+									"    pm.expect(customers.length).to.eql(10);",
+									"    for (var index=0; index < customers.length; index++) {",
+									"        pm.expect(customers[index]).to.have.property(\"customerReference\").that.is.not.eql(null);",
+									"        pm.expect(customers[index]).to.have.property(\"email\").that.is.not.eql(null);",
+									"        pm.expect(customers[index]).to.have.property(\"firstName\").that.is.not.eql(null);",
+									"        pm.expect(customers[index]).to.have.property(\"lastName\").that.is.not.eql(null);",
+									"    }",
+									"});",
+									"",
+									"pm.test(\"Response has a pagination\", function() {",
+									"    pm.expect(pm.response.json()).to.have.property(\"links\").that.is.not.eql(null);",
+									"    pm.expect(pm.response.json().links).to.have.property(\"self\").that.is.eql(\"http://glue.de.spryker.local/agent-customer-search?q=&page[offset]=10&page[limit]=10\");",
+									"    pm.expect(pm.response.json().links).to.have.property(\"last\").that.is.not.eql(null);",
+									"   pm.expect(pm.response.json().links).to.have.property(\"first\").that.is.eql(\"http://glue.de.spryker.local/agent-customer-search?q=&page[offset]=0&page[limit]=10\");",
+									"   pm.expect(pm.response.json().links).to.have.property(\"prev\").that.is.eql(\"http://glue.de.spryker.local/agent-customer-search?q=&page[offset]=0&page[limit]=10\");",
+									"    pm.expect(pm.response.json().links).to.have.property(\"next\").that.is.eql(\"http://glue.de.spryker.local/agent-customer-search?q=&page[offset]=20&page[limit]=10\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/agent-customer-search?q=&page[offset]=10&page[limit]=10",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"agent-customer-search"
+							],
+							"query": [
+								{
+									"key": "q",
+									"value": ""
+								},
+								{
+									"key": "page[offset]",
+									"value": "10"
+								},
+								{
+									"key": "page[limit]",
+									"value": "10"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "Negative",
+			"item": [
+				{
+					"name": "Search for a customer - no agent token",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "32a47fd6-aa42-4c06-8f05-a3736e6bd316",
+								"exec": [
+									"var responseData = pm.response.json().errors;",
+									"",
+									"pm.test(\"Status code is 401\", function () {",
+									"    pm.response.to.have.status(401);",
+									"});",
+									"",
+									"pm.test(\"Search for customer without agent token\", function() {",
+									"    pm.expect(responseData[0].detail).to.be.eql(\"Action is available to agent user only.\");",
+									"    pm.expect(responseData[0].code).to.be.eql(\"4103\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/agent-customer-search?q=sonia@spryker.com",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"agent-customer-search"
+							],
+							"query": [
+								{
+									"key": "q",
+									"value": "sonia@spryker.com"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Search for a customer - wrong token",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "ae189858-7223-45b1-a858-afeda0dc8249",
+								"exec": [
+									"var responseData = pm.response.json().errors;",
+									"",
+									"pm.test(\"Status code is 401\", function () {",
+									"    pm.response.to.have.status(401);",
+									"});",
+									"",
+									"pm.test(\"Search for customer without agent token\", function() {",
+									"    pm.expect(responseData[0].detail).to.be.eql(\"Invalid access token.\");",
+									"    pm.expect(responseData[0].code).to.be.eql(\"001\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "test",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/agent-customer-search?q=sonia@spryker.com",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"agent-customer-search"
+							],
+							"query": [
+								{
+									"key": "q",
+									"value": "sonia@spryker.com"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get customer access token (helper)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "76f11532-042d-438e-9cb9-0fc067d15e1f",
+								"exec": [
+									"//Please note, after customer creation you need to activate it (confirm customer's email) manually to be able to login",
+									"",
+									"var responseData = pm.response.json().data;",
+									"",
+									"pm.collectionVariables.set(\"customerToken\", responseData.attributes.accessToken);",
+									"",
+									"pm.test(\"Status code is 201\", function () {",
+									"    pm.response.to.have.status(201);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"data\": {\n\t\t\"type\":\"access-tokens\",\n\t\t\"attributes\":{\n\t\t\t\"username\":\"{{customer_email}}\",\n\t\t\t\"password\": \"{{customerPassword}}\"\n\t\t}\n\t}\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/access-tokens",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"access-tokens"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Search for a customer - with customer token",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "92e18ffa-3e6c-458e-8149-37ea12b239ca",
+								"exec": [
+									"var responseData = pm.response.json().errors;",
+									"",
+									"pm.test(\"Status code is 401\", function () {",
+									"    pm.response.to.have.status(401);",
+									"});",
+									"",
+									"pm.test(\"Search for customer without agent token\", function() {",
+									"    pm.expect(responseData[0].detail).to.be.eql(\"Action is available to agent user only.\");",
+									"    pm.expect(responseData[0].code).to.be.eql(\"4103\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{customerToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/agent-customer-search?q=sonia@spryker.com",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"agent-customer-search"
+							],
+							"query": [
+								{
+									"key": "q",
+									"value": "sonia@spryker.com"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Login as agent (helper)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "e639f2b7-ee6f-46ae-9d91-554dbb1f27af",
+								"exec": [
+									"var responseData = pm.response.json().data;",
+									"",
+									"pm.collectionVariables.set(\"token\", responseData.attributes.accessToken)",
+									"",
+									"pm.test(\"Status code is 201\", function () {",
+									"    pm.response.to.have.status(201);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"data\": {\n        \"type\": \"agent-access-tokens\",\n        \"attributes\": {\n            \"username\": \"{{email}}\",\n            \"password\": \"{{password}}\"\n        }\n    }\n}"
+						},
+						"url": {
+							"raw": "{{url}}/agent-access-tokens",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"agent-access-tokens"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Search for a customer - no customer found",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "afb80057-97d9-46ba-9db1-f8355e945644",
+								"exec": [
+									"var responseData = pm.response.json().data;",
+									"",
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"The response has empty list of customers\", function() {",
+									"    pm.expect(responseData[0].attributes.customers.length).to.eql(0);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/agent-customer-search?q=nosuchcustomer",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"agent-customer-search"
+							],
+							"query": [
+								{
+									"key": "q",
+									"value": "nosuchcustomer"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Search for a customer - wrong request",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "1b51df7b-1248-45c4-9f45-17d2ccb64cfd",
+								"exec": [
+									"var responseData = pm.response.json().errors;",
+									"",
+									"pm.test(\"Status code is 404\", function () {",
+									"    pm.response.to.have.status(404);",
+									"});",
+									"",
+									"pm.test(\"Login with wrong request type\", function() {",
+									"    pm.expect(responseData[0].detail).to.be.eql(\"Not Found\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/agent-customer-search?q=nosuchcustomer",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"agent-customer-search"
+							],
+							"query": [
+								{
+									"key": "q",
+									"value": "nosuchcustomer"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "403abca4-f220-4352-a763-7062f1ff1dc7",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "33a1fd78-653b-4fcc-8d1d-9570c7023b23",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"id": "6cd20470-26e0-4a4b-9f0b-22263b2a639e",
+			"key": "customerEmail",
+			"value": ""
+		},
+		{
+			"id": "ff84f2bc-480d-4f37-bda7-67c87fec8a1c",
+			"key": "random",
+			"value": ""
+		},
+		{
+			"id": "1e30be1d-d753-4f4a-a0d9-51f3a8228559",
+			"key": "emailDomain",
+			"value": "@spryker.com"
+		},
+		{
+			"id": "64f60c80-470a-45c9-b7ec-094ae812e88a",
+			"key": "emailName",
+			"value": "User"
+		},
+		{
+			"id": "205e128f-5a65-45fb-9d60-6544fa4580da",
+			"key": "customerPassword",
+			"value": "change123"
+		},
+		{
+			"id": "eb982b9f-96ed-4102-a876-fd02b1d30bc7",
+			"key": "firstName",
+			"value": "Test"
+		},
+		{
+			"id": "34f7a1f7-7a4d-403f-9d79-a377cf107995",
+			"key": "lastName",
+			"value": "User"
+		},
+		{
+			"id": "324f5ab5-0f12-414b-8ea3-67a3aa42e20f",
+			"key": "customerToken",
+			"value": ""
+		},
+		{
+			"id": "0ae5a37b-2067-4bfd-9b3b-15829822f69f",
+			"key": "email",
+			"value": "admin@spryker.com"
+		},
+		{
+			"id": "3f64cebf-07f1-4478-a9a3-c7e4fba4588d",
+			"key": "password",
+			"value": "change123"
+		},
+		{
+			"id": "f6d04bf9-86d3-4af5-adf7-baf257e3d316",
+			"key": "token",
+			"value": ""
+		},
+		{
+			"id": "afb511a5-a885-484e-b35b-c11fcb6b6765",
+			"key": "customerReference",
+			"value": ""
+		},
+		{
+			"id": "624c4e6d-5a37-4878-bedc-8da98fee4112",
+			"key": "customer_reference",
+			"value": ""
+		},
+		{
+			"id": "bee49b2e-ff6c-440f-9a5e-788ab4ed55b5",
+			"key": "customer_email",
+			"value": "sonia@spryker.com"
+		}
+	],
+	"protocolProfileBehavior": {}
+}

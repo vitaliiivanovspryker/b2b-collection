@@ -1,0 +1,692 @@
+{
+	"info": {
+		"_postman_id": "ad65457b-0682-4fb0-acc0-b845d6e15fe3",
+		"name": "GLUE-5236-Retrieving-single-cart",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Request access token (helper)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "37a334d9-7312-4d62-97c7-a90c42f77490",
+						"exec": [
+							"var responseData = pm.response.json().data;",
+							"",
+							"pm.environment.set(\"token\", responseData.attributes.accessToken);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"data\": {\n        \"type\": \"access-tokens\",\n        \"attributes\": {\n            \"username\": \"sonia@spryker.com\",\n            \"password\": \"change123\"\n        }\n    }\n}"
+				},
+				"url": {
+					"raw": "{{url}}/access-tokens",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"access-tokens"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Retrieve single cart",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "b5d8d6ce-05ad-4867-9b73-09b3b04f7921",
+						"exec": [
+							"var responseData = pm.response.json().data;",
+							"",
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Has correct type\", function() {",
+							"    pm.expect(responseData.type).to.eql(\"carts\");",
+							"});",
+							"",
+							"pm.test(\"Has id returned\", function() {",
+							"    pm.expect(responseData.id).to.not.eql(null);",
+							"    pm.expect(responseData.id).to.be.a(\"string\");",
+							"});",
+							"",
+							"pm.test(\"Has priceMode returned\", function() {",
+							"    pm.expect(responseData.attributes.priceMode).not.eql(null);",
+							"    pm.expect(responseData.attributes.priceMode).to.be.a(\"string\");",
+							"});",
+							"",
+							"pm.test(\"Has currency returned\", function() {",
+							"    pm.expect(responseData.attributes.currency).not.eql(null);",
+							"    pm.expect(responseData.attributes.currency).to.be.a(\"string\");",
+							"});",
+							"",
+							"pm.test(\"Has store returned\", function() {",
+							"    pm.expect(responseData.attributes.store).not.eql(null);",
+							"    pm.expect(responseData.attributes.store).to.be.a(\"string\");",
+							"});",
+							"",
+							"pm.test(\"Has discounts returned\", function() {",
+							"    pm.expect(responseData.attributes.discounts.length).not.eql(null);",
+							"});",
+							"",
+							"pm.test(\"Has totals returned\", function() {",
+							"    pm.expect(responseData.attributes.totals.length).not.eql(null);",
+							"    ",
+							"    pm.expect(responseData.attributes.totals.expenseTotal).not.eql(null);",
+							"    pm.expect(responseData.attributes.totals.discountTotal).not.eql(null);",
+							"    pm.expect(responseData.attributes.totals.taxTotal).not.eql(null);",
+							"    pm.expect(responseData.attributes.totals.subtotal).not.eql(null);",
+							"    pm.expect(responseData.attributes.totals.grandTotal).not.eql(null);",
+							"});",
+							"",
+							"pm.test(\"Has name returned\", function() {",
+							"    pm.expect(responseData.attributes.name).to.be.a(\"string\");",
+							"});",
+							"",
+							"pm.test(\"Has isDefault returned\", function() {",
+							"    pm.expect(responseData.attributes.isDefault).to.be.a(\"boolean\");",
+							"});",
+							"",
+							"pm.test(\"Has self link\", function() {",
+							"    pm.expect(responseData.links.self).to.not.be.empty;",
+							"    pm.expect(responseData.links.self).to.eql(pm.variables.get(\"url\") + \"/carts/0c3ec260-694a-5cec-b78c-d37d32f92ee9?include=shared-carts\");",
+							"});",
+							"",
+							"",
+							"pm.test(\"Has relationships\", function() {",
+							"    let relationships = responseData.relationships.shared-carts.data;",
+							"    ",
+							"    pm.expect(relationships[0].type).to.not.be.empty;",
+							"    pm.expect(relationships[0].type).to.be.a(\"string\");",
+							"    pm.expect(relationships[0].id).not.eql(null);",
+							"    pm.expect(relationships[0].id).to.be.a(\"string\");",
+							"});",
+							"",
+							"",
+							"pm.test(\"Has correct included type\", function() {",
+							"    pm.expect(pm.response.json().included[0].type).to.eql(\"shared-carts\");",
+							"});",
+							"",
+							"pm.test(\"Has correct included id\", function() {",
+							"    pm.expect(pm.response.json().included[0].id).to.be.a(\"string\");",
+							"});",
+							"",
+							"pm.test(\"Has correct included attributes\", function() {",
+							"    pm.expect(pm.response.json().included[0].attributes.idCompanyUser).to.be.a(\"string\");",
+							"    pm.expect(pm.response.json().included[0].attributes.idCartPermissionGroup).to.eql(2);",
+							"});",
+							"",
+							"pm.test(\"Has correct included link\", function() {",
+							"    pm.expect(pm.response.json().included[0].links.self).to.eql(pm.variables.get(\"url\") + \"/shared-carts/9f801d81-f51a-5ccd-9ae5-616436e7618c\");",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{url}}/carts/0c3ec260-694a-5cec-b78c-d37d32f92ee9?include=shared-carts",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"carts",
+						"0c3ec260-694a-5cec-b78c-d37d32f92ee9"
+					],
+					"query": [
+						{
+							"key": "include",
+							"value": "shared-carts"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Retrieve all carts",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "148a59fe-ae47-4db1-9d4e-5516936ddc2b",
+						"exec": [
+							"var responseData = pm.response.json().data;",
+							"",
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Has correct type\", function() {",
+							"    pm.expect(responseData[0].type).to.eql(\"carts\");",
+							"});",
+							"",
+							"pm.test(\"Has id returned\", function() {",
+							"    pm.expect(responseData[0].id).to.not.eql(null);",
+							"    pm.expect(responseData[0].id).to.be.a(\"string\");",
+							"});",
+							"",
+							"pm.test(\"Has priceMode returned\", function() {",
+							"    pm.expect(responseData[0].attributes.priceMode).not.eql(null);",
+							"    pm.expect(responseData[0].attributes.priceMode).to.be.a(\"string\");",
+							"});",
+							"",
+							"pm.test(\"Has currency returned\", function() {",
+							"    pm.expect(responseData[0].attributes.currency).not.eql(null);",
+							"    pm.expect(responseData[0].attributes.currency).to.be.a(\"string\");",
+							"});",
+							"",
+							"pm.test(\"Has store returned\", function() {",
+							"    pm.expect(responseData[0].attributes.store).not.eql(null);",
+							"    pm.expect(responseData[0].attributes.store).to.be.a(\"string\");",
+							"});",
+							"",
+							"pm.test(\"Has discounts returned\", function() {",
+							"    pm.expect(responseData[0].attributes.discounts.length).not.eql(null);",
+							"});",
+							"",
+							"pm.test(\"Has totals returned\", function() {",
+							"    ",
+							"    pm.expect(responseData[0].attributes.totals.expenseTotal).to.eql(null);",
+							"    pm.expect(responseData[0].attributes.totals.discountTotal).to.eql(null);",
+							"    pm.expect(responseData[0].attributes.totals.taxTotal).to.eql(null);",
+							"    pm.expect(responseData[0].attributes.totals.subtotal).to.eql(null);",
+							"    pm.expect(responseData[0].attributes.totals.grandTotal).to.eql(null);",
+							"});",
+							"",
+							"pm.test(\"Has name returned\", function() {",
+							"    pm.expect(responseData[0].attributes.name).to.be.a(\"string\");",
+							"});",
+							"",
+							"pm.test(\"Has isDefault returned\", function() {",
+							"    pm.expect(responseData[0].attributes.isDefault).to.be.a(\"boolean\");",
+							"});",
+							"",
+							"pm.test(\"Has self link\", function() {",
+							"    pm.expect(responseData[0].links.self).to.not.be.empty;",
+							"    pm.expect(responseData[0].links.self).to.eql(pm.variables.get(\"url\") + \"/carts/61ab15e9-e24a-5dec-a1ef-fc333bd88b0a?include=shared-carts\");",
+							"});",
+							"",
+							"pm.test(\"Has correct type\", function() {",
+							"    pm.expect(responseData[1].type).to.eql(\"carts\");",
+							"});",
+							"",
+							"pm.test(\"Has id returned\", function() {",
+							"    pm.expect(responseData[1].id).to.not.eql(null);",
+							"    pm.expect(responseData[1].id).to.be.a(\"string\");",
+							"});",
+							"",
+							"pm.test(\"Has priceMode returned\", function() {",
+							"    pm.expect(responseData[1].attributes.priceMode).not.eql(null);",
+							"    pm.expect(responseData[1].attributes.priceMode).to.be.a(\"string\");",
+							"});",
+							"",
+							"pm.test(\"Has currency returned\", function() {",
+							"    pm.expect(responseData[1].attributes.currency).not.eql(null);",
+							"    pm.expect(responseData[1].attributes.currency).to.be.a(\"string\");",
+							"});",
+							"",
+							"pm.test(\"Has store returned\", function() {",
+							"    pm.expect(responseData[1].attributes.store).not.eql(null);",
+							"    pm.expect(responseData[1].attributes.store).to.be.a(\"string\");",
+							"});",
+							"",
+							"pm.test(\"Has discounts returned\", function() {",
+							"    pm.expect(responseData[1].attributes.discounts.length).not.eql(null);",
+							"});",
+							"",
+							"pm.test(\"Has totals returned\", function() {",
+							"    pm.expect(responseData[1].attributes.totals.length).not.eql(null);",
+							"    ",
+							"    pm.expect(responseData[1].attributes.totals.expenseTotal).to.eql(null);",
+							"    pm.expect(responseData[1].attributes.totals.discountTotal).to.eql(null);",
+							"    pm.expect(responseData[1].attributes.totals.taxTotal).to.eql(null);",
+							"    pm.expect(responseData[1].attributes.totals.subtotal).to.eql(null);",
+							"    pm.expect(responseData[1].attributes.totals.grandTotal).to.eql(null);",
+							"});",
+							"",
+							"pm.test(\"Has name returned\", function() {",
+							"    pm.expect(responseData[1].attributes.name).to.be.a(\"string\");",
+							"});",
+							"",
+							"pm.test(\"Has isDefault returned\", function() {",
+							"    pm.expect(responseData[1].attributes.isDefault).to.be.a(\"boolean\");",
+							"});",
+							"",
+							"pm.test(\"Has self link\", function() {",
+							"    pm.expect(responseData[1].links.self).to.not.be.empty;",
+							"    pm.expect(responseData[1].links.self).to.eql(pm.variables.get(\"url\") + \"/carts/df11d3f1-eb2f-508c-8a64-95c36b772712?include=shared-carts\");",
+							"});",
+							"",
+							"",
+							"",
+							"",
+							"pm.test(\"Has relationships\", function() {",
+							"    let relationships = responseData.relationships.shared-carts.data;",
+							"    ",
+							"    pm.expect(relationships[0].type).to.not.be.empty;",
+							"    pm.expect(relationships[0].type).to.be.a(\"string\");",
+							"    pm.expect(relationships[0].id).not.eql(null);",
+							"    pm.expect(relationships[0].id).to.be.a(\"string\");",
+							"});",
+							"",
+							"",
+							"pm.test(\"Has correct included type\", function() {",
+							"    pm.expect(pm.response.json().included[0].type).to.eql(\"shared-carts\");",
+							"});",
+							"",
+							"pm.test(\"Has correct included id\", function() {",
+							"    pm.expect(pm.response.json().included[0].id).to.be.a(\"string\");",
+							"});",
+							"",
+							"pm.test(\"Has correct included attributes\", function() {",
+							"    pm.expect(pm.response.json().included[0].attributes.idCompanyUser).to.be.a(\"string\");",
+							"    pm.expect(pm.response.json().included[0].attributes.idCartPermissionGroup).to.eql(2);",
+							"});",
+							"",
+							"pm.test(\"Has correct included link\", function() {",
+							"    pm.expect(pm.response.json().included[0].links.self).to.eql(pm.variables.get(\"url\") + \"/shared-carts/b3994478-7eb4-5d24-8773-a1c79961d977\");",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{url}}/carts?include=shared-carts",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"carts"
+					],
+					"query": [
+						{
+							"key": "include",
+							"value": "shared-carts"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Retrieve single cart withot access token",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "4efa2275-cea7-4460-8d0c-30756e917ba8",
+						"exec": [
+							"var responseData = pm.response.json().errors;",
+							"",
+							"pm.test(\"Status code is 403\", function () {",
+							"    pm.response.to.have.status(403);",
+							"});",
+							"",
+							"pm.test(\"Has correct error code\", function() {",
+							"    pm.expect(responseData[0].code).to.eql(\"002\");",
+							"});",
+							"",
+							"pm.test(\"Has correct error detail\", function() {",
+							"    pm.expect(responseData[0].detail).to.eql(\"Missing access token.\");",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{url}}/carts/0c3ec260-694a-5cec-b78c-d37d32f92ee9?include=shared-carts",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"carts",
+						"0c3ec260-694a-5cec-b78c-d37d32f92ee9"
+					],
+					"query": [
+						{
+							"key": "include",
+							"value": "shared-carts"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Retrieve single cart with incorrect url",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "aa008104-7bdf-4802-b596-fa45691524e3",
+						"exec": [
+							"var responseData = pm.response.json().errors;",
+							"",
+							"pm.test(\"Status code is 404\", function () {",
+							"    pm.response.to.have.status(404);",
+							"});",
+							"",
+							"pm.test(\"Has correct error detail\", function() {",
+							"    pm.expect(responseData[0].detail).to.eql(\"Not Found\");",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{url}}/cart/0c3ec260-694a-5cec-b78c-d37d32f92ee9?include=shared-carts",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"cart",
+						"0c3ec260-694a-5cec-b78c-d37d32f92ee9"
+					],
+					"query": [
+						{
+							"key": "include",
+							"value": "shared-carts"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Retrieve single cart with incorrect uuid",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "fe13f271-58ce-4a1f-a53e-49bc66bc8f8a",
+						"exec": [
+							"var responseData = pm.response.json().errors;",
+							"",
+							"pm.test(\"Status code is 422\", function () {",
+							"    pm.response.to.have.status(422);",
+							"});",
+							"",
+							"pm.test(\"Has correct error detail\", function() {",
+							"    pm.expect(responseData[0].code).to.eql(\"101\");",
+							"});",
+							"",
+							"pm.test(\"Has correct error detail\", function() {",
+							"    pm.expect(responseData[0].detail).to.eql(\"Cart with given uuid not found.\");",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{url}}/carts/38990662-1067-5b63-8618-0334a357c3cf?include=shared-carts",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"carts",
+						"38990662-1067-5b63-8618-0334a357c3cf"
+					],
+					"query": [
+						{
+							"key": "include",
+							"value": "shared-carts"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Retrieve single cart with incorrect method POST",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "6dc33cdd-af5c-4ef4-9303-d628906b5cb2",
+						"exec": [
+							"var responseData = pm.response.json().errors;",
+							"",
+							"pm.test(\"Status code is 404\", function () {",
+							"    pm.response.to.have.status(404);",
+							"});",
+							"",
+							"pm.test(\"Has correct error detail\", function() {",
+							"    pm.expect(responseData[0].detail).to.eql(\"Not Found\");",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "{{url}}/carts/0c3ec260-694a-5cec-b78c-d37d32f92ee9?include=shared-carts",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"carts",
+						"0c3ec260-694a-5cec-b78c-d37d32f92ee9"
+					],
+					"query": [
+						{
+							"key": "include",
+							"value": "shared-carts"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Retrieve single cart with incorrect method PUT",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "a57648ba-9c00-4eae-9f19-6720f8e8680f",
+						"exec": [
+							"var responseData = pm.response.json().errors;",
+							"",
+							"pm.test(\"Status code is 404\", function () {",
+							"    pm.response.to.have.status(404);",
+							"});",
+							"",
+							"pm.test(\"Has correct error detail\", function() {",
+							"    pm.expect(responseData[0].detail).to.eql(\"Not Found\");",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PUT",
+				"header": [],
+				"url": {
+					"raw": "{{url}}/carts/0c3ec260-694a-5cec-b78c-d37d32f92ee9?include=shared-carts",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"carts",
+						"0c3ec260-694a-5cec-b78c-d37d32f92ee9"
+					],
+					"query": [
+						{
+							"key": "include",
+							"value": "shared-carts"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Retrieve single cart with incorrect method PATCH",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "296c9ef2-f4d7-4d59-9d12-c8a727822705",
+						"exec": [
+							"var responseData = pm.response.json().errors;",
+							"",
+							"pm.test(\"Status code is 400\", function () {",
+							"    pm.response.to.have.status(400);",
+							"});",
+							"",
+							"pm.test(\"Has correct error detail\", function() {",
+							"    pm.expect(responseData[0].detail).to.eql(\"Post data is invalid.\");",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PATCH",
+				"header": [],
+				"url": {
+					"raw": "{{url}}/carts/0c3ec260-694a-5cec-b78c-d37d32f92ee9?include=shared-carts",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"carts",
+						"0c3ec260-694a-5cec-b78c-d37d32f92ee9"
+					],
+					"query": [
+						{
+							"key": "include",
+							"value": "shared-carts"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

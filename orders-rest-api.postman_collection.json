@@ -1,0 +1,2036 @@
+{
+	"info": {
+		"_postman_id": "f9a6b3b2-21fa-42d1-a6a8-5423dfec7847",
+		"name": "orders-rest-api",
+		"description": "Tests the /orders and /orders/:orderReference for sanity.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Orders List",
+			"item": [
+				{
+					"name": "Prepare customer",
+					"item": [
+						{
+							"name": "Create customer (helper)",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "ea78b590-fbc7-4b10-8baf-744d207c8810",
+										"exec": [
+											"if ('errors' in pm.response.json() && pm.response.json().errors[0].code == 400) {",
+											"    var email = pm.variables.get(\"customerEmail\");",
+											"    pm.variables.set(\"customerEmail\", new Date().getTime() + '@mail.com');",
+											"    postman.setNextRequest(request.name);",
+											"",
+											"} else {",
+											"    ",
+											"    let jsonData = pm.response.json();",
+											"",
+											"    pm.environment.set(\"customerReference\", jsonData.data.id);",
+											"}"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"data\" : {\n     \"type\": \"customers\",\n     \"id\": null,\n     \"attributes\": {\n     \t\t\"salutation\": \"Mr\",\n            \"email\": \"{{customerEmail}}\",\n            \"lastName\": \"Order\",\n            \"firstName\": \"Tester\",\n            \"gender\": \"Male\",\n            \"password\": \"{{customerPassword}}\",\n            \"confirmPassword\": \"{{customerPassword}}\",\n            \"acceptedTerms\": true\n        }\n    }\n}"
+								},
+								"url": {
+									"raw": "{{url}}/customers/",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"customers",
+										""
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get access token (helper)",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "dad794f2-da3f-4d0f-9c79-f9392b4fca1e",
+										"exec": [
+											"var jsonData = pm.response.json();",
+											"",
+											"postman.setEnvironmentVariable(\"token\", jsonData.data.attributes.accessToken);",
+											"postman.setEnvironmentVariable(\"refresh-token\", jsonData.data.attributes.refreshToken);"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/vnd.api+json"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Accept-Language",
+										"value": "de-DE, en;q=0.9"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\"data\":{\"type\":\"access-tokens\",\"attributes\":{\"username\":\"{{customerEmail}}\", \"password\": \"{{customerPassword}}\"}}}"
+								},
+								"url": {
+									"raw": "{{url}}/access-tokens",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"access-tokens"
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"_postman_isSubFolder": true
+				},
+				{
+					"name": "Check empty list or orders",
+					"item": [
+						{
+							"name": "Get empty list of orders",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "d75d6d8a-95ef-43be-a810-c5ac542b3143",
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test(\"Has empty list of orders returned\", function () {",
+											"    var jsonData = pm.response.json();",
+											"    pm.expect(jsonData.data.length).to.eql(0);",
+											"});",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{url}}/orders",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"orders"
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"_postman_isSubFolder": true
+				},
+				{
+					"name": "Place order for customer",
+					"item": [
+						{
+							"name": "Get cart for customer (helper)",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "0368d2b0-dc5e-4aa3-a525-16a486100811",
+										"exec": [
+											"var jsonData = pm.response.json();",
+											"",
+											"pm.environment.set(\"customerCartUuid\", jsonData.data[0].id);"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/vnd.api+json"
+									},
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Accept-Language",
+										"value": "de-DE, en;q=0.9"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{url}}/carts",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"carts"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Add item to cart for customer (helper)",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/vnd.api+json"
+									},
+									{
+										"key": "Accept-Language",
+										"value": "de-DE, en;q=0.9,*;q=0.5"
+									},
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\"data\":{\"type\":\"items\",\"attributes\":{\"sku\":\"009_30692991\", \"quantity\": \"100\"}}}"
+								},
+								"url": {
+									"raw": "{{url}}/carts/{{customerCartUuid}}/items",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"carts",
+										"{{customerCartUuid}}",
+										"items"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Place order with customer (helper)",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "9e83d5d3-8ace-4069-b441-170e4274a233",
+										"exec": [
+											"var jsonData = pm.response.json();",
+											"",
+											"pm.variables.set(\"customerOrderReference\", jsonData.data.attributes.orderReference);"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"data\": {\n        \"type\": \"checkout\",\n        \"attributes\": {\n            \"customer\": {\n                \"salutation\": \"Mr\",\n                \"email\": \"{{customerEmail}}\",\n                \"firstName\": \"spencor\",\n                \"lastName\": \"hopkin\"\n            },\n            \"idCart\": \"{{customerCartUuid}}\",\n            \"billingAddress\": {\n                \"id\": null,\n                \"salutation\": \"Mr\",\n                \"firstName\": \"Spencor\",\n                \"lastName\": \"Hopkin\",\n                \"address1\": \"Julie-Wolfthorn-Straße\",\n                \"address2\": \"1\",\n                \"address3\": \"new address\",\n                \"zipCode\": \"10115\",\n                \"city\": \"Berlin\",\n                \"iso2Code\": \"DE\",\n                \"company\": \"spryker\",\n                \"phone\": \"+49 (30) 2084 98350\"\n            },\n            \"shippingAddress\": {\n                \"id\": null,\n                \"salutation\": \"Mr\",\n                \"firstName\": \"Spencor\",\n                \"lastName\": \"Hopkin\",\n                \"address1\": \"Julie-Wolfthorn-Straße\",\n                \"address2\": \"1\",\n                \"address3\": \"new one\",\n                \"zipCode\": \"10115\",\n                \"city\": \"Berlin\",\n                \"iso2Code\": \"DE\",\n                \"company\": \"spryker\",\n                \"phone\": \"+49 (30) 2084 98350\"\n            },\n            \"payments\": [\n                {\n                    \"dummyPaymentInvoice\": {\n                        \"dateOfBirth\": \"08.04.1986\"\n                    },\n                    \"paymentMethodName\": \"invoice\",\n                    \"paymentProviderName\": \"DummyPayment\"\n                }\n            ],\n            \"shipment\": {\n                \"idShipmentMethod\": 1\n            }\n        }\n    }\n}"
+								},
+								"url": {
+									"raw": "{{url}}/checkout",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"checkout"
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"_postman_isSubFolder": true
+				},
+				{
+					"name": "Check order data",
+					"item": [
+						{
+							"name": "Get list of orders with single order",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "d75d6d8a-95ef-43be-a810-c5ac542b3143",
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test(\"Has correct type returned\", function () {",
+											"    var jsonData = pm.response.json().data;",
+											"    var found = false;",
+											"    for (var index in jsonData) {",
+											"        pm.expect(jsonData[index].type).to.eql(\"orders\");",
+											"        found = true;",
+											"    }",
+											"    ",
+											"    pm.expect(found).to.eql(true);",
+											"});",
+											"",
+											"pm.test(\"Has correct id returned\", function () {",
+											"    var jsonData = pm.response.json().data;",
+											"    var found = false;",
+											"    for (var index in jsonData) {",
+											"        pm.expect(jsonData[index].hasOwnProperty(\"id\")).to.eql(true);",
+											"        found = true;",
+											"    }",
+											"    ",
+											"    pm.expect(found).to.eql(true);",
+											"});",
+											"",
+											"pm.test(\"Has correct number of orders returned\", function () {",
+											"    var jsonData = pm.response.json().data;",
+											"    ",
+											"    pm.expect(jsonData.length).to.be.above(0);",
+											"});",
+											"",
+											"pm.test(\"Has not valid attributes returned\", function () {",
+											"    var jsonData = pm.response.json().data;",
+											"    var found = false;",
+											"    for (var index in jsonData) {",
+											"        pm.expect(jsonData[index].hasOwnProperty(\"attributes\")).to.eql(true);",
+											"        pm.expect(jsonData[index].attributes.hasOwnProperty(\"createdAt\")).to.eql(true);",
+											"        pm.expect(jsonData[index].attributes.hasOwnProperty(\"totals\")).to.eql(true);",
+											"        pm.expect(jsonData[index].attributes.hasOwnProperty(\"currencyIsoCode\")).to.eql(true);",
+											"        pm.expect(jsonData[index].attributes.hasOwnProperty(\"priceMode\")).to.eql(true);",
+											"        ",
+											"        pm.expect(jsonData[index].attributes.totals.hasOwnProperty(\"expenseTotal\")).to.eql(true);",
+											"        pm.expect(jsonData[index].attributes.totals.hasOwnProperty(\"discountTotal\")).to.eql(true);",
+											"        pm.expect(jsonData[index].attributes.totals.hasOwnProperty(\"taxTotal\")).to.eql(true);",
+											"        pm.expect(jsonData[index].attributes.totals.hasOwnProperty(\"subtotal\")).to.eql(true);",
+											"        pm.expect(jsonData[index].attributes.totals.hasOwnProperty(\"grandTotal\")).to.eql(true);",
+											"        pm.expect(jsonData[index].attributes.totals.hasOwnProperty(\"canceledTotal\")).to.eql(true);",
+											"        found = true;",
+											"    }",
+											"    ",
+											"    pm.expect(found).to.eql(true);",
+											"});",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{url}}/orders",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"orders"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get order details",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "d75d6d8a-95ef-43be-a810-c5ac542b3143",
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test(\"Has correct type returned\", function () {",
+											"    var jsonData = pm.response.json().data;",
+											"    ",
+											"    pm.expect(jsonData.type).to.eql(\"orders\");",
+											"});",
+											"",
+											"pm.test(\"Has correct id returned\", function () {",
+											"    var jsonData = pm.response.json().data;",
+											"    ",
+											"    pm.expect(jsonData.links.self).to.eql(pm.environment.get(\"url\") + \"/orders/\" +  pm.variables.get('customerOrderReference'));",
+											"});",
+											"",
+											"pm.test(\"Has correct self link\", function () {",
+											"    var jsonData = pm.response.json().data;",
+											"    ",
+											"    pm.expect(jsonData.id).to.eql(pm.variables.get('customerOrderReference'));",
+											"});",
+											"",
+											"pm.test(\"Has valid attributes returned\", function () {",
+											"    var jsonData = pm.response.json().data;",
+											"    ",
+											"    pm.expect(jsonData.hasOwnProperty(\"attributes\")).to.eql(true);",
+											"    pm.expect(jsonData.attributes.hasOwnProperty(\"createdAt\")).to.eql(true);",
+											"    pm.expect(jsonData.attributes.hasOwnProperty(\"totals\")).to.eql(true);",
+											"    pm.expect(jsonData.attributes.hasOwnProperty(\"currencyIsoCode\")).to.eql(true);",
+											"    pm.expect(jsonData.attributes.hasOwnProperty(\"priceMode\")).to.eql(true);",
+											"    pm.expect(jsonData.attributes.hasOwnProperty(\"expenses\")).to.eql(true);",
+											"    pm.expect(jsonData.attributes.hasOwnProperty(\"billingAddress\")).to.eql(true);",
+											"    pm.expect(jsonData.attributes.hasOwnProperty(\"shippingAddress\")).to.eql(true);",
+											"    pm.expect(jsonData.attributes.hasOwnProperty(\"payments\")).to.eql(true);",
+											"    pm.expect(jsonData.attributes.hasOwnProperty(\"calculatedDiscounts\")).to.eql(true);",
+											"});",
+											"",
+											"pm.test(\"Has not valid totals returned\", function () {",
+											"    var jsonData = pm.response.json().data;",
+											"    ",
+											"    pm.expect(jsonData.attributes.totals.hasOwnProperty(\"expenseTotal\")).to.eql(true);",
+											"    pm.expect(jsonData.attributes.totals.hasOwnProperty(\"discountTotal\")).to.eql(true);",
+											"    pm.expect(jsonData.attributes.totals.hasOwnProperty(\"taxTotal\")).to.eql(true);",
+											"    pm.expect(jsonData.attributes.totals.hasOwnProperty(\"subtotal\")).to.eql(true);",
+											"    pm.expect(jsonData.attributes.totals.hasOwnProperty(\"grandTotal\")).to.eql(true);",
+											"    pm.expect(jsonData.attributes.totals.hasOwnProperty(\"canceledTotal\")).to.eql(true);",
+											"});",
+											"",
+											"pm.test(\"Has valid items returned\", function () {",
+											"    var jsonData = pm.response.json().data;",
+											"    var items = pm.response.json().data.attributes.items;",
+											"    var requiredProperties = [",
+											"        'name',",
+											"        'sku',",
+											"        'sumPrice',",
+											"        'sumPriceToPayAggregation',",
+											"        'quantity',",
+											"        'metadata',",
+											"        'calculatedDiscounts',",
+											"        'unitGrossPrice',",
+											"        'sumNetPrice',",
+											"        'unitPrice',",
+											"        'unitTaxAmountFullAggregation',",
+											"        'sumTaxAmountFullAggregation',",
+											"        'refundableAmount',",
+											"        'canceledAmount',",
+											"        'sumSubtotalAggregation',",
+											"        'unitSubtotalAggregation',",
+											"        'unitProductOptionPriceAggregation',",
+											"        'sumProductOptionPriceAggregation',",
+											"        'unitExpensePriceAggregation',",
+											"        'sumExpensePriceAggregation',",
+											"        'unitDiscountAmountAggregation',",
+											"        'sumDiscountAmountAggregation',",
+											"        'unitDiscountAmountFullAggregation',",
+											"        'sumDiscountAmountFullAggregation',",
+											"        'unitPriceToPayAggregation',",
+											"        'taxRateAverageAggregation',",
+											"        'taxAmountAfterCancellation'",
+											"    ];",
+											"    ",
+											"    var foundInItem = false;",
+											"    for (var index in items) {",
+											"        var foundProperties = false;",
+											"        for (var fieldIndex in requiredProperties) {",
+											"            pm.expect(items[index].hasOwnProperty(requiredProperties[fieldIndex])).to.eql(true);",
+											"            foundProperties = true;",
+											"            foundInItem = true;",
+											"        }",
+											"        pm.expect(foundProperties).to.eql(true);",
+											"    }",
+											"    pm.expect(foundInItem).to.eql(true);",
+											"});",
+											"",
+											"pm.test(\"Has valid billing address returned\", function () {",
+											"    var jsonData = pm.response.json().data;",
+											"    var billingAddress = pm.response.json().data.attributes.billingAddress;",
+											"    var requiredProperties = [",
+											"        'salutation',",
+											"        'firstName',",
+											"        'address1',",
+											"        'address2',",
+											"        'company',",
+											"        'city',",
+											"        'zipCode',",
+											"        'phone',",
+											"        'country',",
+											"        'iso2Code',",
+											"    ];",
+											"    ",
+											"    var foundProperties = false;",
+											"    for (var fieldIndex in requiredProperties) {",
+											"        pm.expect(billingAddress.hasOwnProperty(requiredProperties[fieldIndex])).to.eql(true);",
+											"        foundProperties = true;",
+											"    }",
+											"    pm.expect(foundProperties).to.eql(true);",
+											"});",
+											"",
+											"pm.test(\"Has valid shipping address returned\", function () {",
+											"    var jsonData = pm.response.json().data;",
+											"    var shippingAddress = pm.response.json().data.attributes.shippingAddress;",
+											"    var requiredProperties = [",
+											"        'salutation',",
+											"        'firstName',",
+											"        'address1',",
+											"        'address2',",
+											"        'company',",
+											"        'city',",
+											"        'zipCode',",
+											"        'phone',",
+											"        'country',",
+											"        'iso2Code',",
+											"    ];",
+											"    ",
+											"    var foundProperties = false;",
+											"    for (var fieldIndex in requiredProperties) {",
+											"        pm.expect(shippingAddress.hasOwnProperty(requiredProperties[fieldIndex])).to.eql(true);",
+											"        foundProperties = true;",
+											"    }",
+											"    pm.expect(foundProperties).to.eql(true);",
+											"});",
+											"",
+											"",
+											"pm.test(\"Has valid payments returned\", function () {",
+											"    var jsonData = pm.response.json().data;",
+											"    var payments = pm.response.json().data.attributes.payments;",
+											"    var requiredProperties = [",
+											"        'amount',",
+											"        'paymentProvider',",
+											"        'paymentMethod'",
+											"    ];",
+											"    ",
+											"    var foundInPayments = false;",
+											"    for (var index in payments) {",
+											"        var foundProperties = false;",
+											"        for (var fieldIndex in requiredProperties) {",
+											"            pm.expect(payments[index].hasOwnProperty(requiredProperties[fieldIndex])).to.eql(true);",
+											"            foundProperties = true;",
+											"            foundInPayments = true;",
+											"        }",
+											"        pm.expect(foundProperties).to.eql(true);",
+											"    }",
+											"    pm.expect(foundInPayments).to.eql(true);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{url}}/orders/{{customerOrderReference}}",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"orders",
+										"{{customerOrderReference}}"
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"_postman_isSubFolder": true
+				},
+				{
+					"name": "Place order for customer",
+					"item": [
+						{
+							"name": "Get cart for customer (helper)",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "0368d2b0-dc5e-4aa3-a525-16a486100811",
+										"exec": [
+											"var jsonData = pm.response.json();",
+											"",
+											"pm.environment.set(\"customerCartUuid\", jsonData.data[0].id);"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/vnd.api+json"
+									},
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Accept-Language",
+										"value": "de-DE, en;q=0.9"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{url}}/carts",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"carts"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Add item to cart for customer (helper)",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/vnd.api+json"
+									},
+									{
+										"key": "Accept-Language",
+										"value": "de-DE, en;q=0.9,*;q=0.5"
+									},
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\"data\":{\"type\":\"items\",\"attributes\":{\"sku\":\"009_30692991\", \"quantity\": \"100\"}}}"
+								},
+								"url": {
+									"raw": "{{url}}/carts/{{customerCartUuid}}/items",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"carts",
+										"{{customerCartUuid}}",
+										"items"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Place order with customer (helper)",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "9e83d5d3-8ace-4069-b441-170e4274a233",
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"data\": {\n        \"type\": \"checkout\",\n        \"attributes\": {\n            \"customer\": {\n                \"salutation\": \"Mr\",\n                \"email\": \"{{customerEmail}}\",\n                \"firstName\": \"spencor\",\n                \"lastName\": \"hopkin\"\n            },\n            \"idCart\": \"{{customerCartUuid}}\",\n            \"billingAddress\": {\n                \"id\": null,\n                \"salutation\": \"Mr\",\n                \"firstName\": \"Spencor\",\n                \"lastName\": \"Hopkin\",\n                \"address1\": \"Julie-Wolfthorn-Straße\",\n                \"address2\": \"1\",\n                \"address3\": \"new address\",\n                \"zipCode\": \"10115\",\n                \"city\": \"Berlin\",\n                \"iso2Code\": \"DE\",\n                \"company\": \"spryker\",\n                \"phone\": \"+49 (30) 2084 98350\"\n            },\n            \"shippingAddress\": {\n                \"id\": null,\n                \"salutation\": \"Mr\",\n                \"firstName\": \"Spencor\",\n                \"lastName\": \"Hopkin\",\n                \"address1\": \"Julie-Wolfthorn-Straße\",\n                \"address2\": \"1\",\n                \"address3\": \"new one\",\n                \"zipCode\": \"10115\",\n                \"city\": \"Berlin\",\n                \"iso2Code\": \"DE\",\n                \"company\": \"spryker\",\n                \"phone\": \"+49 (30) 2084 98350\"\n            },\n            \"payments\": [\n                {\n                    \"dummyPaymentInvoice\": {\n                        \"dateOfBirth\": \"08.04.1986\"\n                    },\n                    \"paymentMethodName\": \"invoice\",\n                    \"paymentProviderName\": \"DummyPayment\"\n                }\n            ],\n            \"shipment\": {\n                \"idShipmentMethod\": 1\n            }\n        }\n    }\n}"
+								},
+								"url": {
+									"raw": "{{url}}/checkout",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"checkout"
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"_postman_isSubFolder": true
+				},
+				{
+					"name": "Check order data",
+					"item": [
+						{
+							"name": "Get list of orders with multiple orders",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "d75d6d8a-95ef-43be-a810-c5ac542b3143",
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test(\"Has correct type returned\", function () {",
+											"    var jsonData = pm.response.json().data;",
+											"    var found = false;",
+											"    for (var index in jsonData) {",
+											"        pm.expect(jsonData[index].type).to.eql(\"orders\");",
+											"        found = true;",
+											"    }",
+											"    ",
+											"    pm.expect(found).to.eql(true);",
+											"});",
+											"",
+											"pm.test(\"Has correct id returned\", function () {",
+											"    var jsonData = pm.response.json().data;",
+											"    var found = false;",
+											"    for (var index in jsonData) {",
+											"        pm.expect(jsonData[index].hasOwnProperty(\"id\")).to.eql(true);",
+											"        found = true;",
+											"    }",
+											"    ",
+											"    pm.expect(found).to.eql(true);",
+											"});",
+											"",
+											"pm.test(\"Has not valid attributes returned\", function () {",
+											"    var jsonData = pm.response.json().data;",
+											"    var found = false;",
+											"    for (var index in jsonData) {",
+											"        pm.expect(jsonData[index].hasOwnProperty(\"attributes\")).to.eql(true);",
+											"        pm.expect(jsonData[index].attributes.hasOwnProperty(\"createdAt\")).to.eql(true);",
+											"        pm.expect(jsonData[index].attributes.hasOwnProperty(\"totals\")).to.eql(true);",
+											"        pm.expect(jsonData[index].attributes.hasOwnProperty(\"currencyIsoCode\")).to.eql(true);",
+											"        pm.expect(jsonData[index].attributes.hasOwnProperty(\"priceMode\")).to.eql(true);",
+											"        ",
+											"        pm.expect(jsonData[index].attributes.totals.hasOwnProperty(\"expenseTotal\")).to.eql(true);",
+											"        pm.expect(jsonData[index].attributes.totals.hasOwnProperty(\"discountTotal\")).to.eql(true);",
+											"        pm.expect(jsonData[index].attributes.totals.hasOwnProperty(\"taxTotal\")).to.eql(true);",
+											"        pm.expect(jsonData[index].attributes.totals.hasOwnProperty(\"subtotal\")).to.eql(true);",
+											"        pm.expect(jsonData[index].attributes.totals.hasOwnProperty(\"grandTotal\")).to.eql(true);",
+											"        pm.expect(jsonData[index].attributes.totals.hasOwnProperty(\"canceledTotal\")).to.eql(true);",
+											"        found = true;",
+											"    }",
+											"    ",
+											"    pm.expect(found).to.eql(true);",
+											"});",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{url}}/orders",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"orders"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get order details when customer has multiple orders",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "d75d6d8a-95ef-43be-a810-c5ac542b3143",
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test(\"Has correct type returned\", function () {",
+											"    var jsonData = pm.response.json().data;",
+											"    ",
+											"    pm.expect(jsonData.type).to.eql(\"orders\");",
+											"});",
+											"",
+											"pm.test(\"Has correct self link\", function () {",
+											"    var jsonData = pm.response.json().data;",
+											"    ",
+											"    pm.expect(jsonData.id).to.eql(pm.variables.get('customerOrderReference'));",
+											"});",
+											"",
+											"pm.test(\"Has valid attributes returned\", function () {",
+											"    var jsonData = pm.response.json().data;",
+											"    ",
+											"    pm.expect(jsonData.hasOwnProperty(\"attributes\")).to.eql(true);",
+											"    pm.expect(jsonData.attributes.hasOwnProperty(\"createdAt\")).to.eql(true);",
+											"    pm.expect(jsonData.attributes.hasOwnProperty(\"totals\")).to.eql(true);",
+											"    pm.expect(jsonData.attributes.hasOwnProperty(\"currencyIsoCode\")).to.eql(true);",
+											"    pm.expect(jsonData.attributes.hasOwnProperty(\"priceMode\")).to.eql(true);",
+											"    pm.expect(jsonData.attributes.hasOwnProperty(\"expenses\")).to.eql(true);",
+											"    pm.expect(jsonData.attributes.hasOwnProperty(\"billingAddress\")).to.eql(true);",
+											"    pm.expect(jsonData.attributes.hasOwnProperty(\"shippingAddress\")).to.eql(true);",
+											"    pm.expect(jsonData.attributes.hasOwnProperty(\"payments\")).to.eql(true);",
+											"    pm.expect(jsonData.attributes.hasOwnProperty(\"calculatedDiscounts\")).to.eql(true);",
+											"});",
+											"",
+											"pm.test(\"Has not valid totals returned\", function () {",
+											"    var jsonData = pm.response.json().data;",
+											"    ",
+											"    pm.expect(jsonData.attributes.totals.hasOwnProperty(\"expenseTotal\")).to.eql(true);",
+											"    pm.expect(jsonData.attributes.totals.hasOwnProperty(\"discountTotal\")).to.eql(true);",
+											"    pm.expect(jsonData.attributes.totals.hasOwnProperty(\"taxTotal\")).to.eql(true);",
+											"    pm.expect(jsonData.attributes.totals.hasOwnProperty(\"subtotal\")).to.eql(true);",
+											"    pm.expect(jsonData.attributes.totals.hasOwnProperty(\"grandTotal\")).to.eql(true);",
+											"    pm.expect(jsonData.attributes.totals.hasOwnProperty(\"canceledTotal\")).to.eql(true);",
+											"});",
+											"",
+											"pm.test(\"Has valid items returned\", function () {",
+											"    var jsonData = pm.response.json().data;",
+											"    var items = pm.response.json().data.attributes.items;",
+											"    var requiredProperties = [",
+											"        'name',",
+											"        'sku',",
+											"        'sumPrice',",
+											"        'sumPriceToPayAggregation',",
+											"        'quantity',",
+											"        'metadata',",
+											"        'calculatedDiscounts',",
+											"        'unitGrossPrice',",
+											"        'sumNetPrice',",
+											"        'unitPrice',",
+											"        'unitTaxAmountFullAggregation',",
+											"        'sumTaxAmountFullAggregation',",
+											"        'refundableAmount',",
+											"        'canceledAmount',",
+											"        'sumSubtotalAggregation',",
+											"        'unitSubtotalAggregation',",
+											"        'unitProductOptionPriceAggregation',",
+											"        'sumProductOptionPriceAggregation',",
+											"        'unitExpensePriceAggregation',",
+											"        'sumExpensePriceAggregation',",
+											"        'unitDiscountAmountAggregation',",
+											"        'sumDiscountAmountAggregation',",
+											"        'unitDiscountAmountFullAggregation',",
+											"        'sumDiscountAmountFullAggregation',",
+											"        'unitPriceToPayAggregation',",
+											"        'taxRateAverageAggregation',",
+											"        'taxAmountAfterCancellation'",
+											"    ];",
+											"    ",
+											"    var foundInItem = false;",
+											"    for (var index in items) {",
+											"        var foundProperties = false;",
+											"        for (var fieldIndex in requiredProperties) {",
+											"            pm.expect(items[index].hasOwnProperty(requiredProperties[fieldIndex])).to.eql(true);",
+											"            foundProperties = true;",
+											"            foundInItem = true;",
+											"        }",
+											"        pm.expect(foundProperties).to.eql(true);",
+											"    }",
+											"    pm.expect(foundInItem).to.eql(true);",
+											"});",
+											"",
+											"pm.test(\"Has valid billing address returned\", function () {",
+											"    var jsonData = pm.response.json().data;",
+											"    var billingAddress = pm.response.json().data.attributes.billingAddress;",
+											"    var requiredProperties = [",
+											"        'salutation',",
+											"        'firstName',",
+											"        'address1',",
+											"        'address2',",
+											"        'company',",
+											"        'city',",
+											"        'zipCode',",
+											"        'phone',",
+											"        'country',",
+											"        'iso2Code',",
+											"    ];",
+											"    ",
+											"    var foundProperties = false;",
+											"    for (var fieldIndex in requiredProperties) {",
+											"        pm.expect(billingAddress.hasOwnProperty(requiredProperties[fieldIndex])).to.eql(true);",
+											"        foundProperties = true;",
+											"    }",
+											"    pm.expect(foundProperties).to.eql(true);",
+											"});",
+											"",
+											"pm.test(\"Has valid shipping address returned\", function () {",
+											"    var jsonData = pm.response.json().data;",
+											"    var shippingAddress = pm.response.json().data.attributes.shippingAddress;",
+											"    var requiredProperties = [",
+											"        'salutation',",
+											"        'firstName',",
+											"        'address1',",
+											"        'address2',",
+											"        'company',",
+											"        'city',",
+											"        'zipCode',",
+											"        'phone',",
+											"        'country',",
+											"        'iso2Code',",
+											"    ];",
+											"    ",
+											"    var foundProperties = false;",
+											"    for (var fieldIndex in requiredProperties) {",
+											"        pm.expect(shippingAddress.hasOwnProperty(requiredProperties[fieldIndex])).to.eql(true);",
+											"        foundProperties = true;",
+											"    }",
+											"    pm.expect(foundProperties).to.eql(true);",
+											"});",
+											"",
+											"",
+											"pm.test(\"Has valid payments returned\", function () {",
+											"    var jsonData = pm.response.json().data;",
+											"    var payments = pm.response.json().data.attributes.payments;",
+											"    var requiredProperties = [",
+											"        'amount',",
+											"        'paymentProvider',",
+											"        'paymentMethod'",
+											"    ];",
+											"    ",
+											"    var foundInPayments = false;",
+											"    for (var index in payments) {",
+											"        var foundProperties = false;",
+											"        for (var fieldIndex in requiredProperties) {",
+											"            pm.expect(payments[index].hasOwnProperty(requiredProperties[fieldIndex])).to.eql(true);",
+											"            foundProperties = true;",
+											"            foundInPayments = true;",
+											"        }",
+											"        pm.expect(foundProperties).to.eql(true);",
+											"    }",
+											"    pm.expect(foundInPayments).to.eql(true);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{url}}/orders/{{customerOrderReference}}",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"orders",
+										"{{customerOrderReference}}"
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"_postman_isSubFolder": true
+				},
+				{
+					"name": "Prepare another customer",
+					"item": [
+						{
+							"name": "Create another customer (helper)",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "ea78b590-fbc7-4b10-8baf-744d207c8810",
+										"exec": [
+											"if ('errors' in pm.response.json() && pm.response.json().errors[0].code == 400) {",
+											"    var email = pm.variables.get(\"customerAnotherEmail\");",
+											"    pm.variables.set(\"customerAnotherEmail\", new Date().getTime() + '@mail.com');",
+											"    postman.setNextRequest(request.name);",
+											"}"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"data\": {\n        \"type\": \"customers\",\n        \"id\": null,\n        \"attributes\": {\n            \"salutation\": \"Mr\",\n            \"email\": \"{{customerAnotherEmail}}\",\n            \"lastName\": \"Order\",\n            \"firstName\": \"Tester\",\n            \"gender\": \"Male\",\n            \"password\": \"{{customerPassword}}\",\n            \"confirmPassword\": \"{{customerPassword}}\",\n            \"acceptedTerms\": true\n        }\n    }\n}"
+								},
+								"url": {
+									"raw": "{{url}}/customers/",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"customers",
+										""
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get another customer access token (helper)",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "dad794f2-da3f-4d0f-9c79-f9392b4fca1e",
+										"exec": [
+											"var jsonData = pm.response.json();",
+											"",
+											"postman.setEnvironmentVariable(\"anotherToken\", jsonData.data.attributes.accessToken);",
+											"postman.setEnvironmentVariable(\"anotherRefreshToken\", jsonData.data.attributes.refreshToken);"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/vnd.api+json"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Accept-Language",
+										"value": "de-DE, en;q=0.9"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\"data\":{\"type\":\"access-tokens\",\"attributes\":{\"username\":\"{{customerAnotherEmail}}\", \"password\": \"{{customerPassword}}\"}}}"
+								},
+								"url": {
+									"raw": "{{url}}/access-tokens",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"access-tokens"
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"_postman_isSubFolder": true
+				},
+				{
+					"name": "Place order for another customer",
+					"item": [
+						{
+							"name": "Get cart for customer (helper)",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "0368d2b0-dc5e-4aa3-a525-16a486100811",
+										"exec": [
+											"var jsonData = pm.response.json();",
+											"",
+											"pm.environment.set(\"anotherCustomerCartUuid\", jsonData.data[0].id);"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{anotherToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/vnd.api+json"
+									},
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Accept-Language",
+										"value": "de-DE, en;q=0.9"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{url}}/carts",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"carts"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Add item to cart for customer (helper)",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{anotherToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/vnd.api+json"
+									},
+									{
+										"key": "Accept-Language",
+										"value": "de-DE, en;q=0.9,*;q=0.5"
+									},
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\"data\":{\"type\":\"items\",\"attributes\":{\"sku\":\"009_30692991\", \"quantity\": \"100\"}}}"
+								},
+								"url": {
+									"raw": "{{url}}/carts/{{anotherCustomerCartUuid}}/items",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"carts",
+										"{{anotherCustomerCartUuid}}",
+										"items"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Place order with customer (helper)",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "9e83d5d3-8ace-4069-b441-170e4274a233",
+										"exec": [
+											"var jsonData = pm.response.json();",
+											"",
+											"pm.variables.set(\"anotherCustomerOrderReference\", jsonData.data.attributes.orderReference);"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{anotherToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"data\": {\n        \"type\": \"checkout\",\n        \"attributes\": {\n            \"customer\": {\n                \"salutation\": \"Mr\",\n                \"email\": \"{{customerAnotherEmail}}\",\n                \"firstName\": \"spencor\",\n                \"lastName\": \"hopkin\"\n            },\n            \"idCart\": \"{{anotherCustomerCartUuid}}\",\n            \"billingAddress\": {\n                \"id\": null,\n                \"salutation\": \"Mr\",\n                \"firstName\": \"Spencor\",\n                \"lastName\": \"Hopkin\",\n                \"address1\": \"Julie-Wolfthorn-Straße\",\n                \"address2\": \"1\",\n                \"address3\": \"new address\",\n                \"zipCode\": \"10115\",\n                \"city\": \"Berlin\",\n                \"iso2Code\": \"DE\",\n                \"company\": \"spryker\",\n                \"phone\": \"+49 (30) 2084 98350\"\n            },\n            \"shippingAddress\": {\n                \"id\": null,\n                \"salutation\": \"Mr\",\n                \"firstName\": \"Spencor\",\n                \"lastName\": \"Hopkin\",\n                \"address1\": \"Julie-Wolfthorn-Straße\",\n                \"address2\": \"1\",\n                \"address3\": \"new one\",\n                \"zipCode\": \"10115\",\n                \"city\": \"Berlin\",\n                \"iso2Code\": \"DE\",\n                \"company\": \"spryker\",\n                \"phone\": \"+49 (30) 2084 98350\"\n            },\n            \"payments\": [\n                {\n                    \"paymentMethodName\": \"invoice\",\n                    \"paymentProviderName\": \"DummyPayment\"\n                }\n            ],\n            \"shipment\": {\n                \"idShipmentMethod\": 1\n            }\n        }\n    }\n}"
+								},
+								"url": {
+									"raw": "{{url}}/checkout",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"checkout"
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"_postman_isSubFolder": true
+				},
+				{
+					"name": "Check order data for another customer",
+					"item": [
+						{
+							"name": "Get list of orders with single order",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "d75d6d8a-95ef-43be-a810-c5ac542b3143",
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test(\"Has correct type returned\", function () {",
+											"    var jsonData = pm.response.json().data;",
+											"    var found = false;",
+											"    for (var index in jsonData) {",
+											"        pm.expect(jsonData[index].type).to.eql(\"orders\");",
+											"        found = true;",
+											"    }",
+											"    ",
+											"    pm.expect(found).to.eql(true);",
+											"});",
+											"",
+											"pm.test(\"Has correct id returned\", function () {",
+											"    var jsonData = pm.response.json().data;",
+											"    var found = false;",
+											"    for (var index in jsonData) {",
+											"        pm.expect(jsonData[index].hasOwnProperty(\"id\")).to.eql(true);",
+											"        found = true;",
+											"    }",
+											"    ",
+											"    pm.expect(found).to.eql(true);",
+											"});",
+											"",
+											"pm.test(\"Has correct number of orders returned\", function () {",
+											"    var jsonData = pm.response.json().data;",
+											"    ",
+											"    pm.expect(jsonData.length).to.be.above(0);",
+											"});",
+											"",
+											"pm.test(\"Has not valid attributes returned\", function () {",
+											"    var jsonData = pm.response.json().data;",
+											"    var found = false;",
+											"    for (var index in jsonData) {",
+											"        pm.expect(jsonData[index].hasOwnProperty(\"attributes\")).to.eql(true);",
+											"        pm.expect(jsonData[index].attributes.hasOwnProperty(\"createdAt\")).to.eql(true);",
+											"        pm.expect(jsonData[index].attributes.hasOwnProperty(\"totals\")).to.eql(true);",
+											"        pm.expect(jsonData[index].attributes.hasOwnProperty(\"currencyIsoCode\")).to.eql(true);",
+											"        pm.expect(jsonData[index].attributes.hasOwnProperty(\"priceMode\")).to.eql(true);",
+											"        ",
+											"        pm.expect(jsonData[index].attributes.totals.hasOwnProperty(\"expenseTotal\")).to.eql(true);",
+											"        pm.expect(jsonData[index].attributes.totals.hasOwnProperty(\"discountTotal\")).to.eql(true);",
+											"        pm.expect(jsonData[index].attributes.totals.hasOwnProperty(\"taxTotal\")).to.eql(true);",
+											"        pm.expect(jsonData[index].attributes.totals.hasOwnProperty(\"subtotal\")).to.eql(true);",
+											"        pm.expect(jsonData[index].attributes.totals.hasOwnProperty(\"grandTotal\")).to.eql(true);",
+											"        pm.expect(jsonData[index].attributes.totals.hasOwnProperty(\"canceledTotal\")).to.eql(true);",
+											"        found = true;",
+											"    }",
+											"    ",
+											"    pm.expect(found).to.eql(true);",
+											"});",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{anotherToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{url}}/orders",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"orders"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get order details",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "d75d6d8a-95ef-43be-a810-c5ac542b3143",
+										"exec": [
+											"pm.test(\"Status code is 200\", function() {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test(\"Has correct type returned\", function() {",
+											"    var jsonData = pm.response.json().data;",
+											"",
+											"    pm.expect(jsonData.type).to.eql(\"orders\");",
+											"});",
+											"",
+											"pm.test(\"Has correct id returned\", function() {",
+											"    var jsonData = pm.response.json().data;",
+											"",
+											"    pm.expect(jsonData).to.have.property(\"id\").that.is.a(\"string\").to.be.eql(pm.variables.get('anotherCustomerOrderReference'));",
+											"});",
+											"",
+											"pm.test(\"Has correct self link\", function() {",
+											"    var jsonData = pm.response.json().data;",
+											"",
+											"    pm.expect(jsonData.id).to.eql(pm.variables.get('anotherCustomerOrderReference'));",
+											"});",
+											"",
+											"pm.test(\"Has valid attributes returned\", function() {",
+											"    var jsonData = pm.response.json().data;",
+											"",
+											"    pm.expect(jsonData.hasOwnProperty(\"attributes\")).to.eql(true);",
+											"    pm.expect(jsonData.attributes.hasOwnProperty(\"createdAt\")).to.eql(true);",
+											"    pm.expect(jsonData.attributes.hasOwnProperty(\"totals\")).to.eql(true);",
+											"    pm.expect(jsonData.attributes.hasOwnProperty(\"currencyIsoCode\")).to.eql(true);",
+											"    pm.expect(jsonData.attributes.hasOwnProperty(\"priceMode\")).to.eql(true);",
+											"    pm.expect(jsonData.attributes.hasOwnProperty(\"expenses\")).to.eql(true);",
+											"    pm.expect(jsonData.attributes.hasOwnProperty(\"billingAddress\")).to.eql(true);",
+											"    pm.expect(jsonData.attributes.hasOwnProperty(\"shippingAddress\")).to.eql(true);",
+											"    pm.expect(jsonData.attributes.hasOwnProperty(\"payments\")).to.eql(true);",
+											"    pm.expect(jsonData.attributes.hasOwnProperty(\"calculatedDiscounts\")).to.eql(true);",
+											"});",
+											"",
+											"pm.test(\"Has not valid totals returned\", function() {",
+											"    var jsonData = pm.response.json().data;",
+											"",
+											"    pm.expect(jsonData.attributes.totals.hasOwnProperty(\"expenseTotal\")).to.eql(true);",
+											"    pm.expect(jsonData.attributes.totals.hasOwnProperty(\"discountTotal\")).to.eql(true);",
+											"    pm.expect(jsonData.attributes.totals.hasOwnProperty(\"taxTotal\")).to.eql(true);",
+											"    pm.expect(jsonData.attributes.totals.hasOwnProperty(\"subtotal\")).to.eql(true);",
+											"    pm.expect(jsonData.attributes.totals.hasOwnProperty(\"grandTotal\")).to.eql(true);",
+											"    pm.expect(jsonData.attributes.totals.hasOwnProperty(\"canceledTotal\")).to.eql(true);",
+											"});",
+											"",
+											"pm.test(\"Has valid items returned\", function() {",
+											"    var jsonData = pm.response.json().data;",
+											"    var items = pm.response.json().data.attributes.items;",
+											"    var requiredProperties = [",
+											"        'name',",
+											"        'sku',",
+											"        'sumPrice',",
+											"        'sumPriceToPayAggregation',",
+											"        'quantity',",
+											"        'metadata',",
+											"        'calculatedDiscounts',",
+											"        'unitGrossPrice',",
+											"        'sumNetPrice',",
+											"        'unitPrice',",
+											"        'unitTaxAmountFullAggregation',",
+											"        'sumTaxAmountFullAggregation',",
+											"        'refundableAmount',",
+											"        'canceledAmount',",
+											"        'sumSubtotalAggregation',",
+											"        'unitSubtotalAggregation',",
+											"        'unitProductOptionPriceAggregation',",
+											"        'sumProductOptionPriceAggregation',",
+											"        'unitExpensePriceAggregation',",
+											"        'sumExpensePriceAggregation',",
+											"        'unitDiscountAmountAggregation',",
+											"        'sumDiscountAmountAggregation',",
+											"        'unitDiscountAmountFullAggregation',",
+											"        'sumDiscountAmountFullAggregation',",
+											"        'unitPriceToPayAggregation',",
+											"        'taxRateAverageAggregation',",
+											"        'taxAmountAfterCancellation'",
+											"    ];",
+											"",
+											"    var foundInItem = false;",
+											"    for (var index in items) {",
+											"        var foundProperties = false;",
+											"        for (var fieldIndex in requiredProperties) {",
+											"            pm.expect(items[index].hasOwnProperty(requiredProperties[fieldIndex])).to.eql(true);",
+											"            foundProperties = true;",
+											"            foundInItem = true;",
+											"        }",
+											"        pm.expect(foundProperties).to.eql(true);",
+											"    }",
+											"    pm.expect(foundInItem).to.eql(true);",
+											"});",
+											"",
+											"pm.test(\"Has valid billing address returned\", function() {",
+											"    var jsonData = pm.response.json().data;",
+											"    var billingAddress = pm.response.json().data.attributes.billingAddress;",
+											"    var requiredProperties = [",
+											"        'salutation',",
+											"        'firstName',",
+											"        'address1',",
+											"        'address2',",
+											"        'company',",
+											"        'city',",
+											"        'zipCode',",
+											"        'phone',",
+											"        'country',",
+											"        'iso2Code',",
+											"    ];",
+											"",
+											"    var foundProperties = false;",
+											"    for (var fieldIndex in requiredProperties) {",
+											"        pm.expect(billingAddress.hasOwnProperty(requiredProperties[fieldIndex])).to.eql(true);",
+											"        foundProperties = true;",
+											"    }",
+											"    pm.expect(foundProperties).to.eql(true);",
+											"});",
+											"",
+											"pm.test(\"Has valid shipping address returned\", function() {",
+											"    var jsonData = pm.response.json().data;",
+											"    var shippingAddress = pm.response.json().data.attributes.shippingAddress;",
+											"    var requiredProperties = [",
+											"        'salutation',",
+											"        'firstName',",
+											"        'address1',",
+											"        'address2',",
+											"        'company',",
+											"        'city',",
+											"        'zipCode',",
+											"        'phone',",
+											"        'country',",
+											"        'iso2Code',",
+											"    ];",
+											"",
+											"    var foundProperties = false;",
+											"    for (var fieldIndex in requiredProperties) {",
+											"        pm.expect(shippingAddress.hasOwnProperty(requiredProperties[fieldIndex])).to.eql(true);",
+											"        foundProperties = true;",
+											"    }",
+											"    pm.expect(foundProperties).to.eql(true);",
+											"});",
+											"",
+											"",
+											"pm.test(\"Has valid payments returned\", function() {",
+											"    var jsonData = pm.response.json().data;",
+											"    var payments = pm.response.json().data.attributes.payments;",
+											"    var requiredProperties = [",
+											"        'amount',",
+											"        'paymentProvider',",
+											"        'paymentMethod'",
+											"    ];",
+											"",
+											"    var foundInPayments = false;",
+											"    for (var index in payments) {",
+											"        var foundProperties = false;",
+											"        for (var fieldIndex in requiredProperties) {",
+											"            pm.expect(payments[index].hasOwnProperty(requiredProperties[fieldIndex])).to.eql(true);",
+											"            foundProperties = true;",
+											"            foundInPayments = true;",
+											"        }",
+											"        pm.expect(foundProperties).to.eql(true);",
+											"    }",
+											"    pm.expect(foundInPayments).to.eql(true);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{anotherToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{url}}/orders/{{anotherCustomerOrderReference}}",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"orders",
+										"{{anotherCustomerOrderReference}}"
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"_postman_isSubFolder": true
+				},
+				{
+					"name": "Negative. Get list of orders for another customer",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "d75d6d8a-95ef-43be-a810-c5ac542b3143",
+								"exec": [
+									"pm.test(\"Status code is 404\", function () {",
+									"    pm.response.to.have.status(404);",
+									"});",
+									"",
+									"pm.test(\"Has correct error status returned\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.errors[0].status).to.eql(404);",
+									"});",
+									"",
+									"pm.test(\"Has correct error code returned\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.errors[0].code).to.eql(\"801\");",
+									"});",
+									"",
+									"pm.test(\"Has correct error detail returned\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.errors[0].detail).to.eql(\"Can't find order by the given order reference\");",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/orders/{{anotherCustomerOrderReference}}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"orders",
+								"{{anotherCustomerOrderReference}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Negative. Get list of orders without access token",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "d75d6d8a-95ef-43be-a810-c5ac542b3143",
+								"exec": [
+									"pm.test(\"Status code is 403\", function () {",
+									"    pm.response.to.have.status(403);",
+									"});",
+									"",
+									"pm.test(\"Has correct error status returned\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.errors[0].status).to.eql(403);",
+									"});",
+									"",
+									"pm.test(\"Has correct error code returned\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.errors[0].code).to.eql(\"002\");",
+									"});",
+									"",
+									"pm.test(\"Has correct error detail returned\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.errors[0].detail).to.eql(\"Missing access token.\");",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/orders",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"orders"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Negative. Get list of orders with anonimous user",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "d75d6d8a-95ef-43be-a810-c5ac542b3143",
+								"exec": [
+									"pm.test(\"Status code is 403\", function () {",
+									"    pm.response.to.have.status(403);",
+									"});",
+									"",
+									"pm.test(\"Has correct error status returned\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.errors[0].status).to.eql(403);",
+									"});",
+									"",
+									"pm.test(\"Has correct error code returned\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.errors[0].code).to.eql(\"002\");",
+									"});",
+									"",
+									"pm.test(\"Has correct error detail returned\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.errors[0].detail).to.eql(\"Missing access token.\");",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-Anonymous-Customer-Unique-Id",
+								"value": "00",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/orders",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"orders"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "075ad3da-5350-4659-ba14-2c3f0fc10523",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "d6261758-0330-4b1b-afb4-29b048428d51",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "88995cf2-4421-4946-9f12-4b0615aa2142",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "5aff0728-8b93-45e1-aa7b-d6d6c1a9f611",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"id": "f73e07a4-3386-4bb1-b2df-8981e6c43131",
+			"key": "customerEmail",
+			"value": "order.tester@test.com",
+			"type": "string"
+		},
+		{
+			"id": "693eb16a-610d-4dea-a179-497c320c9481",
+			"key": "customerPassword",
+			"value": "change123",
+			"type": "string"
+		},
+		{
+			"id": "7ffb20f5-31f3-4539-8609-f5d46e41f453",
+			"key": "customerReference",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"id": "b949f84e-bea8-43da-bd46-eabb82d7f9fe",
+			"key": "customerAnotherEmail",
+			"value": "order.another.tester@test.com",
+			"type": "string"
+		},
+		{
+			"id": "30ea3daa-bcaf-4189-8f4e-31c4e3f8282c",
+			"key": "customerCartUuid",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"id": "b02b48b8-fa62-4242-821e-1e4049fd4ead",
+			"key": "anotherToken",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"id": "cfde31ce-5e48-4907-96cd-448ddebd39cf",
+			"key": "anotherCustomerCartUuid",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"id": "64418829-f2b2-4a5e-b61e-8a01dbc83bca",
+			"key": "anotherCustomerOrderReference",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"id": "bb202d68-bdae-4c61-9b60-1e93af03447e",
+			"key": "customerOrderReference",
+			"value": "",
+			"type": "string"
+		}
+	]
+}

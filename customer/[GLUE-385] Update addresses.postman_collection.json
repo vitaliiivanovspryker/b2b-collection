@@ -1,0 +1,1541 @@
+{
+	"info": {
+		"_postman_id": "3545e895-c01f-49ff-b9e2-14fc430683d9",
+		"name": "[GLUE-385] Update addresses",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Create a customer",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "4d62da5d-d90d-4547-a6af-581358d8251d",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Status code is 201\", function () {",
+							"    pm.response.to.have.status(201);",
+							"});",
+							"",
+							"try {",
+							"    pm.environment.set(\"customer_reference\", pm.response.json().data.id);",
+							"} catch(e) {",
+							"    console.log(e);",
+							"}"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/vnd.api+json"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "Accept-Language",
+						"value": "de-DE, de;q=0.9, en;q=0.1"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"data\":\n\t{\n\t\t\"type\":\"register-customer\",\n\t\t\t\"attributes\":{\n\t\t\t\t\"salutation\":\"{{salutation}}\",\n\t\t\t\t\"firstName\":\"{{firstName}}\",\n\t\t\t\t\"lastName\":\"{{lastName}}\",\n\t\t\t\t\"email\":\"{{email}}\",\n\t\t\t\t\"password\":\"{{password}}\",\n\t\t\t\t\"passwordConfirmation\":\"{{password}}\",\n\t\t\t\t\"acceptedTerms\":true\n\t\t\t\t\n\t\t\t}\n\t}\n}"
+				},
+				"url": {
+					"raw": "{{url}}/customers",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"customers"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Request access token",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "ce512c0c-8f48-4378-b475-751938bc8179",
+						"type": "text/javascript",
+						"exec": [
+							"var data = JSON.parse(responseBody);",
+							"postman.setEnvironmentVariable(\"token\", data.data.attributes.accessToken);",
+							"postman.setEnvironmentVariable(\"refresh-token\", data.data.attributes.refreshToken);",
+							"",
+							"pm.test(\"Has correct type\", function() {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.data.type).to.eql(\"access-tokens\");",
+							"});",
+							"",
+							"pm.test(\"Has id null\", function() {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.data.id).to.eql(null);",
+							"});",
+							"",
+							"pm.test(\"Has token type Bearer\", function(){",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.data.attributes.tokenType).to.eql(\"Bearer\");",
+							"});",
+							"",
+							"pm.test(\"Has expiration time\", function() {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.data.attributes.expiresIn).to.eql(28800);",
+							"});",
+							"",
+							"pm.test(\"Has access_token returned\", function() {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.data.attributes.accessToken).to.not.be.empty;",
+							"});",
+							"",
+							"pm.test(\"Has refresh_token returned\", function() {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.data.attributes.refreshToken).to.not.be.empty;",
+							"});",
+							"",
+							"pm.test.skip(\"Has self link\", function() {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.data.links.self).to.eql(pm.environment.get(\"url\") + \"/access_tokens\");",
+							"});"
+						]
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/vnd.api+json"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "Accept-Language",
+						"value": "de-DE, en;q=0.9"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"data\":{\"type\":\"access_tokens\",\"attributes\":{\"username\":\"{{email}}\", \"password\": \"change123\"}}}"
+				},
+				"url": {
+					"raw": "{{url}}/access-tokens",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"access-tokens"
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "Request access token",
+					"originalRequest": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/vnd.api+json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/vnd.api+json"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "de-DE, en;q=0.9"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"data\":{\"type\":\"access_tokens\",\"attributes\":{\"username\":\"spencor.hopkin@spryker.com\", \"password\": \"change123\"}}}"
+						},
+						"url": {
+							"raw": "{{url}}/access_tokens",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"access_tokens"
+							]
+						}
+					},
+					"status": "Created",
+					"code": 201,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Cache-Control",
+							"value": "no-cache",
+							"name": "Cache-Control",
+							"description": "Tells all caching mechanisms from server to client whether they may cache this object. It is measured in seconds"
+						},
+						{
+							"key": "Connection",
+							"value": "close",
+							"name": "Connection",
+							"description": "Options that are desired for the connection"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/vnd.api+json",
+							"name": "Content-Type",
+							"description": "The mime type of this content"
+						},
+						{
+							"key": "Date",
+							"value": "Thu, 21 Jun 2018 15:09:53 GMT",
+							"name": "Date",
+							"description": "The date and time that the message was sent"
+						},
+						{
+							"key": "Transfer-Encoding",
+							"value": "chunked",
+							"name": "Transfer-Encoding",
+							"description": "The form of encoding used to safely transfer the entity to the user. Currently defined methods are: chunked, compress, deflate, gzip, identity."
+						},
+						{
+							"key": "X-Server",
+							"value": "spryker-vagrant",
+							"name": "X-Server",
+							"description": "Custom header"
+						},
+						{
+							"key": "content-language",
+							"value": "en_US",
+							"name": "content-language",
+							"description": "The language the content is in"
+						}
+					],
+					"cookie": [],
+					"body": "{\"data\":{\"type\":\"access_tokens\",\"id\":null,\"attributes\":{\"token_type\":\"Bearer\",\"expires_in\":28799,\"access_token\":\"eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsImp0aSI6IjI3NjYxZTJlMTk1Njc2ZDgzNTI3MDYwZDY5ODY2MGU3MjA1ODIzMTJkZTUwMjZmMTNjZDFkY2YxNjk1NmE0MTBiZGVmNzc5MDJjNGE1ZmRjIn0.eyJhdWQiOiJmcm9udGVuZCIsImp0aSI6IjI3NjYxZTJlMTk1Njc2ZDgzNTI3MDYwZDY5ODY2MGU3MjA1ODIzMTJkZTUwMjZmMTNjZDFkY2YxNjk1NmE0MTBiZGVmNzc5MDJjNGE1ZmRjIiwiaWF0IjoxNTI5NTkzNzkyLCJuYmYiOjE1Mjk1OTM3OTIsImV4cCI6MTUyOTYyMjU5Miwic3ViIjoie1wiY3VzdG9tZXJfcmVmZXJlbmNlXCI6XCJERS0tMVwiLFwiaWRfY3VzdG9tZXJcIjoxfSIsInNjb3BlcyI6WyJjdXN0b21lciJdfQ.U1Ij4aDJ7H34E8XFCXfQORCnytk7wUuGRAGkBGhhWQsHDQucgSJs8V5q820E9Z3V8lEGXoY2vpZJZ-wP41HVFMsXJo10LG6NenekOeRNVpSpBVAcys5cSCBT25sv32OqFnn-g18CkemAgKAx9qCqzIRj6hmrkGjXDWhHpphJYBX40s38hR7IDHK2DSODifm-lyivd7wIohASbi4nVTgL57TsNsiSJJaWje4mc8Vs-rcNiuwl4t6pVvHRDMlDskq_S1tNp8GXrj_ESNtesuFf_F_iiUt20tJFgdqYddeMZNIECRX1S1WQjefRVZBgvvqDUAeemVb75CAF1TCILW8S-Q\",\"refresh_token\":\"def5020076edcef1e548965759216bcb4957c4e3623e567bbcb66de2e2fdc4e00fbe539bd5d77837c48d05dfa223aeea9701eb43b808b1b71d5820222500fc4bfc045686a636cf5479c6d437f0c210e73de919b044e56471d44402496ff5253d23b9d0d821bf4925e27eb2817eba1538abb5f861a03dd0290897d97b8902e58fcd995c217309ac661d2db449417eb26fb24fd9832312a26cf065ac5122ba747044ac6eb4898fe2ef8b0ba57642c3989a5ac1dd72785098b3da12ed0d35b3f481a09a9d235386de514526e1267c8fe7178e9e229154f6c0dc9c547927ca61a6f725ca23c33930453fcae7e448dd8407d77dec07a41e8c360a3fafe5e1b50b535814e18ac513528113b2726b6414977096b1a7477d43d0bb319906c8086984f8ae182190b30103e8b4ebacc37438d7fada1c06102f870c85660c52a47d879e57e9643369206ac614a6051fd4eb1a3f4a032b74b59af84b88e1a2620b0f86b8ac59366100a9ef03b7606100f884d25d7fc56ac13c5538ccf985701b64ded1e2ec462a0800861747d2706b3184d1b3a4082b7f1e717d17092c4b70b75e5c14fb69d27dc4bdd0c0a905\"},\"links\":{\"self\":\"http:\\/\\/glue.de.shop-suite.local\\/access_tokens\\/\"}}}"
+				}
+			]
+		},
+		{
+			"name": "Create first address with default values",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "17d15c04-4be7-4703-8c0b-11b29796c276",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Status is ok, response is json\", function () {",
+							"    pm.response.to.be.json; ",
+							"});",
+							"",
+							"try {",
+							"    pm.environment.set(\"addressId_1\", pm.response.json().data.id);",
+							"} catch(e) {",
+							"    console.log(e);",
+							"}",
+							""
+						]
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"data\" : {\n     \"type\": \"addresses\",\n     \"attributes\": {\n            \"customer_reference\": \"{{customer_reference}}\",\n            \"salutation\": \"Mr\",\n            \"firstName\": \"John\",\n            \"lastName\": \"Doe\",\n            \"address1\": \"Third, 33, 11\",\n            \"address2\": \"b\",\n            \"address3\": \"aaa\",\n            \"zipCode\": \"12312\",\n            \"city\": \"Berlin\",\n            \"country\": \"Germany\",\n            \"iso2Code\": \"DE\",\n            \"phone\": \"22111-3-4-5\",\n            \"isDefaultShipping\": false,\n            \"isDefaultBilling\": false\n    \t}   \n    }\n}"
+				},
+				"url": {
+					"raw": "{{url}}/customers/{{customer_reference}}/addresses",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"customers",
+						"{{customer_reference}}",
+						"addresses"
+					]
+				},
+				"description": "This test is to verify that first address is created successfully first address is set as shipping and billing address by default"
+			},
+			"response": []
+		},
+		{
+			"name": "Create second address with default values",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "f2ea7ae1-7d76-4469-9d8f-934726cc2847",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Status is ok, response is json\", function () {",
+							"    pm.response.to.be.json; ",
+							"});",
+							"",
+							"try {",
+							"    pm.environment.set(\"addressId_2\", pm.response.json().data.id);",
+							"} catch(e) {",
+							"    console.log(e);",
+							"}",
+							""
+						]
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"data\" : {\n     \"type\": \"addresses\",\n     \"attributes\": {\n            \"customer_reference\": \"{{customer_reference}}\",\n            \"salutation\": \"Mr\",\n            \"firstName\": \"John\",\n            \"lastName\": \"Doe\",\n            \"address1\": \"Third, 33, 11\",\n            \"address2\": \"b\",\n            \"address3\": \"aaa\",\n            \"zipCode\": \"12312\",\n            \"city\": \"Berlin\",\n            \"country\": \"Germany\",\n            \"iso2Code\": \"DE\",\n            \"phone\": \"22111-3-4-5\",\n            \"isDefaultShipping\": false,\n            \"isDefaultBilling\": false\n    \t}   \n    }\n}"
+				},
+				"url": {
+					"raw": "{{url}}/customers/{{customer_reference}}/addresses",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"customers",
+						"{{customer_reference}}",
+						"addresses"
+					]
+				},
+				"description": "This test is to verify that first address is created successfully first address is set as shipping and billing address by default"
+			},
+			"response": []
+		},
+		{
+			"name": "Update customer  address with \"isDefaultShipping\": false,",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "ef3f20b9-d9db-44c6-a672-b06c7dd66583",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Has correct type returned\", function() {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.data.type).to.eql(\"addresses\");",
+							"    pm.expect(jsonData.data.type).to.be.a(\"string\");",
+							"});",
+							"",
+							"pm.test(\"Has id returned\", function() {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.data.id).to.be.a(\"string\");",
+							"    pm.expect(jsonData.data.id).to.eql(pm.environment.get(\"addressId_1\"));",
+							"});",
+							"",
+							"pm.test(\"Has correct attributes\", function() {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.data.attributes.salutation).to.be.eql(\"Mr\");",
+							"    pm.expect(jsonData.data.attributes.firstName).to.be.eql(\"John\");",
+							"    pm.expect(jsonData.data.attributes.lastName).to.be.eql(\"Doe\");",
+							"    pm.expect(jsonData.data.attributes.address1).to.be.eql(\"Third, 33, 11\");",
+							"    pm.expect(jsonData.data.attributes.address2).to.be.eql(\"b\");",
+							"    pm.expect(jsonData.data.attributes.address3).to.be.eql(\"aaa\");",
+							"    pm.expect(jsonData.data.attributes.zipCode).to.be.eql(\"12312\");",
+							"    pm.expect(jsonData.data.attributes.city).to.be.eql(\"Berlin\");",
+							"    pm.expect(jsonData.data.attributes.country).to.be.eql(\"Germany\");",
+							"    pm.expect(jsonData.data.attributes.iso2Code).to.be.eql(\"DE\");",
+							"    pm.expect(jsonData.data.attributes.company).to.be.eql(null);",
+							"    pm.expect(jsonData.data.attributes.phone).to.be.eql(\"22111-3-4-5\");",
+							"    pm.expect(jsonData.data.attributes.isDefaultShipping).to.be.eql(false);",
+							"    pm.expect(jsonData.data.attributes.isDefaultBilling).to.be.eql(true);",
+							"});",
+							"",
+							"",
+							"pm.test(\"Has self link\", function() {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.data.links.self).to.eql(pm.environment.get(\"url\") + \"/customers/\" +pm.environment.get(\"customer_reference\")+\"/addresses/\"+ pm.environment.get(\"addressId_1\"));",
+							"});"
+						]
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"data\": {\n        \"type\": \"addresses\",\n        \"id\": \"{{addressId_1}}\",\n        \"attributes\": {\n            \"isDefaultShipping\": false\n        }\n    }\n}"
+				},
+				"url": {
+					"raw": "{{url}}/customers/{{customer_reference}}/addresses/{{addressId_1}}",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"customers",
+						"{{customer_reference}}",
+						"addresses",
+						"{{addressId_1}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update customer  address with \"isDefaultBilling\": false",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "06a112d5-50fb-4f41-98b9-e638cd8d05d6",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Status is ok, response is json\", function () {",
+							"    pm.response.to.be.ok; ",
+							"    pm.response.to.be.json; ",
+							"});",
+							"",
+							"pm.test(\"Status code is 201\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Has correct type returned\", function() {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.data.type).to.eql(\"addresses\");",
+							"    pm.expect(jsonData.data.type).to.be.a(\"string\");",
+							"});",
+							"",
+							"pm.test(\"Has id returned\", function() {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.data.id).to.be.a(\"string\");",
+							"    pm.expect(jsonData.data.id).to.eql(pm.environment.get(\"addressId_1\"));",
+							"});",
+							"",
+							"pm.test(\"Has correct attributes\", function() {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.data.attributes.salutation).to.be.eql(\"Mr\");",
+							"    pm.expect(jsonData.data.attributes.firstName).to.be.eql(\"John\");",
+							"    pm.expect(jsonData.data.attributes.lastName).to.be.eql(\"Doe\");",
+							"    pm.expect(jsonData.data.attributes.address1).to.be.eql(\"Third, 33, 11\");",
+							"    pm.expect(jsonData.data.attributes.address2).to.be.eql(\"b\");",
+							"    pm.expect(jsonData.data.attributes.address3).to.be.eql(\"aaa\");",
+							"    pm.expect(jsonData.data.attributes.zipCode).to.be.eql(\"12312\");",
+							"    pm.expect(jsonData.data.attributes.city).to.be.eql(\"Berlin\");",
+							"    pm.expect(jsonData.data.attributes.country).to.be.eql(\"Germany\");",
+							"    pm.expect(jsonData.data.attributes.iso2Code).to.be.eql(\"DE\");",
+							"    pm.expect(jsonData.data.attributes.company).to.be.eql(null);",
+							"    pm.expect(jsonData.data.attributes.phone).to.be.eql(\"22111-3-4-5\");",
+							"    pm.expect(jsonData.data.attributes.isDefaultShipping).to.be.eql(false);",
+							"    pm.expect(jsonData.data.attributes.isDefaultBilling).to.be.eql(false);",
+							"});",
+							"",
+							"",
+							"pm.test(\"Has self link\", function() {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.data.links.self).to.eql(pm.environment.get(\"url\") + \"/customers/\" +pm.environment.get(\"customer_reference\")+\"/addresses/\"+ pm.environment.get(\"addressId_1\"));",
+							"});"
+						]
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"data\": {\n        \"type\": \"addresses\",\n       \"id\": \"{{addressId_1}}\",\n        \"attributes\": {\n            \"isDefaultBilling\": false\n        }\n    }\n}"
+				},
+				"url": {
+					"raw": "{{url}}/customers/{{customer_reference}}/addresses/{{addressId_1}}",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"customers",
+						"{{customer_reference}}",
+						"addresses",
+						"{{addressId_1}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update customer  address with wrong url",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "4c182119-ecd4-4867-9a53-e4b6b0419b2a",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Status code is 404\", function () {",
+							"    pm.response.to.have.status(404);",
+							"});",
+							"",
+							"pm.test(\"Has correct error message returned\", function() {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.errors[0].detail).to.eql(\"Not Found\");",
+							"});",
+							""
+						]
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"data\": {\n        \"type\": \"addresses\",\n       \"id\": \"{{addressId_1}}\",\n        \"attributes\": {\n            \"salutation\": \"Mr\",\n            \"firstName\": \"John\",\n            \"lastName\": \"Doe\",\n            \"address1\": \"Third, 33, 11\",\n            \"address2\": \"b\",\n            \"address3\": \"aaa\",\n            \"zipCode\": \"12312\",\n            \"city\": \"Berlin\",\n            \"country\": \"Germany\",\n            \"iso2Code\": \"DE\",\n            \"company\": null,\n            \"phone\": \"22111-3-4-5\",\n            \"isDefaultShipping\": false,\n            \"isDefaultBilling\": false\n        }\n    }\n}"
+				},
+				"url": {
+					"raw": "{{url}}/customers/{{customer_reference}}/addressses/{{addressId_1}}",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"customers",
+						"{{customer_reference}}",
+						"addressses",
+						"{{addressId_1}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update not existed customer address",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "765fb6fc-880e-4940-b05f-e22b7f4ca987",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Status code is 404\", function () {",
+							"    pm.response.to.have.status(404);",
+							"});",
+							"",
+							"pm.test(\"Has correct error message returned\", function() {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.errors[0].detail).to.eql(\"Address was not found.\");",
+							"});",
+							""
+						]
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"data\": {\n        \"type\": \"addresses\",\n        \"id\": \"{{addressId_1}}\",\n        \"attributes\": {\n            \"salutation\": \"Mr\",\n            \"firstName\": \"John\",\n            \"lastName\": \"Doe\",\n            \"address1\": \"Third, 33, 11\",\n            \"address2\": \"b\",\n            \"address3\": \"aaa\",\n            \"zipCode\": \"12312\",\n            \"city\": \"Berlin\",\n            \"country\": \"Germany\",\n            \"iso2Code\": \"DE\",\n            \"company\": \"123\",\n            \"phone\": \"22111-3-4-5\",\n            \"isDefaultShipping\": false,\n            \"isDefaultBilling\": false\n        }\n    }\n}"
+				},
+				"url": {
+					"raw": "{{url}}/customers/{{customer_reference}}/addresses/666d66b6-66fb-6d6-b666-b6e66ae6c666",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"customers",
+						"{{customer_reference}}",
+						"addresses",
+						"666d66b6-66fb-6d6-b666-b6e66ae6c666"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update customer address of another user",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "6b310676-4150-4627-89be-c227592b7f9f",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Status code is 403\", function () {",
+							"    pm.response.to.have.status(403);",
+							"});",
+							"",
+							"pm.test(\"Has correct error message returned\", function() {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.errors[0].detail).to.eql(\"Unauthorized request.\");",
+							"});",
+							""
+						]
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"data\": {\n        \"type\": \"addresses\",\n       \"id\": \"{{addressId_1}}\",\n        \"attributes\": {\n            \"salutation\": \"Mr\",\n            \"firstName\": \"John\",\n            \"lastName\": \"Doe\",\n            \"address1\": \"Third, 33, 11\",\n            \"address2\": \"b\",\n            \"address3\": \"aaa\",\n            \"zipCode\": \"12312\",\n            \"city\": \"Berlin\",\n            \"country\": \"Germany\",\n            \"iso2Code\": \"DE\",\n            \"company\": null,\n            \"phone\": \"22111-3-4-5\",\n            \"isDefaultShipping\": false,\n            \"isDefaultBilling\": false\n        }\n    }\n}"
+				},
+				"url": {
+					"raw": "{{url}}/customers/DE--1/addresses/{{addressId_1}}",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"customers",
+						"DE--1",
+						"addresses",
+						"{{addressId_1}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update customer address of not existed customer",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "3c346930-5cf9-44ea-bfef-7cb2674f6f26",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Status code is 404\", function () {",
+							"    pm.response.to.have.status(404);",
+							"});",
+							"",
+							"pm.test(\"Has correct error message returned\", function() {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.errors[0].detail).to.eql(\"Customer not found.\");",
+							"});",
+							""
+						]
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"data\": {\n        \"type\": \"addresses\",\n       \"id\": \"{{addressId_1}}\",\n        \"attributes\": {\n            \"salutation\": \"Mr\",\n            \"firstName\": \"John\",\n            \"lastName\": \"Doe\",\n            \"address1\": \"Third, 33, 11\",\n            \"address2\": \"b\",\n            \"address3\": \"aaa\",\n            \"zipCode\": \"12312\",\n            \"city\": \"Berlin\",\n            \"country\": \"Germany\",\n            \"iso2Code\": \"DE\",\n            \"company\": null,\n            \"phone\": \"22111-3-4-5\",\n            \"isDefaultShipping\": false,\n            \"isDefaultBilling\": false\n        }\n    }\n}"
+				},
+				"url": {
+					"raw": "{{url}}/customers/DE--111111/addresses/{{addressId_1}}",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"customers",
+						"DE--111111",
+						"addresses",
+						"{{addressId_1}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update customer address",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "8a0c8cac-dbbe-4a2f-8122-424d3774e94b",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Status code is 404\", function () {",
+							"    pm.response.to.have.status(404);",
+							"});",
+							"",
+							"pm.test(\"Has correct error message returned\", function() {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.errors[0].detail).to.eql(\"Not Found\");",
+							"});",
+							""
+						]
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"data\": {\n        \"type\": \"addresses\",\n       \"id\": \"{{addressId_1}}\",\n        \"attributes\": {\n            \"salutation\": \"Mr\",\n            \"firstName\": \"John\",\n            \"lastName\": \"Doe\",\n            \"address1\": \"Third, 33, 22\",\n            \"address2\": \"b\",\n            \"address3\": \"aaa\",\n            \"zipCode\": \"12312\",\n            \"city\": \"Berlin\",\n            \"country\": \"Germany\",\n            \"iso2Code\": \"DE\",\n            \"company\": null,\n            \"phone\": \"22111-3-4-5\",\n            \"isDefaultShipping\": false,\n            \"isDefaultBilling\": false\n        }\n    }\n}"
+				},
+				"url": {
+					"raw": "{{url}}/customers/{{customer_reference}}/addresses/{{addressId_1}}",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"customers",
+						"{{customer_reference}}",
+						"addresses",
+						"{{addressId_1}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update customer address with Salutation = Null",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "45826356-14af-443a-8779-82ff1a3d387a",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Status code is 400\", function () {",
+							"    pm.response.to.have.status(400);",
+							"});",
+							"",
+							"pm.test(\"Has correct error message returned\", function() {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.errors[0].detail).to.eql(\"Salutation cannot be null.\");",
+							"});",
+							""
+						]
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"data\": {\n        \"type\": \"addresses\",\n       \"id\": \"{{addressId_1}}\",\n        \"attributes\": {\n            \"salutation\": null,\n            \"firstName\": \"John\",\n            \"lastName\": \"Doe\",\n            \"address1\": \"Third, 33, 11\",\n            \"address2\": \"b\",\n            \"address3\": \"aaa\",\n            \"zipCode\": \"12312\",\n            \"city\": \"Berlin\",\n            \"country\": \"Germany\",\n            \"iso2Code\": \"DE\",\n            \"company\": null,\n            \"phone\": \"22111-3-4-5\",\n            \"isDefaultShipping\": false,\n            \"isDefaultBilling\": false\n        }\n    }\n}"
+				},
+				"url": {
+					"raw": "{{url}}/customers/{{customer_reference}}/addresses/{{addressId_1}}",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"customers",
+						"{{customer_reference}}",
+						"addresses",
+						"{{addressId_1}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update customer address with firstName = Null",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "22b57776-7a58-4988-b3ec-6ee04bb2ce8a",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Status code is 400\", function () {",
+							"    pm.response.to.have.status(400);",
+							"});",
+							"",
+							"pm.test(\"Has correct error message returned\", function() {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.errors[0].detail).to.eql(\"\");",
+							"});",
+							""
+						]
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"data\": {\n        \"type\": \"addresses\",\n       \"id\": \"{{addressId_1}}\",\n        \"attributes\": {\n            \"salutation\": \"Mr\",\n            \"firstName\": null,\n            \"lastName\": \"Doe\",\n            \"address1\": \"Third, 33, 11\",\n            \"address2\": \"b\",\n            \"address3\": \"aaa\",\n            \"zipCode\": \"12312\",\n            \"city\": \"Berlin\",\n            \"country\": \"Germany\",\n            \"iso2Code\": \"DE\",\n            \"company\": null,\n            \"phone\": \"22111-3-4-5\",\n            \"isDefaultShipping\": false,\n            \"isDefaultBilling\": false\n        }\n    }\n}"
+				},
+				"url": {
+					"raw": "{{url}}/customers/{{customer_reference}}/addresses/{{addressId_1}}",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"customers",
+						"{{customer_reference}}",
+						"addresses",
+						"{{addressId_1}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update customer address with lastName = Null",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "15ef1390-3c92-4870-9ac0-e1dab0defcf3",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Status code is 400\", function () {",
+							"    pm.response.to.have.status(400);",
+							"});",
+							"",
+							"pm.test(\"Has correct error message returned\", function() {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.errors[0].detail).to.eql(\"\");",
+							"});",
+							""
+						]
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"data\": {\n        \"type\": \"addresses\",\n       \"id\": \"{{addressId_1}}\",\n        \"attributes\": {\n            \"salutation\": \"Mr\",\n            \"firstName\": \"John\",\n            \"lastName\": null,\n            \"address1\": \"Third, 33, 11\",\n            \"address2\": \"b\",\n            \"address3\": \"aaa\",\n            \"zipCode\": \"12312\",\n            \"city\": \"Berlin\",\n            \"country\": \"Germany\",\n            \"iso2Code\": \"DE\",\n            \"company\": null,\n            \"phone\": \"22111-3-4-5\",\n            \"isDefaultShipping\": false,\n            \"isDefaultBilling\": false\n        }\n    }\n}"
+				},
+				"url": {
+					"raw": "{{url}}/customers/{{customer_reference}}/addresses/{{addressId_1}}",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"customers",
+						"{{customer_reference}}",
+						"addresses",
+						"{{addressId_1}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update customer address with address1 = Null",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "10649bec-8779-43f2-a896-906ef1d5069a",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Status code is 400\", function () {",
+							"    pm.response.to.have.status(400);",
+							"});",
+							"",
+							"pm.test(\"Has correct error message returned\", function() {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.errors[0].detail).to.eql(\"\");",
+							"});",
+							""
+						]
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"data\": {\n        \"type\": \"addresses\",\n       \"id\": \"{{addressId_1}}\",\n        \"attributes\": {\n            \"salutation\": \"Mr\",\n            \"firstName\": \"John\",\n            \"lastName\": \"Doe\",\n            \"address1\": null,\n            \"address2\": \"b\",\n            \"address3\": \"aaa\",\n            \"zipCode\": \"12312\",\n            \"city\": \"Berlin\",\n            \"country\": \"Germany\",\n            \"iso2Code\": \"DE\",\n            \"company\": null,\n            \"phone\": \"22111-3-4-5\",\n            \"isDefaultShipping\": false,\n            \"isDefaultBilling\": false\n        }\n    }\n}"
+				},
+				"url": {
+					"raw": "{{url}}/customers/{{customer_reference}}/addresses/{{addressId_1}}",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"customers",
+						"{{customer_reference}}",
+						"addresses",
+						"{{addressId_1}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update customer address with address2 = Null",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "0a77c8fb-b3ba-4e58-a142-f7c682cfa8c2",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Status code is 400\", function () {",
+							"    pm.response.to.have.status(400);",
+							"});",
+							"",
+							"pm.test(\"Has correct error message returned\", function() {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.errors[0].detail).to.eql(\"\");",
+							"});",
+							""
+						]
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"data\": {\n        \"type\": \"addresses\",\n       \"id\": \"{{addressId_1}}\",\n        \"attributes\": {\n            \"salutation\": \"Mr\",\n            \"firstName\": \"John\",\n            \"lastName\": \"Doe\",\n            \"address1\": \"Third, 33, 11\",\n            \"address2\": null,\n            \"address3\": \"aaa\",\n            \"zipCode\": \"12312\",\n            \"city\": \"Berlin\",\n            \"country\": \"Germany\",\n            \"iso2Code\": \"DE\",\n            \"company\": null,\n            \"phone\": \"22111-3-4-5\",\n            \"isDefaultShipping\": false,\n            \"isDefaultBilling\": false\n        }\n    }\n}"
+				},
+				"url": {
+					"raw": "{{url}}/customers/{{customer_reference}}/addresses/{{addressId_1}}",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"customers",
+						"{{customer_reference}}",
+						"addresses",
+						"{{addressId_1}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update customer address with address3 = Null",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "c6fc3faf-9b74-4d09-8882-05e867d39738",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Status code is 400\", function () {",
+							"    pm.response.to.have.status(400);",
+							"});",
+							"",
+							"pm.test(\"Has correct error message returned\", function() {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.errors[0].detail).to.eql(\"\");",
+							"});",
+							""
+						]
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"data\": {\n        \"type\": \"addresses\",\n       \"id\": \"{{addressId_1}}\",\n        \"attributes\": {\n            \"salutation\": \"Mr\",\n            \"firstName\": \"John\",\n            \"lastName\": \"Doe\",\n            \"address1\": \"Third, 33, 11\",\n            \"address2\": \"b\",\n            \"address3\": null,\n            \"zipCode\": \"12312\",\n            \"city\": \"Berlin\",\n            \"country\": \"Germany\",\n            \"iso2Code\": \"DE\",\n            \"company\": null,\n            \"phone\": \"22111-3-4-5\",\n            \"isDefaultShipping\": false,\n            \"isDefaultBilling\": false\n        }\n    }\n}"
+				},
+				"url": {
+					"raw": "{{url}}/customers/{{customer_reference}}/addresses/{{addressId_1}}",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"customers",
+						"{{customer_reference}}",
+						"addresses",
+						"{{addressId_1}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update customer address with zipCode = Null",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "2c92ba06-7740-44e5-a8e4-7a8ccb1416de",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Status code is 400\", function () {",
+							"    pm.response.to.have.status(400);",
+							"});",
+							"",
+							"pm.test(\"Has correct error message returned\", function() {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.errors[0].detail).to.eql(\"\");",
+							"});",
+							""
+						]
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"data\": {\n        \"type\": \"addresses\",\n       \"id\": \"{{addressId_1}}\",\n        \"attributes\": {\n            \"salutation\": \"Mr\",\n            \"firstName\": \"John\",\n            \"lastName\": \"Doe\",\n            \"address1\": \"Third, 33, 11\",\n            \"address2\": \"b\",\n            \"address3\": \"aaa\",\n            \"zipCode\": null,\n            \"city\": \"Berlin\",\n            \"country\": \"Germany\",\n            \"iso2Code\": \"DE\",\n            \"company\": null,\n            \"phone\": \"22111-3-4-5\",\n            \"isDefaultShipping\": false,\n            \"isDefaultBilling\": false\n        }\n    }\n}"
+				},
+				"url": {
+					"raw": "{{url}}/customers/{{customer_reference}}/addresses/{{addressId_1}}",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"customers",
+						"{{customer_reference}}",
+						"addresses",
+						"{{addressId_1}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update customer address with city = Null",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "39df3809-6086-4644-a661-ac20b1590475",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Status code is 400\", function () {",
+							"    pm.response.to.have.status(400);",
+							"});",
+							"",
+							"pm.test(\"Has correct error message returned\", function() {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.errors[0].detail).to.eql(\"\");",
+							"});",
+							""
+						]
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"data\": {\n        \"type\": \"addresses\",\n       \"id\": \"{{addressId_1}}\",\n        \"attributes\": {\n            \"salutation\": \"Mr\",\n            \"firstName\": \"John\",\n            \"lastName\": \"Doe\",\n            \"address1\": \"Third, 33, 11\",\n            \"address2\": \"b\",\n            \"address3\": \"aaa\",\n            \"zipCode\": \"12312\",\n            \"city\": null,\n            \"country\": \"Germany\",\n            \"iso2Code\": \"DE\",\n            \"company\": null,\n            \"phone\": \"22111-3-4-5\",\n            \"isDefaultShipping\": false,\n            \"isDefaultBilling\": false\n        }\n    }\n}"
+				},
+				"url": {
+					"raw": "{{url}}/customers/{{customer_reference}}/addresses/{{addressId_1}}",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"customers",
+						"{{customer_reference}}",
+						"addresses",
+						"{{addressId_1}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update customer address with country = Null",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "496c56ca-86d6-4b0c-b1a1-5c64af1c0b00",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Status code is 400\", function () {",
+							"    pm.response.to.have.status(400);",
+							"});",
+							"",
+							"pm.test(\"Has correct error message returned\", function() {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.errors[0].detail).to.eql(\"\");",
+							"});",
+							""
+						]
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"data\": {\n        \"type\": \"addresses\",\n        \"id\": \"{{addressId_1}}\",\n        \"attributes\": {\n            \"salutation\": \"Mr\",\n            \"firstName\": \"John\",\n            \"lastName\": \"Doe\",\n            \"address1\": \"Third, 33, 11\",\n            \"address2\": \"b\",\n            \"address3\": \"aaa\",\n            \"zipCode\": \"12312\",\n            \"city\": \"Berlin\",\n            \"country\": null,\n            \"iso2Code\": \"DE\",\n            \"company\": null,\n            \"phone\": \"22111-3-4-5\",\n            \"isDefaultShipping\": false,\n            \"isDefaultBilling\": false\n        }\n    }\n}"
+				},
+				"url": {
+					"raw": "{{url}}/customers/{{customer_reference}}/addresses/{{addressId_1}}",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"customers",
+						"{{customer_reference}}",
+						"addresses",
+						"{{addressId_1}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update customer address with iso2Code = Null",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "07acd536-68d2-4f87-98e6-9806cf186106",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Status code is 400\", function () {",
+							"    pm.response.to.have.status(400);",
+							"});",
+							"",
+							"pm.test(\"Has correct error message returned\", function() {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.errors[0].detail).to.eql(\"\");",
+							"});",
+							""
+						]
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"data\": {\n        \"type\": \"addresses\",\n        \"id\": \"{{addressId_1}}\",\n        \"attributes\": {\n            \"salutation\": \"Mr\",\n            \"firstName\": \"John\",\n            \"lastName\": \"Doe\",\n            \"address1\": \"Third, 33, 11\",\n            \"address2\": \"b\",\n            \"address3\": \"aaa\",\n            \"zipCode\": \"12312\",\n            \"city\": \"Berlin\",\n            \"country\": \"Germany\",\n            \"iso2Code\": null,\n            \"company\": null,\n            \"phone\": \"22111-3-4-5\",\n            \"isDefaultShipping\": false,\n            \"isDefaultBilling\": false\n        }\n    }\n}"
+				},
+				"url": {
+					"raw": "{{url}}/customers/{{customer_reference}}/addresses/{{addressId_1}}",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"customers",
+						"{{customer_reference}}",
+						"addresses",
+						"{{addressId_1}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update customer address with phone = Null",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "89a2b026-fcda-4867-b0bf-fdfc49dcb37f",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Status code is 400\", function () {",
+							"    pm.response.to.have.status(400);",
+							"});",
+							"",
+							"pm.test(\"Has correct error message returned\", function() {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.errors[0].detail).to.eql(\"\");",
+							"});",
+							""
+						]
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"data\": {\n        \"type\": \"addresses\",\n        \"id\": \"{{addressId_1}}\",\n        \"attributes\": {\n            \"salutation\": \"Mr\",\n            \"firstName\": \"John\",\n            \"lastName\": \"Doe\",\n            \"address1\": \"Third, 33, 11\",\n            \"address2\": \"b\",\n            \"address3\": \"aaa\",\n            \"zipCode\": \"12312\",\n            \"city\": \"Berlin\",\n            \"country\": \"Germany\",\n            \"iso2Code\": \"DE\",\n            \"company\": null,\n            \"phone\": null,\n            \"isDefaultShipping\": false,\n            \"isDefaultBilling\": false\n        }\n    }\n}"
+				},
+				"url": {
+					"raw": "{{url}}/customers/{{customer_reference}}/addresses/{{addressId_1}}",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"customers",
+						"{{customer_reference}}",
+						"addresses",
+						"{{addressId_1}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete customer Copy",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "68749e00-c774-4b55-9b9a-ce0462740b61",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Status code is 204\", function () {",
+							"    pm.response.to.have.status(204);",
+							"});"
+						]
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "b4e77322-2686-4984-806b-d32b21ab994c",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{url}}/customers/{{customer_reference}}",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"customers",
+						"{{customer_reference}}"
+					]
+				},
+				"description": "This test is to verify that request returns valid message and status code if customer does not have any addresses"
+			},
+			"response": []
+		}
+	]
+}

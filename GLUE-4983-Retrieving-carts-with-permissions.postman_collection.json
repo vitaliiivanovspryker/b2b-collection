@@ -1,0 +1,1775 @@
+{
+	"info": {
+		"_postman_id": "0625bc39-e96d-438e-a7fa-6113f28f3822",
+		"name": "GLUE-4983-Retrieving-carts-with-permissions",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Full access",
+			"item": [
+				{
+					"name": "Request access token (helper)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "871764df-f1ad-4e0a-b326-d129ce255d6d",
+								"exec": [
+									"var responseData = pm.response.json().data;",
+									"",
+									"pm.environment.set(\"token\", responseData.attributes.accessToken);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"data\": {\n        \"type\": \"access-tokens\",\n        \"attributes\": {\n            \"username\": \"Solomon@spryker.com\",\n            \"password\": \"change123\"\n        }\n    }\n}"
+						},
+						"url": {
+							"raw": "{{url}}/access-tokens",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"access-tokens"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Retrieve list of carts",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "2ffeee23-53da-43c0-be23-ebb8b890c9e2",
+								"exec": [
+									"var responseData = pm.response.json().data;",
+									"",
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Has correct type\", function() {",
+									"    pm.expect(responseData[0].type).to.eql(\"carts\");",
+									"});",
+									"",
+									"pm.test(\"Has id returned\", function() {",
+									"    pm.expect(responseData[0].id).to.not.eql(null);",
+									"    pm.expect(responseData[0].id).to.be.a(\"string\");",
+									"});",
+									"",
+									"pm.test(\"Has priceMode returned\", function() {",
+									"    pm.expect(responseData[0].attributes.priceMode).not.eql(null);",
+									"    pm.expect(responseData[0].attributes.priceMode).to.be.a(\"string\");",
+									"});",
+									"",
+									"pm.test(\"Has currency returned\", function() {",
+									"    pm.expect(responseData[0].attributes.currency).not.eql(null);",
+									"    pm.expect(responseData[0].attributes.currency).to.be.a(\"string\");",
+									"});",
+									"",
+									"pm.test(\"Has store returned\", function() {",
+									"    pm.expect(responseData[0].attributes.store).not.eql(null);",
+									"    pm.expect(responseData[0].attributes.store).to.be.a(\"string\");",
+									"});",
+									"",
+									"pm.test(\"Has discounts returned\", function() {",
+									"    pm.expect(responseData[0].attributes.discounts.length).not.eql(null);",
+									"});",
+									"",
+									"pm.test(\"Has totals returned\", function() {",
+									"    pm.expect(responseData[0].attributes.totals.length).not.eql(null);",
+									"    ",
+									"    pm.expect(responseData[0].attributes.totals.expenseTotal).to.eql(null);",
+									"    pm.expect(responseData[0].attributes.totals.discountTotal).to.eql(null);",
+									"    pm.expect(responseData[0].attributes.totals.taxTotal).to.eql(null);",
+									"    pm.expect(responseData[0].attributes.totals.subtotal).to.eql(null);",
+									"    pm.expect(responseData[0].attributes.totals.grandTotal).to.eql(null);",
+									"});",
+									"",
+									"pm.test(\"Has name returned\", function() {",
+									"    pm.expect(responseData[0].attributes.name).to.be.a(\"string\");",
+									"});",
+									"",
+									"pm.test(\"Has isDefault returned\", function() {",
+									"    pm.expect(responseData[0].attributes.isDefault).to.be.a(\"boolean\");",
+									"});",
+									"",
+									"pm.test(\"Has self link\", function() {",
+									"    pm.expect(responseData[0].links.self).to.not.be.empty;",
+									"    pm.expect(responseData[0].links.self).to.eql(pm.variables.get(\"url\") + \"/carts/dc16f734-968d-5a45-92b7-aae5f804f77c\");",
+									"});",
+									"",
+									"pm.test(\"Has correct type\", function() {",
+									"    pm.expect(responseData[1].type).to.eql(\"carts\");",
+									"});",
+									"",
+									"pm.test(\"Has id returned\", function() {",
+									"    pm.expect(responseData[1].id).to.not.eql(null);",
+									"    pm.expect(responseData[1].id).to.be.a(\"string\");",
+									"});",
+									"",
+									"pm.test(\"Has priceMode returned\", function() {",
+									"    pm.expect(responseData[1].attributes.priceMode).not.eql(null);",
+									"    pm.expect(responseData[1].attributes.priceMode).to.be.a(\"string\");",
+									"});",
+									"",
+									"pm.test(\"Has currency returned\", function() {",
+									"    pm.expect(responseData[1].attributes.currency).not.eql(null);",
+									"    pm.expect(responseData[1].attributes.currency).to.be.a(\"string\");",
+									"});",
+									"",
+									"pm.test(\"Has store returned\", function() {",
+									"    pm.expect(responseData[1].attributes.store).not.eql(null);",
+									"    pm.expect(responseData[1].attributes.store).to.be.a(\"string\");",
+									"});",
+									"",
+									"pm.test(\"Has discounts returned\", function() {",
+									"    pm.expect(responseData[1].attributes.discounts.length).not.eql(null);",
+									"});",
+									"",
+									"pm.test(\"Has totals returned\", function() {",
+									"    pm.expect(responseData[1].attributes.totals.length).not.eql(null);",
+									"    ",
+									"    pm.expect(responseData[1].attributes.totals.expenseTotal).not.eql(null);",
+									"    pm.expect(responseData[1].attributes.totals.discountTotal).not.eql(null);",
+									"    pm.expect(responseData[1].attributes.totals.taxTotal).not.eql(null);",
+									"    pm.expect(responseData[1].attributes.totals.subtotal).not.eql(null);",
+									"    pm.expect(responseData[1].attributes.totals.grandTotal).not.eql(null);",
+									"});",
+									"",
+									"pm.test(\"Has name returned\", function() {",
+									"    pm.expect(responseData[1].attributes.name).to.be.a(\"string\");",
+									"});",
+									"",
+									"pm.test(\"Has isDefault returned\", function() {",
+									"    pm.expect(responseData[1].attributes.isDefault).to.be.a(\"boolean\");",
+									"});",
+									"",
+									"pm.test(\"Has self link\", function() {",
+									"    pm.expect(responseData[1].links.self).to.not.be.empty;",
+									"    pm.expect(responseData[1].links.self).to.eql(pm.variables.get(\"url\") + \"/carts/df11d3f1-eb2f-508c-8a64-95c36b772712\");",
+									"});",
+									"",
+									"pm.test(\"Has correct type\", function() {",
+									"    pm.expect(responseData[2].type).to.eql(\"carts\");",
+									"});",
+									"",
+									"pm.test(\"Has id returned\", function() {",
+									"    pm.expect(responseData[2].id).to.not.eql(null);",
+									"    pm.expect(responseData[2].id).to.be.a(\"string\");",
+									"});",
+									"",
+									"pm.test(\"Has priceMode returned\", function() {",
+									"    pm.expect(responseData[2].attributes.priceMode).not.eql(null);",
+									"    pm.expect(responseData[2].attributes.priceMode).to.be.a(\"string\");",
+									"});",
+									"",
+									"pm.test(\"Has currency returned\", function() {",
+									"    pm.expect(responseData[2].attributes.currency).not.eql(null);",
+									"    pm.expect(responseData[2].attributes.currency).to.be.a(\"string\");",
+									"});",
+									"",
+									"pm.test(\"Has store returned\", function() {",
+									"    pm.expect(responseData[2].attributes.store).not.eql(null);",
+									"    pm.expect(responseData[2].attributes.store).to.be.a(\"string\");",
+									"});",
+									"",
+									"pm.test(\"Has discounts returned\", function() {",
+									"    pm.expect(responseData[2].attributes.discounts.length).not.eql(null);",
+									"});",
+									"",
+									"pm.test(\"Has totals returned\", function() {",
+									"    pm.expect(responseData[2].attributes.totals.length).not.eql(null);",
+									"    ",
+									"    pm.expect(responseData[2].attributes.totals.expenseTotal).not.eql(null);",
+									"    pm.expect(responseData[2].attributes.totals.discountTotal).not.eql(null);",
+									"    pm.expect(responseData[2].attributes.totals.taxTotal).not.eql(null);",
+									"    pm.expect(responseData[2].attributes.totals.subtotal).not.eql(null);",
+									"    pm.expect(responseData[2].attributes.totals.grandTotal).not.eql(null);",
+									"});",
+									"",
+									"pm.test(\"Has name returned\", function() {",
+									"    pm.expect(responseData[2].attributes.name).to.be.a(\"string\");",
+									"});",
+									"",
+									"pm.test(\"Has isDefault returned\", function() {",
+									"    pm.expect(responseData[2].attributes.isDefault).to.be.a(\"boolean\");",
+									"});",
+									"",
+									"pm.test(\"Has self link\", function() {",
+									"    pm.expect(responseData[2].links.self).to.not.be.empty;",
+									"    pm.expect(responseData[2].links.self).to.eql(pm.variables.get(\"url\") + \"/carts/0c3ec260-694a-5cec-b78c-d37d32f92ee9\");",
+									"});",
+									"",
+									"pm.test(\"Has self link\", function() {",
+									"    pm.expect(pm.response.json().links.self).to.eql(pm.variables.get(\"url\") + \"/carts\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/carts",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"carts"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Retrieve list of carts include permissions",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "eb56d012-4a31-47a5-adea-b6f13416ea3c",
+								"exec": [
+									"var responseData = pm.response.json().data;",
+									"",
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Has correct type\", function() {",
+									"    pm.expect(responseData[0].type).to.eql(\"carts\");",
+									"});",
+									"",
+									"pm.test(\"Has id returned\", function() {",
+									"    pm.expect(responseData[0].id).to.not.eql(null);",
+									"    pm.expect(responseData[0].id).to.be.a(\"string\");",
+									"});",
+									"",
+									"pm.test(\"Has priceMode returned\", function() {",
+									"    pm.expect(responseData[0].attributes.priceMode).not.eql(null);",
+									"    pm.expect(responseData[0].attributes.priceMode).to.be.a(\"string\");",
+									"});",
+									"",
+									"pm.test(\"Has currency returned\", function() {",
+									"    pm.expect(responseData[0].attributes.currency).not.eql(null);",
+									"    pm.expect(responseData[0].attributes.currency).to.be.a(\"string\");",
+									"});",
+									"",
+									"pm.test(\"Has store returned\", function() {",
+									"    pm.expect(responseData[0].attributes.store).not.eql(null);",
+									"    pm.expect(responseData[0].attributes.store).to.be.a(\"string\");",
+									"});",
+									"",
+									"pm.test(\"Has discounts returned\", function() {",
+									"    pm.expect(responseData[0].attributes.discounts.length).not.eql(null);",
+									"});",
+									"",
+									"pm.test(\"Has totals returned\", function() {",
+									"    pm.expect(responseData[0].attributes.totals.length).not.eql(null);",
+									"    ",
+									"    pm.expect(responseData[0].attributes.totals.expenseTotal).to.eql(null);",
+									"    pm.expect(responseData[0].attributes.totals.discountTotal).to.eql(null);",
+									"    pm.expect(responseData[0].attributes.totals.taxTotal).to.eql(null);",
+									"    pm.expect(responseData[0].attributes.totals.subtotal).to.eql(null);",
+									"    pm.expect(responseData[0].attributes.totals.grandTotal).to.eql(null);",
+									"});",
+									"",
+									"pm.test(\"Has name returned\", function() {",
+									"    pm.expect(responseData[0].attributes.name).to.be.a(\"string\");",
+									"});",
+									"",
+									"pm.test(\"Has isDefault returned\", function() {",
+									"    pm.expect(responseData[0].attributes.isDefault).to.be.a(\"boolean\");",
+									"});",
+									"",
+									"pm.test(\"Has self link\", function() {",
+									"    pm.expect(responseData[0].links.self).to.not.be.empty;",
+									"    pm.expect(responseData[0].links.self).to.eql(pm.variables.get(\"url\") + \"/carts/dc16f734-968d-5a45-92b7-aae5f804f77c?include=cart-permission-groups\");",
+									"});",
+									"",
+									"pm.test(\"Has correct type\", function() {",
+									"    pm.expect(responseData[1].type).to.eql(\"carts\");",
+									"});",
+									"",
+									"pm.test(\"Has id returned\", function() {",
+									"    pm.expect(responseData[1].id).to.not.eql(null);",
+									"    pm.expect(responseData[1].id).to.be.a(\"string\");",
+									"});",
+									"",
+									"pm.test(\"Has priceMode returned\", function() {",
+									"    pm.expect(responseData[1].attributes.priceMode).not.eql(null);",
+									"    pm.expect(responseData[1].attributes.priceMode).to.be.a(\"string\");",
+									"});",
+									"",
+									"pm.test(\"Has currency returned\", function() {",
+									"    pm.expect(responseData[1].attributes.currency).not.eql(null);",
+									"    pm.expect(responseData[1].attributes.currency).to.be.a(\"string\");",
+									"});",
+									"",
+									"pm.test(\"Has store returned\", function() {",
+									"    pm.expect(responseData[1].attributes.store).not.eql(null);",
+									"    pm.expect(responseData[1].attributes.store).to.be.a(\"string\");",
+									"});",
+									"",
+									"pm.test(\"Has discounts returned\", function() {",
+									"    pm.expect(responseData[1].attributes.discounts.length).not.eql(null);",
+									"});",
+									"",
+									"pm.test(\"Has totals returned\", function() {",
+									"    pm.expect(responseData[1].attributes.totals.length).not.eql(null);",
+									"    ",
+									"    pm.expect(responseData[1].attributes.totals.expenseTotal).not.eql(null);",
+									"    pm.expect(responseData[1].attributes.totals.discountTotal).not.eql(null);",
+									"    pm.expect(responseData[1].attributes.totals.taxTotal).not.eql(null);",
+									"    pm.expect(responseData[1].attributes.totals.subtotal).not.eql(null);",
+									"    pm.expect(responseData[1].attributes.totals.grandTotal).not.eql(null);",
+									"});",
+									"",
+									"pm.test(\"Has name returned\", function() {",
+									"    pm.expect(responseData[1].attributes.name).to.be.a(\"string\");",
+									"});",
+									"",
+									"pm.test(\"Has isDefault returned\", function() {",
+									"    pm.expect(responseData[1].attributes.isDefault).to.be.a(\"boolean\");",
+									"});",
+									"",
+									"pm.test(\"Has self link\", function() {",
+									"    pm.expect(responseData[1].links.self).to.not.be.empty;",
+									"    pm.expect(responseData[1].links.self).to.eql(pm.variables.get(\"url\") + \"/carts/df11d3f1-eb2f-508c-8a64-95c36b772712?include=cart-permission-groups\");",
+									"});",
+									"",
+									"pm.test(\"Has relationships\", function() {",
+									"    let relationships = responseData[1].relationships.cart-permission-groups.data[0];",
+									"    pm.expect(relationships.type).to.not.be.empty;",
+									"    pm.expect(relationships.type).to.be.a(\"string\");",
+									"    pm.expect(relationships.id).to.not.eql(null);",
+									"    pm.expect(relationships.id).to.be.a(\"string\");",
+									"});",
+									"",
+									"pm.test(\"Has correct type\", function() {",
+									"    pm.expect(responseData[2].type).to.eql(\"carts\");",
+									"});",
+									"",
+									"pm.test(\"Has id returned\", function() {",
+									"    pm.expect(responseData[2].id).to.not.eql(null);",
+									"    pm.expect(responseData[2].id).to.be.a(\"string\");",
+									"});",
+									"",
+									"pm.test(\"Has priceMode returned\", function() {",
+									"    pm.expect(responseData[2].attributes.priceMode).not.eql(null);",
+									"    pm.expect(responseData[2].attributes.priceMode).to.be.a(\"string\");",
+									"});",
+									"",
+									"pm.test(\"Has currency returned\", function() {",
+									"    pm.expect(responseData[2].attributes.currency).not.eql(null);",
+									"    pm.expect(responseData[2].attributes.currency).to.be.a(\"string\");",
+									"});",
+									"",
+									"pm.test(\"Has store returned\", function() {",
+									"    pm.expect(responseData[2].attributes.store).not.eql(null);",
+									"    pm.expect(responseData[2].attributes.store).to.be.a(\"string\");",
+									"});",
+									"",
+									"pm.test(\"Has discounts returned\", function() {",
+									"    pm.expect(responseData[2].attributes.discounts.length).not.eql(null);",
+									"});",
+									"",
+									"pm.test(\"Has totals returned\", function() {",
+									"    pm.expect(responseData[2].attributes.totals.length).not.eql(null);",
+									"    ",
+									"    pm.expect(responseData[2].attributes.totals.expenseTotal).not.eql(null);",
+									"    pm.expect(responseData[2].attributes.totals.discountTotal).not.eql(null);",
+									"    pm.expect(responseData[2].attributes.totals.taxTotal).not.eql(null);",
+									"    pm.expect(responseData[2].attributes.totals.subtotal).not.eql(null);",
+									"    pm.expect(responseData[2].attributes.totals.grandTotal).not.eql(null);",
+									"});",
+									"",
+									"pm.test(\"Has name returned\", function() {",
+									"    pm.expect(responseData[2].attributes.name).to.be.a(\"string\");",
+									"});",
+									"",
+									"pm.test(\"Has isDefault returned\", function() {",
+									"    pm.expect(responseData[2].attributes.isDefault).to.be.a(\"boolean\");",
+									"});",
+									"",
+									"pm.test(\"Has self link\", function() {",
+									"    pm.expect(responseData[2].links.self).to.not.be.empty;",
+									"    pm.expect(responseData[2].links.self).to.eql(pm.variables.get(\"url\") + \"/carts/0c3ec260-694a-5cec-b78c-d37d32f92ee9?include=cart-permission-groups\");",
+									"});",
+									"",
+									"pm.test(\"Has relationships\", function() {",
+									"    let relationships = responseData[2].relationships.cart-permission-groups.data[0];",
+									"    pm.expect(relationships.type).to.not.be.empty;",
+									"    pm.expect(relationships.type).to.be.a(\"string\");",
+									"    pm.expect(relationships.id).to.not.eql(null);",
+									"    pm.expect(relationships.id).to.be.a(\"string\");",
+									"});",
+									"",
+									"pm.test(\"Has self link\", function() {",
+									"    pm.expect(pm.response.json().links.self).to.eql(pm.variables.get(\"url\") + \"/carts?include=cart-permission-groups\");",
+									"});",
+									"",
+									"pm.test(\"Has correct included type\", function() {",
+									"    pm.expect(pm.response.json().included[0].type).to.eql(\"cart-permission-groups\");",
+									"});",
+									"",
+									"pm.test(\"Has correct included id\", function() {",
+									"    pm.expect(pm.response.json().included[0].id).to.eql(\"2\");",
+									"});",
+									"",
+									"pm.test(\"Has correct included attributes\", function() {",
+									"    pm.expect(pm.response.json().included[0].attributes.name).to.eql(\"FULL_ACCESS\");",
+									"    pm.expect(pm.response.json().included[0].attributes.isDefault).to.eql(false);",
+									"});",
+									"",
+									"pm.test(\"Has correct included link\", function() {",
+									"    pm.expect(pm.response.json().included[0].links.self).to.eql(pm.variables.get(\"url\") + \"/cart-permission-groups/2\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/carts?include=cart-permission-groups",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"carts"
+							],
+							"query": [
+								{
+									"key": "include",
+									"value": "cart-permission-groups"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Read only access",
+			"item": [
+				{
+					"name": "Request access token (helper)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "871764df-f1ad-4e0a-b326-d129ce255d6d",
+								"exec": [
+									"var responseData = pm.response.json().data;",
+									"",
+									"pm.environment.set(\"token\", responseData.attributes.accessToken);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"data\": {\n        \"type\": \"access-tokens\",\n        \"attributes\": {\n            \"username\": \"Sarah@spryker.com\",\n            \"password\": \"change123\"\n        }\n    }\n}"
+						},
+						"url": {
+							"raw": "{{url}}/access-tokens",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"access-tokens"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Retrieve list of carts",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "650e637f-6dea-4339-8f7e-76e343a57613",
+								"exec": [
+									"var responseData = pm.response.json().data;",
+									"",
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Has correct type\", function() {",
+									"    pm.expect(responseData[0].type).to.eql(\"carts\");",
+									"});",
+									"",
+									"pm.test(\"Has id returned\", function() {",
+									"    pm.expect(responseData[0].id).to.not.eql(null);",
+									"    pm.expect(responseData[0].id).to.be.a(\"string\");",
+									"});",
+									"",
+									"pm.test(\"Has priceMode returned\", function() {",
+									"    pm.expect(responseData[0].attributes.priceMode).not.eql(null);",
+									"    pm.expect(responseData[0].attributes.priceMode).to.be.a(\"string\");",
+									"});",
+									"",
+									"pm.test(\"Has currency returned\", function() {",
+									"    pm.expect(responseData[0].attributes.currency).not.eql(null);",
+									"    pm.expect(responseData[0].attributes.currency).to.be.a(\"string\");",
+									"});",
+									"",
+									"pm.test(\"Has store returned\", function() {",
+									"    pm.expect(responseData[0].attributes.store).not.eql(null);",
+									"    pm.expect(responseData[0].attributes.store).to.be.a(\"string\");",
+									"});",
+									"",
+									"pm.test(\"Has discounts returned\", function() {",
+									"    pm.expect(responseData[0].attributes.discounts.length).not.eql(null);",
+									"});",
+									"",
+									"pm.test(\"Has totals returned\", function() {",
+									"    pm.expect(responseData[0].attributes.totals.length).not.eql(null);",
+									"    ",
+									"    pm.expect(responseData[0].attributes.totals.expenseTotal).to.eql(null);",
+									"    pm.expect(responseData[0].attributes.totals.discountTotal).to.eql(null);",
+									"    pm.expect(responseData[0].attributes.totals.taxTotal).to.eql(null);",
+									"    pm.expect(responseData[0].attributes.totals.subtotal).to.eql(null);",
+									"    pm.expect(responseData[0].attributes.totals.grandTotal).to.eql(null);",
+									"});",
+									"",
+									"pm.test(\"Has name returned\", function() {",
+									"    pm.expect(responseData[0].attributes.name).to.be.a(\"string\");",
+									"});",
+									"",
+									"pm.test(\"Has isDefault returned\", function() {",
+									"    pm.expect(responseData[0].attributes.isDefault).to.be.a(\"boolean\");",
+									"});",
+									"",
+									"pm.test(\"Has self link\", function() {",
+									"    pm.expect(responseData[0].links.self).to.not.be.empty;",
+									"    pm.expect(responseData[0].links.self).to.eql(pm.variables.get(\"url\") + \"/carts/763688aa-d182-5b07-a2cb-2ae9380ae5f2\");",
+									"});",
+									"",
+									"pm.test(\"Has correct type\", function() {",
+									"    pm.expect(responseData[1].type).to.eql(\"carts\");",
+									"});",
+									"",
+									"pm.test(\"Has id returned\", function() {",
+									"    pm.expect(responseData[1].id).to.not.eql(null);",
+									"    pm.expect(responseData[1].id).to.be.a(\"string\");",
+									"});",
+									"",
+									"pm.test(\"Has priceMode returned\", function() {",
+									"    pm.expect(responseData[1].attributes.priceMode).not.eql(null);",
+									"    pm.expect(responseData[1].attributes.priceMode).to.be.a(\"string\");",
+									"});",
+									"",
+									"pm.test(\"Has currency returned\", function() {",
+									"    pm.expect(responseData[1].attributes.currency).not.eql(null);",
+									"    pm.expect(responseData[1].attributes.currency).to.be.a(\"string\");",
+									"});",
+									"",
+									"pm.test(\"Has store returned\", function() {",
+									"    pm.expect(responseData[1].attributes.store).not.eql(null);",
+									"    pm.expect(responseData[1].attributes.store).to.be.a(\"string\");",
+									"});",
+									"",
+									"pm.test(\"Has discounts returned\", function() {",
+									"    pm.expect(responseData[1].attributes.discounts.length).not.eql(null);",
+									"});",
+									"",
+									"pm.test(\"Has totals returned\", function() {",
+									"    pm.expect(responseData[1].attributes.totals.length).not.eql(null);",
+									"    ",
+									"    pm.expect(responseData[1].attributes.totals.expenseTotal).not.eql(null);",
+									"    pm.expect(responseData[1].attributes.totals.discountTotal).not.eql(null);",
+									"    pm.expect(responseData[1].attributes.totals.taxTotal).not.eql(null);",
+									"    pm.expect(responseData[1].attributes.totals.subtotal).not.eql(null);",
+									"    pm.expect(responseData[1].attributes.totals.grandTotal).not.eql(null);",
+									"});",
+									"",
+									"pm.test(\"Has name returned\", function() {",
+									"    pm.expect(responseData[1].attributes.name).to.be.a(\"string\");",
+									"});",
+									"",
+									"pm.test(\"Has isDefault returned\", function() {",
+									"    pm.expect(responseData[1].attributes.isDefault).to.be.a(\"boolean\");",
+									"});",
+									"",
+									"pm.test(\"Has self link\", function() {",
+									"    pm.expect(responseData[1].links.self).to.not.be.empty;",
+									"    pm.expect(responseData[1].links.self).to.eql(pm.variables.get(\"url\") + \"/carts/0c3ec260-694a-5cec-b78c-d37d32f92ee9\");",
+									"});",
+									"",
+									"pm.test(\"Has self link\", function() {",
+									"    pm.expect(pm.response.json().links.self).to.eql(pm.variables.get(\"url\") + \"/carts\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/carts",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"carts"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Retrieve list of carts include permissions",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "53045f88-228a-4548-a1ad-568de4d5f9c4",
+								"exec": [
+									"var responseData = pm.response.json().data;",
+									"",
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Has correct type\", function() {",
+									"    pm.expect(responseData[0].type).to.eql(\"carts\");",
+									"});",
+									"",
+									"pm.test(\"Has id returned\", function() {",
+									"    pm.expect(responseData[0].id).to.not.eql(null);",
+									"    pm.expect(responseData[0].id).to.be.a(\"string\");",
+									"});",
+									"",
+									"pm.test(\"Has priceMode returned\", function() {",
+									"    pm.expect(responseData[0].attributes.priceMode).not.eql(null);",
+									"    pm.expect(responseData[0].attributes.priceMode).to.be.a(\"string\");",
+									"});",
+									"",
+									"pm.test(\"Has currency returned\", function() {",
+									"    pm.expect(responseData[0].attributes.currency).not.eql(null);",
+									"    pm.expect(responseData[0].attributes.currency).to.be.a(\"string\");",
+									"});",
+									"",
+									"pm.test(\"Has store returned\", function() {",
+									"    pm.expect(responseData[0].attributes.store).not.eql(null);",
+									"    pm.expect(responseData[0].attributes.store).to.be.a(\"string\");",
+									"});",
+									"",
+									"pm.test(\"Has discounts returned\", function() {",
+									"    pm.expect(responseData[0].attributes.discounts.length).not.eql(null);",
+									"});",
+									"",
+									"pm.test(\"Has totals returned\", function() {",
+									"    pm.expect(responseData[0].attributes.totals.length).not.eql(null);",
+									"    ",
+									"    pm.expect(responseData[0].attributes.totals.expenseTotal).to.eql(null);",
+									"    pm.expect(responseData[0].attributes.totals.discountTotal).to.eql(null);",
+									"    pm.expect(responseData[0].attributes.totals.taxTotal).to.eql(null);",
+									"    pm.expect(responseData[0].attributes.totals.subtotal).to.eql(null);",
+									"    pm.expect(responseData[0].attributes.totals.grandTotal).to.eql(null);",
+									"});",
+									"",
+									"pm.test(\"Has name returned\", function() {",
+									"    pm.expect(responseData[0].attributes.name).to.be.a(\"string\");",
+									"});",
+									"",
+									"pm.test(\"Has isDefault returned\", function() {",
+									"    pm.expect(responseData[0].attributes.isDefault).to.be.a(\"boolean\");",
+									"});",
+									"",
+									"pm.test(\"Has self link\", function() {",
+									"    pm.expect(responseData[0].links.self).to.not.be.empty;",
+									"    pm.expect(responseData[0].links.self).to.eql(pm.variables.get(\"url\") + \"/carts/763688aa-d182-5b07-a2cb-2ae9380ae5f2?include=cart-permission-groups\");",
+									"});",
+									"",
+									"pm.test(\"Has correct type\", function() {",
+									"    pm.expect(responseData[1].type).to.eql(\"carts\");",
+									"});",
+									"",
+									"pm.test(\"Has id returned\", function() {",
+									"    pm.expect(responseData[1].id).to.not.eql(null);",
+									"    pm.expect(responseData[1].id).to.be.a(\"string\");",
+									"});",
+									"",
+									"pm.test(\"Has priceMode returned\", function() {",
+									"    pm.expect(responseData[1].attributes.priceMode).not.eql(null);",
+									"    pm.expect(responseData[1].attributes.priceMode).to.be.a(\"string\");",
+									"});",
+									"",
+									"pm.test(\"Has currency returned\", function() {",
+									"    pm.expect(responseData[1].attributes.currency).not.eql(null);",
+									"    pm.expect(responseData[1].attributes.currency).to.be.a(\"string\");",
+									"});",
+									"",
+									"pm.test(\"Has store returned\", function() {",
+									"    pm.expect(responseData[1].attributes.store).not.eql(null);",
+									"    pm.expect(responseData[1].attributes.store).to.be.a(\"string\");",
+									"});",
+									"",
+									"pm.test(\"Has discounts returned\", function() {",
+									"    pm.expect(responseData[1].attributes.discounts.length).not.eql(null);",
+									"});",
+									"",
+									"pm.test(\"Has totals returned\", function() {",
+									"    pm.expect(responseData[1].attributes.totals.length).not.eql(null);",
+									"    ",
+									"    pm.expect(responseData[1].attributes.totals.expenseTotal).not.eql(null);",
+									"    pm.expect(responseData[1].attributes.totals.discountTotal).not.eql(null);",
+									"    pm.expect(responseData[1].attributes.totals.taxTotal).not.eql(null);",
+									"    pm.expect(responseData[1].attributes.totals.subtotal).not.eql(null);",
+									"    pm.expect(responseData[1].attributes.totals.grandTotal).not.eql(null);",
+									"});",
+									"",
+									"pm.test(\"Has name returned\", function() {",
+									"    pm.expect(responseData[1].attributes.name).to.be.a(\"string\");",
+									"});",
+									"",
+									"pm.test(\"Has isDefault returned\", function() {",
+									"    pm.expect(responseData[1].attributes.isDefault).to.be.a(\"boolean\");",
+									"});",
+									"",
+									"pm.test(\"Has self link\", function() {",
+									"    pm.expect(responseData[1].links.self).to.not.be.empty;",
+									"    pm.expect(responseData[1].links.self).to.eql(pm.variables.get(\"url\") + \"/carts/0c3ec260-694a-5cec-b78c-d37d32f92ee9?include=cart-permission-groups\");",
+									"});",
+									"",
+									"pm.test(\"Has relationships\", function() {",
+									"    let relationships = responseData[1].relationships.cart-permission-groups.data[0];",
+									"    pm.expect(relationships.type).to.not.be.empty;",
+									"    pm.expect(relationships.type).to.be.a(\"string\");",
+									"    pm.expect(relationships.id).to.not.eql(null);",
+									"    pm.expect(relationships.id).to.be.a(\"string\");",
+									"});",
+									"",
+									"pm.test(\"Has self link\", function() {",
+									"    pm.expect(pm.response.json().links.self).to.eql(pm.variables.get(\"url\") + \"/carts?include=cart-permission-groups\");",
+									"});",
+									"",
+									"pm.test(\"Has correct included type\", function() {",
+									"    pm.expect(pm.response.json().included[0].type).to.eql(\"cart-permission-groups\");",
+									"});",
+									"",
+									"pm.test(\"Has correct included id\", function() {",
+									"    pm.expect(pm.response.json().included[0].id).to.eql(\"1\");",
+									"});",
+									"",
+									"pm.test(\"Has correct included attributes\", function() {",
+									"    pm.expect(pm.response.json().included[0].attributes.name).to.eql(\"READ_ONLY\");",
+									"    pm.expect(pm.response.json().included[0].attributes.isDefault).to.eql(true);",
+									"});",
+									"",
+									"pm.test(\"Has correct included link\", function() {",
+									"    pm.expect(pm.response.json().included[0].links.self).to.eql(pm.variables.get(\"url\") + \"/cart-permission-groups/1\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/carts?include=cart-permission-groups",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"carts"
+							],
+							"query": [
+								{
+									"key": "include",
+									"value": "cart-permission-groups"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Bob",
+			"item": [
+				{
+					"name": "Request access token (helper)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "871764df-f1ad-4e0a-b326-d129ce255d6d",
+								"exec": [
+									"var responseData = pm.response.json().data;",
+									"",
+									"pm.environment.set(\"token\", responseData.attributes.accessToken);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"data\": {\n        \"type\": \"access-tokens\",\n        \"attributes\": {\n            \"username\": \"anne.boleyn@spryker.com\",\n            \"password\": \"change123\"\n        }\n    }\n}"
+						},
+						"url": {
+							"raw": "{{url}}/access-tokens",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"access-tokens"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Retrieve list of carts",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "40a72fe5-8005-4dcd-89f6-6bf571784f4d",
+								"exec": [
+									"var responseData = pm.response.json().data;",
+									"",
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Has correct type\", function() {",
+									"    pm.expect(responseData[0].type).to.eql(\"carts\");",
+									"});",
+									"",
+									"pm.test(\"Has id returned\", function() {",
+									"    pm.expect(responseData[0].id).to.not.eql(null);",
+									"    pm.expect(responseData[0].id).to.be.a(\"string\");",
+									"});",
+									"",
+									"pm.test(\"Has priceMode returned\", function() {",
+									"    pm.expect(responseData[0].attributes.priceMode).not.eql(null);",
+									"    pm.expect(responseData[0].attributes.priceMode).to.be.a(\"string\");",
+									"});",
+									"",
+									"pm.test(\"Has currency returned\", function() {",
+									"    pm.expect(responseData[0].attributes.currency).not.eql(null);",
+									"    pm.expect(responseData[0].attributes.currency).to.be.a(\"string\");",
+									"});",
+									"",
+									"pm.test(\"Has store returned\", function() {",
+									"    pm.expect(responseData[0].attributes.store).not.eql(null);",
+									"    pm.expect(responseData[0].attributes.store).to.be.a(\"string\");",
+									"});",
+									"",
+									"pm.test(\"Has discounts returned\", function() {",
+									"    pm.expect(responseData[0].attributes.discounts.length).not.eql(null);",
+									"});",
+									"",
+									"pm.test(\"Has totals returned\", function() {",
+									"    pm.expect(responseData[0].attributes.totals.length).not.eql(null);",
+									"    ",
+									"    pm.expect(responseData[0].attributes.totals.expenseTotal).to.eql(null);",
+									"    pm.expect(responseData[0].attributes.totals.discountTotal).to.eql(null);",
+									"    pm.expect(responseData[0].attributes.totals.taxTotal).to.eql(null);",
+									"    pm.expect(responseData[0].attributes.totals.subtotal).to.eql(null);",
+									"    pm.expect(responseData[0].attributes.totals.grandTotal).to.eql(null);",
+									"});",
+									"",
+									"pm.test(\"Has name returned\", function() {",
+									"    pm.expect(responseData[0].attributes.name).to.be.a(\"string\");",
+									"});",
+									"",
+									"pm.test(\"Has isDefault returned\", function() {",
+									"    pm.expect(responseData[0].attributes.isDefault).to.be.a(\"boolean\");",
+									"});",
+									"",
+									"pm.test(\"Has self link\", function() {",
+									"    pm.expect(responseData[0].links.self).to.not.be.empty;",
+									"    pm.expect(responseData[0].links.self).to.eql(pm.variables.get(\"url\") + \"/carts/59743e37-0182-5153-9935-77106741a9d2\");",
+									"});",
+									"",
+									"pm.test(\"Has self link\", function() {",
+									"    pm.expect(pm.response.json().links.self).to.eql(pm.variables.get(\"url\") + \"/carts\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/carts",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"carts"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Retrieve list of carts include permissions",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "fbf87206-bc9a-43cd-b796-f2d84bf41b64",
+								"exec": [
+									"var responseData = pm.response.json().data;",
+									"",
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Has correct type\", function() {",
+									"    pm.expect(responseData[0].type).to.eql(\"carts\");",
+									"});",
+									"",
+									"pm.test(\"Has id returned\", function() {",
+									"    pm.expect(responseData[0].id).to.not.eql(null);",
+									"    pm.expect(responseData[0].id).to.be.a(\"string\");",
+									"});",
+									"",
+									"pm.test(\"Has priceMode returned\", function() {",
+									"    pm.expect(responseData[0].attributes.priceMode).not.eql(null);",
+									"    pm.expect(responseData[0].attributes.priceMode).to.be.a(\"string\");",
+									"});",
+									"",
+									"pm.test(\"Has currency returned\", function() {",
+									"    pm.expect(responseData[0].attributes.currency).not.eql(null);",
+									"    pm.expect(responseData[0].attributes.currency).to.be.a(\"string\");",
+									"});",
+									"",
+									"pm.test(\"Has store returned\", function() {",
+									"    pm.expect(responseData[0].attributes.store).not.eql(null);",
+									"    pm.expect(responseData[0].attributes.store).to.be.a(\"string\");",
+									"});",
+									"",
+									"pm.test(\"Has discounts returned\", function() {",
+									"    pm.expect(responseData[0].attributes.discounts.length).not.eql(null);",
+									"});",
+									"",
+									"pm.test(\"Has totals returned\", function() {",
+									"    pm.expect(responseData[0].attributes.totals.length).not.eql(null);",
+									"    ",
+									"    pm.expect(responseData[0].attributes.totals.expenseTotal).to.eql(null);",
+									"    pm.expect(responseData[0].attributes.totals.discountTotal).to.eql(null);",
+									"    pm.expect(responseData[0].attributes.totals.taxTotal).to.eql(null);",
+									"    pm.expect(responseData[0].attributes.totals.subtotal).to.eql(null);",
+									"    pm.expect(responseData[0].attributes.totals.grandTotal).to.eql(null);",
+									"});",
+									"",
+									"pm.test(\"Has name returned\", function() {",
+									"    pm.expect(responseData[0].attributes.name).to.be.a(\"string\");",
+									"});",
+									"",
+									"pm.test(\"Has isDefault returned\", function() {",
+									"    pm.expect(responseData[0].attributes.isDefault).to.be.a(\"boolean\");",
+									"});",
+									"",
+									"pm.test(\"Has self link\", function() {",
+									"    pm.expect(responseData[0].links.self).to.not.be.empty;",
+									"    pm.expect(responseData[0].links.self).to.eql(pm.variables.get(\"url\") + \"/carts/59743e37-0182-5153-9935-77106741a9d2?include=cart-permission-groups\");",
+									"});",
+									"",
+									"pm.test(\"Has self link\", function() {",
+									"    pm.expect(pm.response.json().links.self).to.eql(pm.variables.get(\"url\") + \"/carts?include=cart-permission-groups\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/carts?include=cart-permission-groups",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"carts"
+							],
+							"query": [
+								{
+									"key": "include",
+									"value": "cart-permission-groups"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Negative",
+			"item": [
+				{
+					"name": "Request access token (helper)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "871764df-f1ad-4e0a-b326-d129ce255d6d",
+								"exec": [
+									"var responseData = pm.response.json().data;",
+									"",
+									"pm.environment.set(\"token\", responseData.attributes.accessToken);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"data\": {\n        \"type\": \"access-tokens\",\n        \"attributes\": {\n            \"username\": \"Solomon@spryker.com\",\n            \"password\": \"change123\"\n        }\n    }\n}"
+						},
+						"url": {
+							"raw": "{{url}}/access-tokens",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"access-tokens"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Retrieve list of carts without access token",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "e8d99c44-fdaf-436c-8ea0-1eaea786ba58",
+								"exec": [
+									"var responseData = pm.response.json().errors;",
+									"",
+									"pm.test(\"Status code is 403\", function () {",
+									"    pm.response.to.have.status(403);",
+									"});",
+									"",
+									"pm.test(\"Has correct error code\", function() {",
+									"    pm.expect(responseData[0].code).to.eql(\"002\");",
+									"});",
+									"",
+									"pm.test(\"Has correct error detail\", function() {",
+									"    pm.expect(responseData[0].detail).to.eql(\"Missing access token.\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/carts",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"carts"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Retrieve list of carts with incorrect ulr",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "64af1c86-e5e6-4a65-8b99-1af285ee5355",
+								"exec": [
+									"var responseData = pm.response.json().errors;",
+									"",
+									"pm.test(\"Status code is 404\", function () {",
+									"    pm.response.to.have.status(404);",
+									"});",
+									"",
+									"pm.test(\"Has correct error detail\", function() {",
+									"    pm.expect(responseData[0].detail).to.eql(\"Not Found\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/cart",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"cart"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Retrieve list of carts with incorrect method POST",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "4b3e83ac-e39b-46bf-9213-a59dbea56583",
+								"exec": [
+									"var responseData = pm.response.json().errors;",
+									"",
+									"pm.test(\"Status code is 400\", function () {",
+									"    pm.response.to.have.status(400);",
+									"});",
+									"",
+									"pm.test(\"Has correct error detail\", function() {",
+									"    pm.expect(responseData[0].detail).to.eql(\"Post data is invalid.\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/carts",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"carts"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Retrieve list of carts with incorrect method PUT",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "ea8db701-d990-4a66-8192-0883b5ce612f",
+								"exec": [
+									"var responseData = pm.response.json().errors;",
+									"",
+									"pm.test(\"Status code is 404\", function () {",
+									"    pm.response.to.have.status(404);",
+									"});",
+									"",
+									"pm.test(\"Has correct error detail\", function() {",
+									"    pm.expect(responseData[0].detail).to.eql(\"Not Found\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/carts",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"carts"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Retrieve list of carts with incorrect method PATCH",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "6bd3fca7-e32d-4486-ad19-a1cc9d632f10",
+								"exec": [
+									"var responseData = pm.response.json().errors;",
+									"",
+									"pm.test(\"Status code is 400\", function () {",
+									"    pm.response.to.have.status(400);",
+									"});",
+									"",
+									"pm.test(\"Has correct error detail\", function() {",
+									"    pm.expect(responseData[0].detail).to.eql(\"Post data is invalid.\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PATCH",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/carts",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"carts"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Retrieve list of carts with incorrect method DELETE",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "bc193105-84ac-4b9e-83e1-95639467a203",
+								"exec": [
+									"var responseData = pm.response.json().errors;",
+									"",
+									"pm.test(\"Status code is 400\", function () {",
+									"    pm.response.to.have.status(400);",
+									"});",
+									"",
+									"pm.test(\"Has correct error detail\", function() {",
+									"    pm.expect(responseData[0].detail).to.eql(\"Resource id is not specified.\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/carts",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"carts"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Retrieve list of carts include permissions without acces token",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "a4f8db39-ebb4-448c-8688-af676dc9e066",
+								"exec": [
+									"var responseData = pm.response.json().errors;",
+									"",
+									"pm.test(\"Status code is 403\", function () {",
+									"    pm.response.to.have.status(403);",
+									"});",
+									"",
+									"pm.test(\"Has correct error code\", function() {",
+									"    pm.expect(responseData[0].code).to.eql(\"002\");",
+									"});",
+									"",
+									"pm.test(\"Has correct error detail\", function() {",
+									"    pm.expect(responseData[0].detail).to.eql(\"Missing access token.\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/carts?include=cart-permission-groups",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"carts"
+							],
+							"query": [
+								{
+									"key": "include",
+									"value": "cart-permission-groups"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Retrieve list of carts include permissions with incorrect ulr",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "7469cd16-cbf4-42f9-a5b3-4964c4f401f2",
+								"exec": [
+									"var responseData = pm.response.json().errors;",
+									"",
+									"pm.test(\"Status code is 404\", function () {",
+									"    pm.response.to.have.status(404);",
+									"});",
+									"",
+									"pm.test(\"Has correct error detail\", function() {",
+									"    pm.expect(responseData[0].detail).to.eql(\"Not Found\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/cart?include=cart-permission-groups",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"cart"
+							],
+							"query": [
+								{
+									"key": "include",
+									"value": "cart-permission-groups"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Retrieve list of carts include permissions witincorrect method POST",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "8156e0e9-8bb2-4ad6-ac5f-7208c8a55f29",
+								"exec": [
+									"var responseData = pm.response.json().errors;",
+									"",
+									"pm.test(\"Status code is 400\", function () {",
+									"    pm.response.to.have.status(400);",
+									"});",
+									"",
+									"pm.test(\"Has correct error detail\", function() {",
+									"    pm.expect(responseData[0].detail).to.eql(\"Post data is invalid.\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/carts?include=cart-permission-groups",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"carts"
+							],
+							"query": [
+								{
+									"key": "include",
+									"value": "cart-permission-groups"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Retrieve list of carts include permissions witincorrect method PUT",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "58e977ca-779c-4eaa-8d81-4544f0dfe600",
+								"exec": [
+									"var responseData = pm.response.json().errors;",
+									"",
+									"pm.test(\"Status code is 404\", function () {",
+									"    pm.response.to.have.status(404);",
+									"});",
+									"",
+									"pm.test(\"Has correct error detail\", function() {",
+									"    pm.expect(responseData[0].detail).to.eql(\"Not Found\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/carts?include=cart-permission-groups",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"carts"
+							],
+							"query": [
+								{
+									"key": "include",
+									"value": "cart-permission-groups"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Retrieve list of carts include permissions witincorrect method PATCH",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "1375f0b0-4dc2-4249-a66c-44a2db6d9daf",
+								"exec": [
+									"var responseData = pm.response.json().errors;",
+									"",
+									"pm.test(\"Status code is 400\", function () {",
+									"    pm.response.to.have.status(400);",
+									"});",
+									"",
+									"pm.test(\"Has correct error detail\", function() {",
+									"    pm.expect(responseData[0].detail).to.eql(\"Post data is invalid.\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PATCH",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/carts?include=cart-permission-groups",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"carts"
+							],
+							"query": [
+								{
+									"key": "include",
+									"value": "cart-permission-groups"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Retrieve list of carts include permissions witincorrect method DELETE",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "ec842e6c-101f-4cac-b5f8-c7be616ab4df",
+								"exec": [
+									"var responseData = pm.response.json().errors;",
+									"",
+									"pm.test(\"Status code is 400\", function () {",
+									"    pm.response.to.have.status(400);",
+									"});",
+									"",
+									"pm.test(\"Has correct error detail\", function() {",
+									"    pm.expect(responseData[0].detail).to.eql(\"Resource id is not specified.\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/carts?include=cart-permission-groups",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"carts"
+							],
+							"query": [
+								{
+									"key": "include",
+									"value": "cart-permission-groups"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}

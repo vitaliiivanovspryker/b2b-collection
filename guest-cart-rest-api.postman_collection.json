@@ -1,0 +1,3985 @@
+{
+	"info": {
+		"_postman_id": "4039cde7-8835-4570-9459-b9872851e10a",
+		"name": "guest-cart-rest-api",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Creation a guest cart",
+			"item": [
+				{
+					"name": "Request for creating/adding a guest cart ",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "05370552-f35d-44b3-a690-1496fc7d0ad8",
+								"exec": [
+									"var responseData = pm.response.json().data;",
+									"",
+									"pm.variables.set(\"guest_cart_id\", responseData.id);",
+									"",
+									"pm.test(\"Status code is 201\", function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"pm.test(\"Has correct type\", function() {",
+									"    pm.expect(responseData.type).to.eql(\"guest-carts\");",
+									"});",
+									"",
+									"pm.test(\"Has id returned\", function() {",
+									"    pm.expect(responseData.id).not.eql(null);",
+									"    pm.expect(responseData.id).to.be.a(\"string\");",
+									"});",
+									"",
+									"pm.test(\"Has priceMode returned\", function() {",
+									"    pm.expect(responseData.attributes.priceMode).not.eql(null);",
+									"    pm.expect(responseData.attributes.priceMode).to.be.a(\"string\");",
+									"});",
+									"",
+									"pm.test(\"Has currency returned\", function() {",
+									"    pm.expect(responseData.attributes.currency).not.eql(null);",
+									"    pm.expect(responseData.attributes.currency).to.be.a(\"string\");",
+									"});",
+									"",
+									"pm.test(\"Has store returned\", function() {",
+									"    pm.expect(responseData.attributes.store).not.eql(null);",
+									"    pm.expect(responseData.attributes.store).to.be.a(\"string\");",
+									"});",
+									"",
+									"pm.test(\"Has discounts returned\", function() {",
+									"    pm.expect(responseData.attributes.discounts.length).not.eql(null);",
+									"});",
+									"",
+									"pm.test(\"Has totals returned\", function() {",
+									"    pm.expect(responseData.attributes.totals.length).not.eql(null);",
+									"    ",
+									"    pm.expect(responseData.attributes.totals.expenseTotal).not.eql(null);",
+									"    pm.expect(responseData.attributes.totals.discountTotal).not.eql(null);",
+									"    pm.expect(responseData.attributes.totals.taxTotal).not.eql(null);",
+									"    pm.expect(responseData.attributes.totals.subtotal).not.eql(null);",
+									"    pm.expect(responseData.attributes.totals.grandTotal).not.eql(null);",
+									"});",
+									"",
+									"pm.test(\"Has self link\", function() {",
+									"    pm.expect(responseData.links.self).to.not.be.empty;",
+									"    pm.expect(responseData.links.self).to.eql(pm.variables.get(\"url\") + \"/guest-carts/\" + pm.variables.get(\"guest_cart_id\"));",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "X-Anonymous-Customer-Unique-Id",
+								"value": "{{anonymous_customer_id}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"data\": {\n        \"type\": \"guest-cart-items\",\n        \"attributes\": {\n            \"sku\": \"{{sku}}\",\n            \"quantity\": 1\n        }\n    }\n}"
+						},
+						"url": {
+							"raw": "{{url}}/guest-cart-items",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"guest-cart-items"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Request for creating/adding a guest cart with a bundle product \"Not support now\"",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "05370552-f35d-44b3-a690-1496fc7d0ad8",
+								"exec": [
+									"var responseJson = pm.response.json();",
+									"",
+									"pm.test(\"Status code is 422\", function () {",
+									"    pm.response.to.have.status(422);",
+									"});",
+									"",
+									"pm.test(\"Correct error status\", function() {",
+									"    pm.expect(responseJson.errors[0].status).to.eql(422);",
+									"});",
+									"",
+									"pm.test(\"Correct error code\", function() {",
+									"    pm.expect(responseJson.errors[0].code).to.eql(\"102\");",
+									"});",
+									"",
+									"pm.test(\"Correct error message\", function() {",
+									"    pm.expect(responseJson.errors[0].detail).to.eql(\"Product \" + pm.variables.get(\"bundle_sky\") + \" is not available at the moment.\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "X-Anonymous-Customer-Unique-Id",
+								"type": "text",
+								"value": "{{anonymous_customer_id}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"data\": {\n        \"type\": \"guest-cart-items\",\n        \"attributes\": {\n            \"sku\": \"{{bundle_sky}}\",\n            \"quantity\": 1\n        }\n    }\n}"
+						},
+						"url": {
+							"raw": "{{url}}/guest-cart-items",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"guest-cart-items"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Request for creating/adding a guest cart with 0 in body",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "05370552-f35d-44b3-a690-1496fc7d0ad8",
+								"exec": [
+									"var responseJson = pm.response.json();",
+									"",
+									"pm.test(\"Status code is 422\", function () {",
+									"    pm.response.to.have.status(422);",
+									"});",
+									"",
+									"pm.test(\"Correct error status\", function() {",
+									"    pm.expect(responseJson.errors[0].status).to.eql(422);",
+									"});",
+									"",
+									"pm.test(\"Correct error code\", function() {",
+									"    pm.expect(responseJson.errors[0].code).to.eql(\"102\");",
+									"});",
+									"",
+									"pm.test(\"Correct error message\", function() {",
+									"    pm.expect(responseJson.errors[0].detail).to.eql(\"Wrong quantity for product SKU '\" + pm.variables.get(\"sku\") + \"'.\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "X-Anonymous-Customer-Unique-Id",
+								"type": "text",
+								"value": "{{anonymous_customer_id}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"data\": {\n        \"type\": \"guest-cart-items\",\n        \"attributes\": {\n            \"sku\": \"{{sku}}\",\n            \"quantity\": 0\n        }\n    }\n}"
+						},
+						"url": {
+							"raw": "{{url}}/guest-cart-items",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"guest-cart-items"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Send the request with an invalid/abstract SKU",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "05370552-f35d-44b3-a690-1496fc7d0ad8",
+								"exec": [
+									"var responseJson = pm.response.json();",
+									"",
+									"pm.test(\"Status code is 422\", function () {",
+									"    pm.response.to.have.status(422);",
+									"});",
+									"",
+									"pm.test(\"Correct error status\", function() {",
+									"    pm.expect(responseJson.errors[0].status).to.eql(422);",
+									"});",
+									"",
+									"pm.test(\"Correct error code\", function() {",
+									"    pm.expect(responseJson.errors[0].code).to.eql(\"102\");",
+									"});",
+									"",
+									"pm.test(\"Correct error message\", function() {",
+									"    pm.expect(responseJson.errors[0].detail).to.eql(\"Product \\\"\" + pm.variables.get(\"wrong_sku\") + \"\\\" not found\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "X-Anonymous-Customer-Unique-Id",
+								"type": "text",
+								"value": "{{anonymous_customer_id}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"data\": {\n        \"type\": \"guest-cart-items\",\n        \"attributes\": {\n            \"sku\": \"{{wrong_sku}}\",\n            \"quantity\": 1\n        }\n    }\n}"
+						},
+						"url": {
+							"raw": "{{url}}/guest-cart-items",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"guest-cart-items"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Send the request with empty X-Anonymous-Customer-Unique-Id in the header",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "05370552-f35d-44b3-a690-1496fc7d0ad8",
+								"exec": [
+									"var responseJson = pm.response.json();",
+									"",
+									"pm.test(\"Status code is 400\", function () {",
+									"    pm.response.to.have.status(400);",
+									"});",
+									"",
+									"pm.test(\"Correct error status\", function() {",
+									"    pm.expect(responseJson.errors[0].status).to.eql(400);",
+									"});",
+									"",
+									"pm.test(\"Correct error code\", function() {",
+									"    pm.expect(responseJson.errors[0].code).to.eql(\"109\");",
+									"});",
+									"",
+									"pm.test(\"Correct error message\", function() {",
+									"    pm.expect(responseJson.errors[0].detail).to.eql(\"Anonymous customer unique id is empty.\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "X-Anonymous-Customer-Unique-Id",
+								"value": "",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"data\": {\n        \"type\": \"guest-cart-items\",\n        \"attributes\": {\n            \"sku\": \"{{sku}}\",\n            \"quantity\": 1\n        }\n    }\n}"
+						},
+						"url": {
+							"raw": "{{url}}/guest-cart-items",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"guest-cart-items"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Send the request without X-Anonymous-Customer-Unique-Id in the header",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "05370552-f35d-44b3-a690-1496fc7d0ad8",
+								"exec": [
+									"var responseJson = pm.response.json();",
+									"",
+									"pm.test(\"Status code is 400\", function () {",
+									"    pm.response.to.have.status(400);",
+									"});",
+									"",
+									"pm.test(\"Correct error status\", function() {",
+									"    pm.expect(responseJson.errors[0].status).to.eql(400);",
+									"});",
+									"",
+									"pm.test(\"Correct error code\", function() {",
+									"    pm.expect(responseJson.errors[0].code).to.eql(\"109\");",
+									"});",
+									"",
+									"pm.test(\"Correct error message\", function() {",
+									"    pm.expect(responseJson.errors[0].detail).to.eql(\"Anonymous customer unique id is empty.\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "X-Anonymous-Customer-Unique-Id",
+								"value": "",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"data\": {\n        \"type\": \"guest-cart-items\",\n        \"attributes\": {\n            \"sku\": \"{{sku}}\",\n            \"quantity\": 1\n        }\n    }\n}"
+						},
+						"url": {
+							"raw": "{{url}}/guest-cart-items",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"guest-cart-items"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Send the request with an empty body",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "05370552-f35d-44b3-a690-1496fc7d0ad8",
+								"exec": [
+									"var responseJson = pm.response.json();",
+									"",
+									"pm.test(\"Status code is 400\", function () {",
+									"    pm.response.to.have.status(400);",
+									"});",
+									"",
+									"pm.test(\"Correct error status\", function() {",
+									"    pm.expect(responseJson.errors[0].status).to.eql(400);",
+									"});",
+									"",
+									"pm.test(\"Correct error message\", function() {",
+									"    pm.expect(responseJson.errors[0].detail).to.eql(\"Post data is invalid.\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "X-Anonymous-Customer-Unique-Id",
+								"type": "text",
+								"value": "{{anonymous_customer_id}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/guest-cart-items",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"guest-cart-items"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Send the request with a wrong type \"customer\"",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "05370552-f35d-44b3-a690-1496fc7d0ad8",
+								"exec": [
+									"var responseJson = pm.response.json();",
+									"",
+									"pm.test(\"Status code is 400\", function () {",
+									"    pm.response.to.have.status(400);",
+									"});",
+									"",
+									"pm.test(\"Correct error status\", function() {",
+									"    pm.expect(responseJson.errors[0].status).to.eql(400);",
+									"});",
+									"",
+									"pm.test(\"Correct error message\", function() {",
+									"    pm.expect(responseJson.errors[0].detail).to.eql(\"Post data is invalid.\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "X-Anonymous-Customer-Unique-Id",
+								"type": "text",
+								"value": "{{anonymous_customer_id}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"data\": {\n        \"type\": \"customer\",\n        \"attributes\": {\n            \"sku\": \"{{sku}}\",\n            \"quantity\": 1\n        }\n    }\n}"
+						},
+						"url": {
+							"raw": "{{url}}/guest-cart-items",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"guest-cart-items"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Send the request without type",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "05370552-f35d-44b3-a690-1496fc7d0ad8",
+								"exec": [
+									"var responseJson = pm.response.json();",
+									"",
+									"pm.test(\"Status code is 400\", function () {",
+									"    pm.response.to.have.status(400);",
+									"});",
+									"",
+									"pm.test(\"Correct error status\", function() {",
+									"    pm.expect(responseJson.errors[0].status).to.eql(400);",
+									"});",
+									"",
+									"pm.test(\"Correct error message\", function() {",
+									"    pm.expect(responseJson.errors[0].detail).to.eql(\"Post data is invalid.\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "X-Anonymous-Customer-Unique-Id",
+								"type": "text",
+								"value": "{{anonymous_customer_id}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"data\": {\n        \"type\": \"\",\n        \"attributes\": {\n            \"sku\": \"{{sku}}\",\n            \"quantity\": 1\n        }\n    }\n}"
+						},
+						"url": {
+							"raw": "{{url}}/guest-cart-items",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"guest-cart-items"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Send the request with empty attributes",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "05370552-f35d-44b3-a690-1496fc7d0ad8",
+								"exec": [
+									"var responseJson = pm.response.json();",
+									"",
+									"pm.test(\"Status code is 400\", function () {",
+									"    pm.response.to.have.status(400);",
+									"});",
+									"",
+									"pm.test(\"Correct error status\", function() {",
+									"    pm.expect(responseJson.errors[0].status).to.eql(400);",
+									"});",
+									"",
+									"pm.test(\"Correct error code\", function() {",
+									"    pm.expect(responseJson.errors[0].code).to.eql(\"901\");",
+									"});",
+									"",
+									"pm.test(\"Correct error message\", function() {",
+									"    pm.expect(responseJson.errors[0].detail).to.eql(\"[sku] => This field is missing.\");",
+									"});",
+									"",
+									"pm.test(\"Correct error status\", function() {",
+									"    pm.expect(responseJson.errors[1].status).to.eql(400);",
+									"});",
+									"",
+									"pm.test(\"Correct error code\", function() {",
+									"    pm.expect(responseJson.errors[1].code).to.eql(\"901\");",
+									"});",
+									"",
+									"pm.test(\"Correct error message\", function() {",
+									"    pm.expect(responseJson.errors[1].detail).to.eql(\"[quantity] => This field is missing.\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "X-Anonymous-Customer-Unique-Id",
+								"type": "text",
+								"value": "{{anonymous_customer_id}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"data\": {\n        \"type\": \"guest-cart-items\",\n        \"attributes\": {\n        }\n    }\n}"
+						},
+						"url": {
+							"raw": "{{url}}/guest-cart-items",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"guest-cart-items"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Send the request with empty sku",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "05370552-f35d-44b3-a690-1496fc7d0ad8",
+								"exec": [
+									"var responseJson = pm.response.json();",
+									"",
+									"pm.test(\"Status code is 400\", function () {",
+									"    pm.response.to.have.status(400);",
+									"});",
+									"",
+									"pm.test(\"Correct error status\", function() {",
+									"    pm.expect(responseJson.errors[0].status).to.eql(400);",
+									"});",
+									"",
+									"pm.test(\"Correct error code\", function() {",
+									"    pm.expect(responseJson.errors[0].code).to.eql(\"901\");",
+									"});",
+									"",
+									"pm.test(\"Correct error message\", function() {",
+									"    pm.expect(responseJson.errors[0].detail).to.eql(\"[sku] => This value should not be blank.\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "X-Anonymous-Customer-Unique-Id",
+								"type": "text",
+								"value": "{{anonymous_customer_id}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"data\": {\n        \"type\": \"guest-cart-items\",\n        \"attributes\": {\n            \"sku\": \"\",\n            \"quantity\": 1\n        }\n    }\n}"
+						},
+						"url": {
+							"raw": "{{url}}/guest-cart-items",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"guest-cart-items"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Send the request with empty quantity",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "05370552-f35d-44b3-a690-1496fc7d0ad8",
+								"exec": [
+									"var responseJson = pm.response.json();",
+									"",
+									"pm.test(\"Status code is 400\", function () {",
+									"    pm.response.to.have.status(400);",
+									"});",
+									"",
+									"pm.test(\"Correct error status\", function() {",
+									"    pm.expect(responseJson.errors[0].status).to.eql(400);",
+									"});",
+									"",
+									"pm.test(\"Correct error code\", function() {",
+									"    pm.expect(responseJson.errors[0].code).to.eql(\"901\");",
+									"});",
+									"",
+									"pm.test(\"Correct error message\", function() {",
+									"    pm.expect(responseJson.errors[0].detail).to.eql(\"[quantity] => This value should not be blank.\");",
+									"});",
+									"",
+									"pm.test(\"Correct error status\", function() {",
+									"    pm.expect(responseJson.errors[1].status).to.eql(400);",
+									"});",
+									"",
+									"pm.test(\"Correct error code\", function() {",
+									"    pm.expect(responseJson.errors[1].code).to.eql(\"901\");",
+									"});",
+									"",
+									"pm.test(\"Correct error message\", function() {",
+									"    pm.expect(responseJson.errors[1].detail).to.eql(\"[quantity] => This value should be of type numeric.\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "X-Anonymous-Customer-Unique-Id",
+								"type": "text",
+								"value": "{{anonymous_customer_id}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"data\": {\n        \"type\": \"guest-cart-items\",\n        \"attributes\": {\n            \"sku\": \"{{sku}}\",\n            \"quantity\": \"\"\n        }\n    }\n}"
+						},
+						"url": {
+							"raw": "{{url}}/guest-cart-items",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"guest-cart-items"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Send the request without sku",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "05370552-f35d-44b3-a690-1496fc7d0ad8",
+								"exec": [
+									"var responseJson = pm.response.json();",
+									"",
+									"pm.test(\"Status code is 400\", function () {",
+									"    pm.response.to.have.status(400);",
+									"});",
+									"",
+									"pm.test(\"Correct error status\", function() {",
+									"    pm.expect(responseJson.errors[0].status).to.eql(400);",
+									"});",
+									"",
+									"pm.test(\"Correct error code\", function() {",
+									"    pm.expect(responseJson.errors[0].code).to.eql(\"901\");",
+									"});",
+									"",
+									"pm.test(\"Correct error message\", function() {",
+									"    pm.expect(responseJson.errors[0].detail).to.eql(\"[sku] => This field is missing.\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "X-Anonymous-Customer-Unique-Id",
+								"type": "text",
+								"value": "{{anonymous_customer_id}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"data\": {\n        \"type\": \"guest-cart-items\",\n        \"attributes\": {\n            \"quantity\": 1\n        }\n    }\n}"
+						},
+						"url": {
+							"raw": "{{url}}/guest-cart-items",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"guest-cart-items"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Send the request without quantity",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "05370552-f35d-44b3-a690-1496fc7d0ad8",
+								"exec": [
+									"var responseJson = pm.response.json();",
+									"",
+									"pm.test(\"Status code is 400\", function () {",
+									"    pm.response.to.have.status(400);",
+									"});",
+									"",
+									"pm.test(\"Correct error status\", function() {",
+									"    pm.expect(responseJson.errors[0].status).to.eql(400);",
+									"});",
+									"",
+									"pm.test(\"Correct error code\", function() {",
+									"    pm.expect(responseJson.errors[0].code).to.eql(\"901\");",
+									"});",
+									"",
+									"pm.test(\"Correct error message\", function() {",
+									"    pm.expect(responseJson.errors[0].detail).to.eql(\"[quantity] => This field is missing.\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "X-Anonymous-Customer-Unique-Id",
+								"type": "text",
+								"value": "{{anonymous_customer_id}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"data\": {\n        \"type\": \"guest-cart-items\",\n        \"attributes\": {\n            \"sku\": \"{{sku}}\"\n        }\n    }\n}"
+						},
+						"url": {
+							"raw": "{{url}}/guest-cart-items",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"guest-cart-items"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Send the request with broken URL",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "05370552-f35d-44b3-a690-1496fc7d0ad8",
+								"exec": [
+									"var responseJson = pm.response.json();",
+									"",
+									"pm.test(\"Status code is 404\", function () {",
+									"    pm.response.to.have.status(404);",
+									"});",
+									"",
+									"pm.test(\"Correct error status\", function() {",
+									"    pm.expect(responseJson.errors[0].status).to.eql(404);",
+									"});",
+									"",
+									"pm.test(\"Correct error message\", function() {",
+									"    pm.expect(responseJson.errors[0].detail).to.eql(\"Not Found\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "X-Anonymous-Customer-Unique-Id",
+								"type": "text",
+								"value": "{{anonymous_customer_id}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"data\": {\n        \"type\": \"guest-cart-items\",\n        \"attributes\": {\n            \"sku\": \"{{sku}}\",\n            \"quantity\": 1\n        }\n    }\n}"
+						},
+						"url": {
+							"raw": "{{url}}/guest-cart-item",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"guest-cart-item"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Send the request with a mistake in some name of fields like sKu & attrbutes & qty",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "05370552-f35d-44b3-a690-1496fc7d0ad8",
+								"exec": [
+									"var responseJson = pm.response.json();",
+									"",
+									"pm.test(\"Status code is 404\", function () {",
+									"    pm.response.to.have.status(404);",
+									"});",
+									"",
+									"pm.test(\"Correct error status\", function() {",
+									"    pm.expect(responseJson.errors[0].status).to.eql(404);",
+									"});",
+									"",
+									"pm.test(\"Correct error message\", function() {",
+									"    pm.expect(responseJson.errors[0].detail).to.eql(\"Not Found\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "X-Anonymous-Customer-Unique-Id",
+								"type": "text",
+								"value": "{{anonymous_customer_id}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"data\": {\n        \"type\": \"guest-cart-items\",\n        \"attrbutes\": {\n            \"sKu\": \"{{sku}}\",\n            \"qty\": 1\n        }\n    }\n}"
+						},
+						"url": {
+							"raw": "{{url}}/guest-cart-item",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"guest-cart-item"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Request for creating/adding a guest cart with a wrong method",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "05370552-f35d-44b3-a690-1496fc7d0ad8",
+								"exec": [
+									"var responseJson = pm.response.json();",
+									"",
+									"pm.test(\"Status code is 404\", function () {",
+									"    pm.response.to.have.status(404);",
+									"});",
+									"",
+									"pm.test(\"Correct error status\", function() {",
+									"    pm.expect(responseJson.errors[0].status).to.eql(404);",
+									"});",
+									"",
+									"pm.test(\"Correct error message\", function() {",
+									"    pm.expect(responseJson.errors[0].detail).to.eql(\"Not Found\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "X-Anonymous-Customer-Unique-Id",
+								"type": "text",
+								"value": "{{anonymous_customer_id}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"data\": {\n        \"type\": \"guest-cart-items\",\n        \"attributes\": {\n            \"sku\": \"{{sku}}\",\n            \"quantity\": 1\n        }\n    }\n}"
+						},
+						"url": {
+							"raw": "{{url}}/guest-cart-item",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"guest-cart-item"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Request for creating/adding a guest cart with a wrong method",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "05370552-f35d-44b3-a690-1496fc7d0ad8",
+								"exec": [
+									"var responseJson = pm.response.json();",
+									"",
+									"pm.test(\"Status code is 404\", function () {",
+									"    pm.response.to.have.status(404);",
+									"});",
+									"",
+									"pm.test(\"Correct error status\", function() {",
+									"    pm.expect(responseJson.errors[0].status).to.eql(404);",
+									"});",
+									"",
+									"pm.test(\"Correct error message\", function() {",
+									"    pm.expect(responseJson.errors[0].detail).to.eql(\"Not Found\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "X-Anonymous-Customer-Unique-Id",
+								"type": "text",
+								"value": "{{anonymous_customer_id}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"data\": {\n        \"type\": \"guest-cart-items\",\n        \"attributes\": {\n            \"sku\": \"{{sku}}\",\n            \"quantity\": 1\n        }\n    }\n}"
+						},
+						"url": {
+							"raw": "{{url}}/guest-cart-item",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"guest-cart-item"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Request for creating/adding a guest cart with a wrong method",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "05370552-f35d-44b3-a690-1496fc7d0ad8",
+								"exec": [
+									"var responseJson = pm.response.json();",
+									"",
+									"pm.test(\"Status code is 404\", function () {",
+									"    pm.response.to.have.status(404);",
+									"});",
+									"",
+									"pm.test(\"Correct error status\", function() {",
+									"    pm.expect(responseJson.errors[0].status).to.eql(404);",
+									"});",
+									"",
+									"pm.test(\"Correct error message\", function() {",
+									"    pm.expect(responseJson.errors[0].detail).to.eql(\"Not Found\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "X-Anonymous-Customer-Unique-Id",
+								"type": "text",
+								"value": "{{anonymous_customer_id}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"data\": {\n        \"type\": \"guest-cart-items\",\n        \"attributes\": {\n            \"sku\": \"{{sku}}\",\n            \"quantity\": 1\n        }\n    }\n}"
+						},
+						"url": {
+							"raw": "{{url}}/guest-cart-item",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"guest-cart-item"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Add an item to the guest cart ",
+			"item": [
+				{
+					"name": "Request for creating/adding a guest cart (helper)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "05370552-f35d-44b3-a690-1496fc7d0ad8",
+								"exec": [
+									"var responseData = pm.response.json().data;",
+									"",
+									"pm.variables.set(\"guest_cart_id\", responseData.id);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "X-Anonymous-Customer-Unique-Id",
+								"value": "{{anonymous_customer_id}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"data\": {\n        \"type\": \"guest-cart-items\",\n        \"attributes\": {\n            \"sku\": \"{{sku}}\",\n            \"quantity\": 1\n        }\n    }\n}"
+						},
+						"url": {
+							"raw": "{{url}}/guest-cart-items",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"guest-cart-items"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Request for adding an item into the guest cart",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "05370552-f35d-44b3-a690-1496fc7d0ad8",
+								"exec": [
+									"var responseData = pm.response.json().data;",
+									"",
+									"pm.variables.set(\"guest_cart_id\", responseData.id);",
+									"",
+									"pm.test(\"Status code is 201\", function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"pm.test(\"Has correct type\", function() {",
+									"    pm.expect(responseData.type).to.eql(\"guest-carts\");",
+									"});",
+									"",
+									"pm.test(\"Has id returned\", function() {",
+									"    pm.expect(responseData.id).not.eql(null);",
+									"    pm.expect(responseData.id).to.be.a(\"string\");",
+									"});",
+									"",
+									"pm.test(\"Has priceMode returned\", function() {",
+									"    pm.expect(responseData.attributes.priceMode).not.eql(null);",
+									"    pm.expect(responseData.attributes.priceMode).to.be.a(\"string\");",
+									"});",
+									"",
+									"pm.test(\"Has currency returned\", function() {",
+									"    pm.expect(responseData.attributes.currency).not.eql(null);",
+									"    pm.expect(responseData.attributes.currency).to.be.a(\"string\");",
+									"});",
+									"",
+									"pm.test(\"Has store returned\", function() {",
+									"    pm.expect(responseData.attributes.store).not.eql(null);",
+									"    pm.expect(responseData.attributes.store).to.be.a(\"string\");",
+									"});",
+									"",
+									"pm.test(\"Has discounts returned\", function() {",
+									"    pm.expect(responseData.attributes.discounts.length).not.eql(null);",
+									"});",
+									"",
+									"pm.test(\"Has totals returned\", function() {",
+									"    pm.expect(responseData.attributes.totals.length).not.eql(null);",
+									"    ",
+									"    pm.expect(responseData.attributes.totals.expenseTotal).not.eql(null);",
+									"    pm.expect(responseData.attributes.totals.discountTotal).not.eql(null);",
+									"    pm.expect(responseData.attributes.totals.taxTotal).not.eql(null);",
+									"    pm.expect(responseData.attributes.totals.subtotal).not.eql(null);",
+									"    pm.expect(responseData.attributes.totals.grandTotal).not.eql(null);",
+									"});",
+									"",
+									"pm.test(\"Has self link\", function() {",
+									"    pm.expect(responseData.links.self).to.not.be.empty;",
+									"    pm.expect(responseData.links.self).to.eql(pm.variables.get(\"url\") + \"/guest-carts/\" + pm.variables.get(\"guest_cart_id\"));",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "X-Anonymous-Customer-Unique-Id",
+								"type": "text",
+								"value": "{{anonymous_customer_id}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"data\": {\n        \"type\": \"guest-cart-items\",\n        \"attributes\": {\n            \"sku\": \"{{sku_2}}\",\n            \"quantity\": 1\n        }\n    }\n}"
+						},
+						"url": {
+							"raw": "{{url}}/guest-carts/{{guest_cart_id}}/guest-cart-items",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"guest-carts",
+								"{{guest_cart_id}}",
+								"guest-cart-items"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Request for adding an item into a guest cart another customer",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "05370552-f35d-44b3-a690-1496fc7d0ad8",
+								"exec": [
+									"var responseJson = pm.response.json();",
+									"",
+									"pm.test(\"Status code is 404\", function () {",
+									"    pm.response.to.have.status(404);",
+									"});",
+									"",
+									"pm.test(\"Correct error status\", function() {",
+									"    pm.expect(responseJson.errors[0].status).to.eql(404);",
+									"});",
+									"",
+									"pm.test(\"Correct error code\", function() {",
+									"    pm.expect(responseJson.errors[0].code).to.eql(\"101\");",
+									"});",
+									"",
+									"pm.test(\"Correct error message\", function() {",
+									"    pm.expect(responseJson.errors[0].detail).to.eql(\"Cart with given uuid not found.\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "X-Anonymous-Customer-Unique-Id",
+								"type": "text",
+								"value": "11"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"data\": {\n        \"type\": \"guest-cart-items\",\n        \"attributes\": {\n            \"sku\": \"{{sku_2}}\",\n            \"quantity\": 1\n        }\n    }\n}"
+						},
+						"url": {
+							"raw": "{{url}}/guest-carts/{{guest_cart_id}}/guest-cart-items",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"guest-carts",
+								"{{guest_cart_id}}",
+								"guest-cart-items"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Update an item in a guest cart",
+			"item": [
+				{
+					"name": "Request for creating/adding a guest cart (helper)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "05370552-f35d-44b3-a690-1496fc7d0ad8",
+								"exec": [
+									"var responseData = pm.response.json().data;",
+									"",
+									"pm.variables.set(\"guest_cart_id\", responseData.id);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "X-Anonymous-Customer-Unique-Id",
+								"value": "{{anonymous_customer_id}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"data\": {\n        \"type\": \"guest-cart-items\",\n        \"attributes\": {\n            \"sku\": \"{{sku}}\",\n            \"quantity\": 1\n        }\n    }\n}"
+						},
+						"url": {
+							"raw": "{{url}}/guest-cart-items",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"guest-cart-items"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Clear guest cart (helper)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "05370552-f35d-44b3-a690-1496fc7d0ad8",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "X-Anonymous-Customer-Unique-Id",
+								"value": "{{anonymous_customer_id}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/guest-carts/{{guest_cart_id}}/guest-cart-items/{{sku_2}}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"guest-carts",
+								"{{guest_cart_id}}",
+								"guest-cart-items",
+								"{{sku_2}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Request for increasing qty of an item into the guest cart",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "05370552-f35d-44b3-a690-1496fc7d0ad8",
+								"exec": [
+									"var responseData = pm.response.json().data;",
+									"var includedData = pm.response.json().included;",
+									"",
+									"pm.variables.set(\"guest_cart_id\", responseData.id);",
+									"",
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Has correct type\", function() {",
+									"    pm.expect(responseData.type).to.eql(\"guest-carts\");",
+									"});",
+									"",
+									"pm.test(\"Has id returned\", function() {",
+									"    pm.expect(responseData.id).not.eql(null);",
+									"    pm.expect(responseData.id).to.be.a(\"string\");",
+									"});",
+									"",
+									"pm.test(\"Has product with updated quantity\", function() {",
+									"    pm.expect(includedData[4].attributes.sku).to.eql(pm.variables.get(\"sku\"));",
+									"    pm.expect(includedData[4].attributes.quantity).to.eql(Number(pm.variables.get(\"quantity\")));",
+									"});",
+									"",
+									"pm.test(\"Has self link\", function() {",
+									"    pm.expect(responseData.links.self).to.not.be.empty;",
+									"    pm.expect(responseData.links.self).to.eql(pm.variables.get(\"url\") + \"/guest-carts/\" + pm.variables.get(\"guest_cart_id\"));",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "X-Anonymous-Customer-Unique-Id",
+								"type": "text",
+								"value": "{{anonymous_customer_id}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"data\": {\n        \"type\": \"guest-cart-items\",\n        \"attributes\": {\n            \"quantity\": {{quantity}}\n        }\n    }\n}"
+						},
+						"url": {
+							"raw": "{{url}}/guest-carts/{{guest_cart_id}}/guest-cart-items/{{sku}}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"guest-carts",
+								"{{guest_cart_id}}",
+								"guest-cart-items",
+								"{{sku}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Request for decreasing qty of an item into the guest cart",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "05370552-f35d-44b3-a690-1496fc7d0ad8",
+								"exec": [
+									"var responseData = pm.response.json().data;",
+									"var includedData = pm.response.json().included;",
+									"",
+									"pm.variables.set(\"guest_cart_id\", responseData.id);",
+									"",
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Has correct type\", function() {",
+									"    pm.expect(responseData.type).to.eql(\"guest-carts\");",
+									"});",
+									"",
+									"pm.test(\"Has id returned\", function() {",
+									"    pm.expect(responseData.id).not.eql(null);",
+									"    pm.expect(responseData.id).to.be.a(\"string\");",
+									"});",
+									"",
+									"pm.test(\"Has product with updated quantity\", function() {",
+									"    pm.expect(includedData[4].attributes.sku).to.eql(pm.variables.get(\"sku\"));",
+									"    pm.expect(includedData[4].attributes.quantity).to.eql(Number(pm.variables.get(\"quantity_2\")));",
+									"});",
+									"",
+									"pm.test(\"Has self link\", function() {",
+									"    pm.expect(responseData.links.self).to.not.be.empty;",
+									"    pm.expect(responseData.links.self).to.eql(pm.variables.get(\"url\") + \"/guest-carts/\" + pm.variables.get(\"guest_cart_id\"));",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "X-Anonymous-Customer-Unique-Id",
+								"type": "text",
+								"value": "{{anonymous_customer_id}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"data\": {\n        \"type\": \"guest-cart-items\",\n        \"attributes\": {\n            \"quantity\": {{quantity_2}}\n        }\n    }\n}"
+						},
+						"url": {
+							"raw": "{{url}}/guest-carts/{{guest_cart_id}}/guest-cart-items/{{sku}}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"guest-carts",
+								"{{guest_cart_id}}",
+								"guest-cart-items",
+								"{{sku}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Request for updating qty of an item to 0 into the guest cart",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "05370552-f35d-44b3-a690-1496fc7d0ad8",
+								"exec": [
+									"var responseData = pm.response.json().data;",
+									"",
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Has correct type\", function() {",
+									"    pm.expect(responseData.type).to.eql(\"guest-carts\");",
+									"});",
+									"",
+									"pm.test(\"Has id returned\", function() {",
+									"    pm.expect(responseData.id).not.eql(null);",
+									"    pm.expect(responseData.id).to.be.a(\"string\");",
+									"});",
+									"",
+									"pm.test(\"Has 0 totals returned\", function() {",
+									"    pm.expect(responseData.attributes.totals.length).not.eql(null);",
+									"    ",
+									"    pm.expect(responseData.attributes.totals.expenseTotal).to.eql(0);",
+									"    pm.expect(responseData.attributes.totals.discountTotal).to.eql(0);",
+									"    pm.expect(responseData.attributes.totals.taxTotal).to.eql(0);",
+									"    pm.expect(responseData.attributes.totals.subtotal).to.eql(0);",
+									"    pm.expect(responseData.attributes.totals.grandTotal).to.eql(0);",
+									"});",
+									"",
+									"pm.test(\"Has self link\", function() {",
+									"    pm.expect(responseData.links.self).to.not.be.empty;",
+									"    pm.expect(responseData.links.self).to.eql(pm.variables.get(\"url\") + \"/guest-carts/\" + pm.variables.get(\"guest_cart_id\"));",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "X-Anonymous-Customer-Unique-Id",
+								"type": "text",
+								"value": "{{anonymous_customer_id}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"data\": {\n        \"type\": \"guest-cart-items\",\n        \"attributes\": {\n            \"quantity\": 0\n        }\n    }\n}"
+						},
+						"url": {
+							"raw": "{{url}}/guest-carts/{{guest_cart_id}}/guest-cart-items/{{sku}}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"guest-carts",
+								"{{guest_cart_id}}",
+								"guest-cart-items",
+								"{{sku}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Request for creating/adding a guest cart (helper)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "05370552-f35d-44b3-a690-1496fc7d0ad8",
+								"exec": [
+									"var responseData = pm.response.json().data;",
+									"",
+									"pm.variables.set(\"guest_cart_id\", responseData.id);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "X-Anonymous-Customer-Unique-Id",
+								"value": "{{anonymous_customer_id}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"data\": {\n        \"type\": \"guest-cart-items\",\n        \"attributes\": {\n            \"sku\": \"{{sku}}\",\n            \"quantity\": 1\n        }\n    }\n}"
+						},
+						"url": {
+							"raw": "{{url}}/guest-cart-items",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"guest-cart-items"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Send the request with invalid SKU in URL",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "05370552-f35d-44b3-a690-1496fc7d0ad8",
+								"exec": [
+									"var responseJson = pm.response.json();",
+									"",
+									"pm.test(\"Status code is 404\", function () {",
+									"    pm.response.to.have.status(404);",
+									"});",
+									"",
+									"pm.test(\"Correct error status\", function() {",
+									"    pm.expect(responseJson.errors[0].status).to.eql(404);",
+									"});",
+									"",
+									"pm.test(\"Correct error code\", function() {",
+									"    pm.expect(responseJson.errors[0].code).to.eql(\"103\");",
+									"});",
+									"",
+									"pm.test(\"Correct error message\", function() {",
+									"    pm.expect(responseJson.errors[0].detail).to.eql(\"Item with the given group key not found in the cart.\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "X-Anonymous-Customer-Unique-Id",
+								"type": "text",
+								"value": "{{anonymous_customer_id}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"data\": {\n        \"type\": \"guest-cart-items\",\n        \"attributes\": {\n            \"quantity\": 3\n        }\n    }\n}"
+						},
+						"url": {
+							"raw": "{{url}}/guest-carts/{{guest_cart_id}}/guest-cart-items/228_228",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"guest-carts",
+								"{{guest_cart_id}}",
+								"guest-cart-items",
+								"228_228"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Send the request without sku in URL",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "05370552-f35d-44b3-a690-1496fc7d0ad8",
+								"exec": [
+									"var responseJson = pm.response.json();",
+									"",
+									"pm.test(\"Status code is 400\", function () {",
+									"    pm.response.to.have.status(400);",
+									"});",
+									"",
+									"pm.test(\"Correct error status\", function() {",
+									"    pm.expect(responseJson.errors[0].status).to.eql(400);",
+									"});",
+									"",
+									"pm.test(\"Correct error code\", function() {",
+									"    pm.expect(responseJson.errors[0].code).to.eql(\"108\");",
+									"});",
+									"",
+									"pm.test(\"Correct error message\", function() {",
+									"    pm.expect(responseJson.errors[0].detail).to.eql(\"Cart uuid or item group key is not specified.\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "X-Anonymous-Customer-Unique-Id",
+								"type": "text",
+								"value": "{{anonymous_customer_id}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"data\": {\n        \"type\": \"guest-cart-items\",\n        \"attributes\": {\n            \"quantity\": 3\n        }\n    }\n}"
+						},
+						"url": {
+							"raw": "{{url}}/guest-carts/{{guest_cart_id}}/guest-cart-items",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"guest-carts",
+								"{{guest_cart_id}}",
+								"guest-cart-items"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Send the request with wrong UUID of a guest cart in the URL",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "05370552-f35d-44b3-a690-1496fc7d0ad8",
+								"exec": [
+									"var responseJson = pm.response.json();",
+									"",
+									"pm.test(\"Status code is 404\", function () {",
+									"    pm.response.to.have.status(404);",
+									"});",
+									"",
+									"pm.test(\"Correct error status\", function() {",
+									"    pm.expect(responseJson.errors[0].status).to.eql(404);",
+									"});",
+									"",
+									"pm.test(\"Correct error code\", function() {",
+									"    pm.expect(responseJson.errors[0].code).to.eql(\"101\");",
+									"});",
+									"",
+									"pm.test(\"Correct error message\", function() {",
+									"    pm.expect(responseJson.errors[0].detail).to.eql(\"Cart with given uuid not found.\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "X-Anonymous-Customer-Unique-Id",
+								"type": "text",
+								"value": "{{anonymous_customer_id}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"data\": {\n        \"type\": \"guest-cart-items\",\n        \"attributes\": {\n            \"quantity\": 3\n        }\n    }\n}"
+						},
+						"url": {
+							"raw": "{{url}}/guest-carts/{{wrong_guest_cart_id}}/guest-cart-items/{{sku}}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"guest-carts",
+								"{{wrong_guest_cart_id}}",
+								"guest-cart-items",
+								"{{sku}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Send the request with UUID of a guest cart another customer",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "05370552-f35d-44b3-a690-1496fc7d0ad8",
+								"exec": [
+									"var responseJson = pm.response.json();",
+									"",
+									"pm.test(\"Status code is 404\", function () {",
+									"    pm.response.to.have.status(404);",
+									"});",
+									"",
+									"pm.test(\"Correct error status\", function() {",
+									"    pm.expect(responseJson.errors[0].status).to.eql(404);",
+									"});",
+									"",
+									"pm.test(\"Correct error code\", function() {",
+									"    pm.expect(responseJson.errors[0].code).to.eql(\"101\");",
+									"});",
+									"",
+									"pm.test(\"Correct error message\", function() {",
+									"    pm.expect(responseJson.errors[0].detail).to.eql(\"Cart with given uuid not found.\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "X-Anonymous-Customer-Unique-Id",
+								"type": "text",
+								"value": "11"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"data\": {\n        \"type\": \"guest-cart-items\",\n        \"attributes\": {\n            \"quantity\": 3\n        }\n    }\n}"
+						},
+						"url": {
+							"raw": "{{url}}/guest-carts/{{guest_cart_id}}/guest-cart-items/{{sku}}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"guest-carts",
+								"{{guest_cart_id}}",
+								"guest-cart-items",
+								"{{sku}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Send the request without qty field in the body",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "05370552-f35d-44b3-a690-1496fc7d0ad8",
+								"exec": [
+									"var responseJson = pm.response.json();",
+									"",
+									"pm.test(\"Status code is 400\", function () {",
+									"    pm.response.to.have.status(400);",
+									"});",
+									"",
+									"pm.test(\"Correct error status\", function() {",
+									"    pm.expect(responseJson.errors[0].status).to.eql(400);",
+									"});",
+									"",
+									"pm.test(\"Correct error code\", function() {",
+									"    pm.expect(responseJson.errors[0].code).to.eql(\"901\");",
+									"});",
+									"",
+									"pm.test(\"Correct error message\", function() {",
+									"    pm.expect(responseJson.errors[0].detail).to.eql(\"[quantity] => This field is missing.\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "X-Anonymous-Customer-Unique-Id",
+								"type": "text",
+								"value": "{{anonymous_customer_id}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"data\": {\n        \"type\": \"guest-cart-items\",\n        \"attributes\": {\n        }\n    }\n}"
+						},
+						"url": {
+							"raw": "{{url}}/guest-carts/{{guest_cart_id}}/guest-cart-items/{{sku}}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"guest-carts",
+								"{{guest_cart_id}}",
+								"guest-cart-items",
+								"{{sku}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Send the request with empty quantity",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "05370552-f35d-44b3-a690-1496fc7d0ad8",
+								"exec": [
+									"var responseJson = pm.response.json();",
+									"",
+									"pm.test(\"Status code is 400\", function () {",
+									"    pm.response.to.have.status(400);",
+									"});",
+									"",
+									"pm.test(\"Correct error status\", function() {",
+									"    pm.expect(responseJson.errors[0].status).to.eql(400);",
+									"});",
+									"",
+									"pm.test(\"Correct error code\", function() {",
+									"    pm.expect(responseJson.errors[0].code).to.eql(\"901\");",
+									"});",
+									"",
+									"pm.test(\"Correct error message\", function() {",
+									"    pm.expect(responseJson.errors[0].detail).to.eql(\"[quantity] => This value should not be blank.\");",
+									"});",
+									"",
+									"pm.test(\"Correct error status\", function() {",
+									"    pm.expect(responseJson.errors[1].status).to.eql(400);",
+									"});",
+									"",
+									"pm.test(\"Correct error code\", function() {",
+									"    pm.expect(responseJson.errors[1].code).to.eql(\"901\");",
+									"});",
+									"",
+									"pm.test(\"Correct error message\", function() {",
+									"    pm.expect(responseJson.errors[1].detail).to.eql(\"[quantity] => This value should be of type numeric.\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "X-Anonymous-Customer-Unique-Id",
+								"type": "text",
+								"value": "{{anonymous_customer_id}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"data\": {\n        \"type\": \"guest-cart-items\",\n        \"attributes\": {\n        \t\"quantity\": \"\"\n        }\n    }\n}"
+						},
+						"url": {
+							"raw": "{{url}}/guest-carts/{{guest_cart_id}}/guest-cart-items/{{sku}}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"guest-carts",
+								"{{guest_cart_id}}",
+								"guest-cart-items",
+								"{{sku}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Retrieve the guest cart by UUID & list of guest cart",
+			"item": [
+				{
+					"name": "Request for creating/adding a guest cart (helper)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "05370552-f35d-44b3-a690-1496fc7d0ad8",
+								"exec": [
+									"var responseData = pm.response.json().data;",
+									"",
+									"pm.variables.set(\"guest_cart_id\", responseData.id);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "X-Anonymous-Customer-Unique-Id",
+								"value": "{{anonymous_customer_id}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"data\": {\n        \"type\": \"guest-cart-items\",\n        \"attributes\": {\n            \"sku\": \"{{sku}}\",\n            \"quantity\": 1\n        }\n    }\n}"
+						},
+						"url": {
+							"raw": "{{url}}/guest-cart-items",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"guest-cart-items"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Request for getting the list of guest cart",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "05370552-f35d-44b3-a690-1496fc7d0ad8",
+								"exec": [
+									"var responseData = pm.response.json().data[0];",
+									"",
+									"pm.variables.set(\"guest_cart_id\", responseData.id);",
+									"",
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Has correct type\", function() {",
+									"    pm.expect(responseData.type).to.eql(\"guest-carts\");",
+									"});",
+									"",
+									"pm.test(\"Has id returned\", function() {",
+									"    pm.expect(responseData.id).not.eql(null);",
+									"    pm.expect(responseData.id).to.be.a(\"string\");",
+									"});",
+									"",
+									"pm.test(\"Has priceMode returned\", function() {",
+									"    pm.expect(responseData.attributes.priceMode).not.eql(null);",
+									"    pm.expect(responseData.attributes.priceMode).to.be.a(\"string\");",
+									"});",
+									"",
+									"pm.test(\"Has currency returned\", function() {",
+									"    pm.expect(responseData.attributes.currency).not.eql(null);",
+									"    pm.expect(responseData.attributes.currency).to.be.a(\"string\");",
+									"});",
+									"",
+									"pm.test(\"Has store returned\", function() {",
+									"    pm.expect(responseData.attributes.store).not.eql(null);",
+									"    pm.expect(responseData.attributes.store).to.be.a(\"string\");",
+									"});",
+									"",
+									"pm.test(\"Has discounts returned\", function() {",
+									"    pm.expect(responseData.attributes.discounts.length).not.eql(null);",
+									"});",
+									"",
+									"pm.test(\"Has totals returned\", function() {",
+									"    pm.expect(responseData.attributes.totals.length).not.eql(null);",
+									"    ",
+									"    pm.expect(responseData.attributes.totals.expenseTotal).not.eql(null);",
+									"    pm.expect(responseData.attributes.totals.discountTotal).not.eql(null);",
+									"    pm.expect(responseData.attributes.totals.taxTotal).not.eql(null);",
+									"    pm.expect(responseData.attributes.totals.subtotal).not.eql(null);",
+									"    pm.expect(responseData.attributes.totals.grandTotal).not.eql(null);",
+									"});",
+									"",
+									"pm.test(\"Has self link\", function() {",
+									"    pm.expect(responseData.links.self).to.not.be.empty;",
+									"    pm.expect(responseData.links.self).to.eql(pm.variables.get(\"url\") + \"/guest-carts/\" + pm.variables.get(\"guest_cart_id\"));",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "X-Anonymous-Customer-Unique-Id",
+								"type": "text",
+								"value": "{{anonymous_customer_id}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/guest-carts",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"guest-carts"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Request for getting a gust cart by UUID",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "05370552-f35d-44b3-a690-1496fc7d0ad8",
+								"exec": [
+									"var responseData = pm.response.json().data;",
+									"",
+									"pm.variables.set(\"guest_cart_id\", responseData.id);",
+									"",
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Has correct type\", function() {",
+									"    pm.expect(responseData.type).to.eql(\"guest-carts\");",
+									"});",
+									"",
+									"pm.test(\"Has id returned\", function() {",
+									"    pm.expect(responseData.id).to.eql(pm.variables.get(\"guest_cart_id\"));",
+									"    pm.expect(responseData.id).to.be.a(\"string\");",
+									"});",
+									"",
+									"pm.test(\"Has priceMode returned\", function() {",
+									"    pm.expect(responseData.attributes.priceMode).not.eql(null);",
+									"    pm.expect(responseData.attributes.priceMode).to.be.a(\"string\");",
+									"});",
+									"",
+									"pm.test(\"Has currency returned\", function() {",
+									"    pm.expect(responseData.attributes.currency).not.eql(null);",
+									"    pm.expect(responseData.attributes.currency).to.be.a(\"string\");",
+									"});",
+									"",
+									"pm.test(\"Has store returned\", function() {",
+									"    pm.expect(responseData.attributes.store).not.eql(null);",
+									"    pm.expect(responseData.attributes.store).to.be.a(\"string\");",
+									"});",
+									"",
+									"pm.test(\"Has discounts returned\", function() {",
+									"    pm.expect(responseData.attributes.discounts.length).not.eql(null);",
+									"});",
+									"",
+									"pm.test(\"Has totals returned\", function() {",
+									"    pm.expect(responseData.attributes.totals.length).not.eql(null);",
+									"    ",
+									"    pm.expect(responseData.attributes.totals.expenseTotal).not.eql(null);",
+									"    pm.expect(responseData.attributes.totals.discountTotal).not.eql(null);",
+									"    pm.expect(responseData.attributes.totals.taxTotal).not.eql(null);",
+									"    pm.expect(responseData.attributes.totals.subtotal).not.eql(null);",
+									"    pm.expect(responseData.attributes.totals.grandTotal).not.eql(null);",
+									"});",
+									"",
+									"pm.test(\"Has self link\", function() {",
+									"    pm.expect(responseData.links.self).to.not.be.empty;",
+									"    pm.expect(responseData.links.self).to.eql(pm.variables.get(\"url\") + \"/guest-carts/\" + pm.variables.get(\"guest_cart_id\"));",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "X-Anonymous-Customer-Unique-Id",
+								"type": "text",
+								"value": "{{anonymous_customer_id}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/guest-carts/{{guest_cart_id}}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"guest-carts",
+								"{{guest_cart_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Send the request with broken URL",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "05370552-f35d-44b3-a690-1496fc7d0ad8",
+								"exec": [
+									"var responseJson = pm.response.json();",
+									"",
+									"pm.test(\"Status code is 404\", function () {",
+									"    pm.response.to.have.status(404);",
+									"});",
+									"",
+									"pm.test(\"Correct error status\", function() {",
+									"    pm.expect(responseJson.errors[0].status).to.eql(404);",
+									"});",
+									"",
+									"pm.test(\"Correct error message\", function() {",
+									"    pm.expect(responseJson.errors[0].detail).to.eql(\"Not Found\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "X-Anonymous-Customer-Unique-Id",
+								"type": "text",
+								"value": "{{anonymous_customer_id}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/guest-cart/{{guest_cart_id}}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"guest-cart",
+								"{{guest_cart_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Send the request with no existing UUID",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "05370552-f35d-44b3-a690-1496fc7d0ad8",
+								"exec": [
+									"var responseJson = pm.response.json();",
+									"",
+									"pm.test(\"Status code is 404\", function () {",
+									"    pm.response.to.have.status(404);",
+									"});",
+									"",
+									"pm.test(\"Correct error status\", function() {",
+									"    pm.expect(responseJson.errors[0].status).to.eql(404);",
+									"});",
+									"",
+									"pm.test(\"Correct error code\", function() {",
+									"    pm.expect(responseJson.errors[0].code).to.eql(\"101\");",
+									"});",
+									"",
+									"pm.test(\"Correct error message\", function() {",
+									"    pm.expect(responseJson.errors[0].detail).to.eql(\"Cart with given uuid not found.\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "X-Anonymous-Customer-Unique-Id",
+								"type": "text",
+								"value": "{{anonymous_customer_id}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/guest-carts/{{wrong_guest_cart_id}}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"guest-carts",
+								"{{wrong_guest_cart_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Send the request with UUID of cart another customer",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "05370552-f35d-44b3-a690-1496fc7d0ad8",
+								"exec": [
+									"var responseJson = pm.response.json();",
+									"",
+									"pm.test(\"Status code is 404\", function () {",
+									"    pm.response.to.have.status(404);",
+									"});",
+									"",
+									"pm.test(\"Correct error status\", function() {",
+									"    pm.expect(responseJson.errors[0].status).to.eql(404);",
+									"});",
+									"",
+									"pm.test(\"Correct error code\", function() {",
+									"    pm.expect(responseJson.errors[0].code).to.eql(\"101\");",
+									"});",
+									"",
+									"pm.test(\"Correct error message\", function() {",
+									"    pm.expect(responseJson.errors[0].detail).to.eql(\"Cart with given uuid not found.\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "X-Anonymous-Customer-Unique-Id",
+								"type": "text",
+								"value": "11"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/guest-carts/{{guest_cart_id}}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"guest-carts",
+								"{{guest_cart_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Send the request with the wrong method DELETE",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "05370552-f35d-44b3-a690-1496fc7d0ad8",
+								"exec": [
+									"var responseJson = pm.response.json();",
+									"",
+									"pm.test(\"Status code is 404\", function () {",
+									"    pm.response.to.have.status(404);",
+									"});",
+									"",
+									"pm.test(\"Correct error status\", function() {",
+									"    pm.expect(responseJson.errors[0].status).to.eql(404);",
+									"});",
+									"",
+									"pm.test(\"Correct error message\", function() {",
+									"    pm.expect(responseJson.errors[0].detail).to.eql(\"Not Found\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "X-Anonymous-Customer-Unique-Id",
+								"type": "text",
+								"value": "{{anonymous_customer_id}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/guest-carts/{{guest_cart_id}}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"guest-carts",
+								"{{guest_cart_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Send the request with the wrong method POST",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "05370552-f35d-44b3-a690-1496fc7d0ad8",
+								"exec": [
+									"var responseJson = pm.response.json();",
+									"",
+									"pm.test(\"Status code is 404\", function () {",
+									"    pm.response.to.have.status(404);",
+									"});",
+									"",
+									"pm.test(\"Correct error status\", function() {",
+									"    pm.expect(responseJson.errors[0].status).to.eql(404);",
+									"});",
+									"",
+									"pm.test(\"Correct error message\", function() {",
+									"    pm.expect(responseJson.errors[0].detail).to.eql(\"Not Found\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "X-Anonymous-Customer-Unique-Id",
+								"type": "text",
+								"value": "{{anonymous_customer_id}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/guest-carts/{{guest_cart_id}}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"guest-carts",
+								"{{guest_cart_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Send the request with the wrong method PATCH",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "05370552-f35d-44b3-a690-1496fc7d0ad8",
+								"exec": [
+									"var responseJson = pm.response.json();",
+									"",
+									"pm.test(\"Status code is 404\", function () {",
+									"    pm.response.to.have.status(404);",
+									"});",
+									"",
+									"pm.test(\"Correct error status\", function() {",
+									"    pm.expect(responseJson.errors[0].status).to.eql(404);",
+									"});",
+									"",
+									"pm.test(\"Correct error message\", function() {",
+									"    pm.expect(responseJson.errors[0].detail).to.eql(\"Not Found\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "X-Anonymous-Customer-Unique-Id",
+								"type": "text",
+								"value": "{{anonymous_customer_id}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/guest-carts/{{guest_cart_id}}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"guest-carts",
+								"{{guest_cart_id}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Remove an item from a guest cart",
+			"item": [
+				{
+					"name": "Request for creating/adding a guest cart (helper)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "05370552-f35d-44b3-a690-1496fc7d0ad8",
+								"exec": [
+									"var responseData = pm.response.json().data;",
+									"",
+									"pm.variables.set(\"guest_cart_id\", responseData.id);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "X-Anonymous-Customer-Unique-Id",
+								"value": "{{anonymous_customer_id}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"data\": {\n        \"type\": \"guest-cart-items\",\n        \"attributes\": {\n            \"sku\": \"{{sku}}\",\n            \"quantity\": 1\n        }\n    }\n}"
+						},
+						"url": {
+							"raw": "{{url}}/guest-cart-items",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"guest-cart-items"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Request for removing an item from the regular cart",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "05370552-f35d-44b3-a690-1496fc7d0ad8",
+								"exec": [
+									"pm.test(\"Status code is 204\", function () {",
+									"    pm.response.to.have.status(204);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "X-Anonymous-Customer-Unique-Id",
+								"type": "text",
+								"value": "{{anonymous_customer_id}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/guest-carts/{{guest_cart_id}}/guest-cart-items/{{sku}}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"guest-carts",
+								"{{guest_cart_id}}",
+								"guest-cart-items",
+								"{{sku}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Send the request without uuid of cart in URL",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "05370552-f35d-44b3-a690-1496fc7d0ad8",
+								"exec": [
+									"var responseJson = pm.response.json();",
+									"",
+									"pm.test(\"Status code is 404\", function () {",
+									"    pm.response.to.have.status(404);",
+									"});",
+									"",
+									"pm.test(\"Correct error status\", function() {",
+									"    pm.expect(responseJson.errors[0].status).to.eql(404);",
+									"});",
+									"",
+									"pm.test(\"Correct error message\", function() {",
+									"    pm.expect(responseJson.errors[0].detail).to.eql(\"Not Found\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "X-Anonymous-Customer-Unique-Id",
+								"type": "text",
+								"value": "{{anonymous_customer_id}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/guest-carts/guest-cart-items/{{sku}}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"guest-carts",
+								"guest-cart-items",
+								"{{sku}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Send the request without sku in URL",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "05370552-f35d-44b3-a690-1496fc7d0ad8",
+								"exec": [
+									"var responseJson = pm.response.json();",
+									"",
+									"pm.test(\"Status code is 400\", function () {",
+									"    pm.response.to.have.status(400);",
+									"});",
+									"",
+									"pm.test(\"Correct error status\", function() {",
+									"    pm.expect(responseJson.errors[0].status).to.eql(400);",
+									"});",
+									"",
+									"pm.test(\"Correct error code\", function() {",
+									"    pm.expect(responseJson.errors[0].code).to.eql(\"108\");",
+									"});",
+									"",
+									"pm.test(\"Correct error message\", function() {",
+									"    pm.expect(responseJson.errors[0].detail).to.eql(\"Cart uuid or item group key is not specified.\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "X-Anonymous-Customer-Unique-Id",
+								"type": "text",
+								"value": "{{anonymous_customer_id}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/guest-carts/{{guest_cart_id}}/guest-cart-items",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"guest-carts",
+								"{{guest_cart_id}}",
+								"guest-cart-items"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Send the request with uuid of the cart anther a customer",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "05370552-f35d-44b3-a690-1496fc7d0ad8",
+								"exec": [
+									"var responseJson = pm.response.json();",
+									"",
+									"pm.test(\"Status code is 404\", function () {",
+									"    pm.response.to.have.status(404);",
+									"});",
+									"",
+									"pm.test(\"Correct error status\", function() {",
+									"    pm.expect(responseJson.errors[0].status).to.eql(404);",
+									"});",
+									"",
+									"pm.test(\"Correct error code\", function() {",
+									"    pm.expect(responseJson.errors[0].code).to.eql(\"101\");",
+									"});",
+									"",
+									"pm.test(\"Correct error message\", function() {",
+									"    pm.expect(responseJson.errors[0].detail).to.eql(\"Cart with given uuid not found.\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "X-Anonymous-Customer-Unique-Id",
+								"type": "text",
+								"value": "11"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/guest-carts/{{guest_cart_id}}/guest-cart-items/{{sku}}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"guest-carts",
+								"{{guest_cart_id}}",
+								"guest-cart-items",
+								"{{sku}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Send the request with non-existent SKU in a guest cart",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "05370552-f35d-44b3-a690-1496fc7d0ad8",
+								"exec": [
+									"var responseJson = pm.response.json();",
+									"",
+									"pm.test(\"Status code is 404\", function () {",
+									"    pm.response.to.have.status(404);",
+									"});",
+									"",
+									"pm.test(\"Correct error status\", function() {",
+									"    pm.expect(responseJson.errors[0].status).to.eql(404);",
+									"});",
+									"",
+									"pm.test(\"Correct error code\", function() {",
+									"    pm.expect(responseJson.errors[0].code).to.eql(\"103\");",
+									"});",
+									"",
+									"pm.test(\"Correct error message\", function() {",
+									"    pm.expect(responseJson.errors[0].detail).to.eql(\"Item with the given group key not found in the cart.\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "X-Anonymous-Customer-Unique-Id",
+								"type": "text",
+								"value": "{{anonymous_customer_id}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/guest-carts/{{guest_cart_id}}/guest-cart-items/{{wrong_sku}}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"guest-carts",
+								"{{guest_cart_id}}",
+								"guest-cart-items",
+								"{{wrong_sku}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Send the request with broken URL",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "05370552-f35d-44b3-a690-1496fc7d0ad8",
+								"exec": [
+									"var responseJson = pm.response.json();",
+									"",
+									"pm.test(\"Status code is 404\", function () {",
+									"    pm.response.to.have.status(404);",
+									"});",
+									"",
+									"pm.test(\"Correct error status\", function() {",
+									"    pm.expect(responseJson.errors[0].status).to.eql(404);",
+									"});",
+									"",
+									"pm.test(\"Correct error message\", function() {",
+									"    pm.expect(responseJson.errors[0].detail).to.eql(\"Not Found\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "X-Anonymous-Customer-Unique-Id",
+								"type": "text",
+								"value": "{{anonymous_customer_id}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/guest-cart/{{guest_cart_id}}/guest-cart-items/{{sku}}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"guest-cart",
+								"{{guest_cart_id}}",
+								"guest-cart-items",
+								"{{sku}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Send the request with the wrong method POST",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "05370552-f35d-44b3-a690-1496fc7d0ad8",
+								"exec": [
+									"var responseJson = pm.response.json();",
+									"",
+									"pm.test(\"Status code is 404\", function () {",
+									"    pm.response.to.have.status(404);",
+									"});",
+									"",
+									"pm.test(\"Correct error status\", function() {",
+									"    pm.expect(responseJson.errors[0].status).to.eql(404);",
+									"});",
+									"",
+									"pm.test(\"Correct error message\", function() {",
+									"    pm.expect(responseJson.errors[0].detail).to.eql(\"Not Found\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "X-Anonymous-Customer-Unique-Id",
+								"type": "text",
+								"value": "{{anonymous_customer_id}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/guest-carts/{{guest_cart_id}}/guest-cart-items/{{sku}}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"guest-carts",
+								"{{guest_cart_id}}",
+								"guest-cart-items",
+								"{{sku}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Send the request with the wrong method PATCH",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "05370552-f35d-44b3-a690-1496fc7d0ad8",
+								"exec": [
+									"var responseJson = pm.response.json();",
+									"",
+									"pm.test(\"Status code is 400\", function () {",
+									"    pm.response.to.have.status(400);",
+									"});",
+									"",
+									"pm.test(\"Correct error status\", function() {",
+									"    pm.expect(responseJson.errors[0].status).to.eql(400);",
+									"});",
+									"",
+									"pm.test(\"Correct error message\", function() {",
+									"    pm.expect(responseJson.errors[0].detail).to.eql(\"Post data is invalid.\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "X-Anonymous-Customer-Unique-Id",
+								"type": "text",
+								"value": "{{anonymous_customer_id}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/guest-carts/{{guest_cart_id}}/guest-cart-items/{{sku}}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"guest-carts",
+								"{{guest_cart_id}}",
+								"guest-cart-items",
+								"{{sku}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Send the request with the wrong method GET",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "05370552-f35d-44b3-a690-1496fc7d0ad8",
+								"exec": [
+									"var responseJson = pm.response.json();",
+									"",
+									"pm.test(\"Status code is 404\", function () {",
+									"    pm.response.to.have.status(404);",
+									"});",
+									"",
+									"pm.test(\"Correct error status\", function() {",
+									"    pm.expect(responseJson.errors[0].status).to.eql(404);",
+									"});",
+									"",
+									"pm.test(\"Correct error message\", function() {",
+									"    pm.expect(responseJson.errors[0].detail).to.eql(\"Not Found\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "X-Anonymous-Customer-Unique-Id",
+								"type": "text",
+								"value": "{{anonymous_customer_id}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/guest-carts/{{guest_cart_id}}/guest-cart-items/{{sku}}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"guest-carts",
+								"{{guest_cart_id}}",
+								"guest-cart-items",
+								"{{sku}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Transform to a regular cart",
+			"item": [
+				{
+					"name": "Request for creating/adding a guest cart (helper)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "05370552-f35d-44b3-a690-1496fc7d0ad8",
+								"exec": [
+									"var responseData = pm.response.json().data;",
+									"",
+									"pm.variables.set(\"guest_cart_id\", responseData.id);",
+									"",
+									"pm.variables.set(\"expense_total\", responseData.attributes.totals.expenseTotal);",
+									"pm.variables.set(\"discount_total\", responseData.attributes.totals.discountTotal);",
+									"pm.variables.set(\"tax_total\", responseData.attributes.totals.taxTotal);",
+									"pm.variables.set(\"subtotal\", responseData.attributes.totals.subtotal);",
+									"pm.variables.set(\"grand_total\", responseData.attributes.totals.grandTotal);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "X-Anonymous-Customer-Unique-Id",
+								"value": "{{anonymous_customer_id}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"data\": {\n        \"type\": \"guest-cart-items\",\n        \"attributes\": {\n            \"sku\": \"{{sku}}\",\n            \"quantity\": 1\n        }\n    }\n}"
+						},
+						"url": {
+							"raw": "{{url}}/guest-cart-items",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"guest-cart-items"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create new customer (helper)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "8ad8c317-2a5a-46a7-afee-92b8b26b9d20",
+								"exec": [
+									"var responseData = pm.response.json().data;",
+									"",
+									"pm.variables.set(\"customer_reference\", responseData.id);"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "51ba2b17-58f0-4abe-b0d8-d6e0f93ead8c",
+								"exec": [
+									"setTimeout(function() {}, 1000);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "X-Anonymous-Customer-Unique-Id",
+								"value": "{{anonymous_customer_id}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"data\": {\n    \"type\": \"customers\",\n    \"attributes\": {\n        \"salutation\": \"Mr\",\n        \"gender\": \"Male\",\n        \"firstName\":\"First Name\",\n        \"lastName\":\"test\",\n        \"email\":\"{{username}}\",\n        \"password\":\"{{password}}\",\n        \"confirmPassword\":\"{{password}}\",\n        \"acceptedTerms\":true\n    }\n  }\n}"
+						},
+						"url": {
+							"raw": "{{url}}/customers",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"customers"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Request access token (helper)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "09587067-e655-4e6c-9698-87148832d432",
+								"exec": [
+									"var responseData = pm.response.json().data;",
+									"",
+									"pm.variables.set(\"token\", responseData.attributes.accessToken);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"data\": {\n        \"type\": \"access-tokens\",\n        \"attributes\": {\n            \"username\": \"{{username}}\",\n            \"password\": \"{{password}}\"\n        }\n    }\n}"
+						},
+						"url": {
+							"raw": "{{url}}/access-tokens",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"access-tokens"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Request a cart after transformation",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "09587067-e655-4e6c-9698-87148832d432",
+								"exec": [
+									"var responseData = pm.response.json().data;",
+									"",
+									"pm.variables.set(\"guest_cart_id\", responseData.id);",
+									"",
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Has correct type\", function() {",
+									"    pm.expect(responseData.type).to.eql(\"carts\");",
+									"});",
+									"",
+									"pm.test(\"Has id returned\", function() {",
+									"    pm.expect(responseData.id).to.eql(pm.variables.get(\"guest_cart_id\"));",
+									"    pm.expect(responseData.id).to.be.a(\"string\");",
+									"});",
+									"",
+									"pm.test(\"Has priceMode returned\", function() {",
+									"    pm.expect(responseData.attributes.priceMode).not.eql(null);",
+									"    pm.expect(responseData.attributes.priceMode).to.be.a(\"string\");",
+									"});",
+									"",
+									"pm.test(\"Has currency returned\", function() {",
+									"    pm.expect(responseData.attributes.currency).not.eql(null);",
+									"    pm.expect(responseData.attributes.currency).to.be.a(\"string\");",
+									"});",
+									"",
+									"pm.test(\"Has store returned\", function() {",
+									"    pm.expect(responseData.attributes.store).not.eql(null);",
+									"    pm.expect(responseData.attributes.store).to.be.a(\"string\");",
+									"});",
+									"",
+									"pm.test(\"Has discounts returned\", function() {",
+									"    pm.expect(responseData.attributes.discounts.length).not.eql(null);",
+									"});",
+									"",
+									"pm.test(\"Has totals compared\", function() {",
+									"    pm.expect(responseData.attributes.totals.expenseTotal).to.eql(Number(pm.variables.get(\"expense_total\")));",
+									"    pm.expect(responseData.attributes.totals.discountTotal).to.eql(Number(pm.variables.get(\"discount_total\")));",
+									"    pm.expect(responseData.attributes.totals.taxTotal).to.eql(Number(pm.variables.get(\"tax_total\")));",
+									"    pm.expect(responseData.attributes.totals.subtotal).to.eql(Number(pm.variables.get(\"subtotal\")));",
+									"    pm.expect(responseData.attributes.totals.grandTotal).to.eql(Number(pm.variables.get(\"grand_total\")));",
+									"});",
+									"",
+									"pm.test(\"Has self link\", function() {",
+									"    pm.expect(responseData.links.self).to.not.be.empty;",
+									"    pm.expect(responseData.links.self).to.eql(pm.variables.get(\"url\") + \"/carts/\" + pm.variables.get(\"guest_cart_id\"));",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/carts/{{guest_cart_id}}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"carts",
+								"{{guest_cart_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Request delete customer (helper)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "392dab97-c0fa-42bf-9de4-2f3fe7136abc",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/customers/{{customer_reference}}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"customers",
+								"{{customer_reference}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "a4aa796a-a89a-428d-8bb8-0ffeaba46085",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "3c8a200d-0012-4731-b381-7a4b2feec303",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"id": "7dab8836-9b03-414f-8077-0e519fce4e3d",
+			"key": "sku",
+			"value": "198_19692589",
+			"type": "string"
+		},
+		{
+			"id": "c384efc9-d574-4f48-b08d-8dc80454a16e",
+			"key": "sku_2",
+			"value": "199_24788780",
+			"type": "string"
+		},
+		{
+			"id": "55aff975-b34d-442a-a840-1b12803b4e4b",
+			"key": "bundle_sky",
+			"value": "210_123",
+			"type": "string"
+		},
+		{
+			"id": "435f20d9-4dfc-477f-baed-76ec6d5b1880",
+			"key": "wrong_sku",
+			"value": "228_228",
+			"type": "string"
+		},
+		{
+			"id": "8f07643f-ec85-467e-a05b-e21903070536",
+			"key": "guest_cart_id",
+			"value": "string",
+			"type": "string"
+		},
+		{
+			"id": "6d3d4966-cda4-4cac-ba70-811e56212a23",
+			"key": "anonymous_customer_id",
+			"value": "10",
+			"type": "string"
+		},
+		{
+			"id": "0a3ee18f-a8bc-4757-9b01-11fd98d12fba",
+			"key": "quantity",
+			"value": "3",
+			"type": "string"
+		},
+		{
+			"id": "4305336d-0aa7-4c05-8ad4-b21c695f1039",
+			"key": "quantity_2",
+			"value": "2",
+			"type": "string"
+		},
+		{
+			"id": "8d63dd34-7294-41fc-b91a-981ae54db356",
+			"key": "wrong_guest_cart_id",
+			"value": "585e0d30-edab-53f0-bc3f-da8d5d33202f",
+			"type": "string"
+		},
+		{
+			"id": "3fdc14e4-1828-4e07-969a-3ccdf0fc8d3f",
+			"key": "username",
+			"value": "test.customer@spryker.com",
+			"type": "string"
+		},
+		{
+			"id": "4ed96dc4-bd28-41f9-9217-065ea545c0e5",
+			"key": "password",
+			"value": "change123",
+			"type": "string"
+		},
+		{
+			"id": "e2363a2e-a056-4823-bcf1-2b11a0d1f510",
+			"key": "customer_reference",
+			"value": "string",
+			"type": "string"
+		},
+		{
+			"id": "02faa817-7707-4aed-95c8-d09c6c873eb0",
+			"key": "token",
+			"value": "string",
+			"type": "string"
+		},
+		{
+			"id": "59d51f16-d7ae-4c10-84dc-788fd0ba657d",
+			"key": "expense_total",
+			"value": "string",
+			"type": "string"
+		},
+		{
+			"id": "f94cc5da-5cf0-430c-98cd-0aed85a8391e",
+			"key": "discount_total",
+			"value": "string",
+			"type": "string"
+		},
+		{
+			"id": "b015e502-cb22-42dd-be4b-687fd4b34184",
+			"key": "tax_total",
+			"value": "string",
+			"type": "string"
+		},
+		{
+			"id": "0d3167db-4081-459d-a37d-e7d1eecae92f",
+			"key": "subtotal",
+			"value": "string",
+			"type": "string"
+		},
+		{
+			"id": "4c2396b3-0962-4360-97f3-7cec3d88c876",
+			"key": "grand_total",
+			"value": "string",
+			"type": "string"
+		}
+	]
+}

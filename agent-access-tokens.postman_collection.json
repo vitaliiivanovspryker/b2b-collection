@@ -1,0 +1,298 @@
+{
+	"info": {
+		"_postman_id": "7c9bbd98-5efe-4c68-9e9c-cf033b8348ed",
+		"name": "agent-access-tokens",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Positive",
+			"item": [
+				{
+					"name": "Login as an agent",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "28a9915d-5041-43f6-a492-6a33ab01191e",
+								"exec": [
+									"var responseData = pm.response.json().data;",
+									"",
+									"pm.test(\"Status code is 201\", function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"pm.test(\"Response has proper content\", function() {",
+									"    pm.expect(responseData).to.have.property(\"type\").that.is.eql(\"agent-access-tokens\");",
+									"    pm.expect(responseData).to.have.property(\"attributes\").that.is.not.eql(null);",
+									"    pm.expect(responseData.attributes).to.have.property(\"tokenType\").that.is.eql(\"Bearer\");",
+									"    pm.expect(responseData.attributes).to.have.property(\"accessToken\").that.is.not.eql(null);",
+									"    pm.expect(responseData.attributes).to.have.property(\"refreshToken\").that.is.not.eql(null);",
+									"    pm.expect(responseData).to.have.property(\"links\").that.is.not.eql(null);",
+									"    pm.expect(responseData.links).to.have.property(\"self\").that.have.string(\"agent-access-tokens\");",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"data\": {\n        \"type\": \"agent-access-tokens\",\n        \"attributes\": {\n            \"username\": \"{{email}}\",\n            \"password\": \"{{password}}\"\n        }\n    }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/agent-access-tokens",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"agent-access-tokens"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "Negative",
+			"item": [
+				{
+					"name": "Login with false credentials",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "93ab2afc-2798-404d-b14a-8cb5dac41a4a",
+								"exec": [
+									"var responseData = pm.response.json().errors;",
+									"",
+									"pm.test(\"Status code is 401\", function () {",
+									"    pm.response.to.have.status(401);",
+									"});",
+									"",
+									"pm.test(\"Login with wrong credentials\", function() {",
+									"    pm.expect(responseData[0].detail).to.be.eql(\"Failed to authenticate an agent.\");",
+									"    pm.expect(responseData[0].code).to.be.eql(\"4101\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"data\": {\n        \"type\": \"agent-access-tokens\",\n        \"attributes\": {\n            \"username\": \"{{wrongEmail}}\",\n            \"password\": \"{{password}}\"\n        }\n    }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/agent-access-tokens",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"agent-access-tokens"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Login with empty credentials",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "d4b7658e-6a1d-4b24-8bc2-bcfa5ff0a773",
+								"exec": [
+									"var responseData = pm.response.json().errors;",
+									"",
+									"pm.test(\"Status code is 401\", function () {",
+									"    pm.response.to.have.status(401);",
+									"});",
+									"",
+									"pm.test(\"Login with wrong credentials\", function() {",
+									"    pm.expect(responseData[0].detail).to.be.eql(\"Failed to authenticate an agent.\");",
+									"    pm.expect(responseData[0].code).to.be.eql(\"4101\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"data\": {\n        \"type\": \"agent-access-tokens\",\n        \"attributes\": {\n            \"username\": \"\",\n            \"password\": \"\"\n        }\n    }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/agent-access-tokens",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"agent-access-tokens"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get access token - wrong request",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "4694b6ec-f877-4a7c-b35d-a3181dfe8420",
+								"exec": [
+									"var responseData = pm.response.json().errors;",
+									"",
+									"pm.test(\"Status code is 404\", function () {",
+									"    pm.response.to.have.status(404);",
+									"});",
+									"",
+									"pm.test(\"Login with wrong request type\", function() {",
+									"    pm.expect(responseData[0].detail).to.be.eql(\"Not Found\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"data\": {\n        \"type\": \"agent-access-tokens\",\n        \"attributes\": {\n            \"username\": \"{{email}}\",\n            \"password\": \"{{password}}\"\n        }\n    }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/agent-access-tokens",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"agent-access-tokens"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get access token - error in request type",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "24f321a2-cab6-451d-8783-60394b3df76b",
+								"exec": [
+									"var responseData = pm.response.json().errors;",
+									"",
+									"pm.test(\"Status code is 400\", function () {",
+									"    pm.response.to.have.status(400);",
+									"});",
+									"",
+									"pm.test(\"Login with error in content\", function() {",
+									"    pm.expect(responseData[0].detail).to.be.eql(\"Invalid type.\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"data\": {\n        \"type\": \"agent-access-token\",\n        \"attributes\": {\n            \"username\": \"{{email}}\",\n            \"password\": \"{{password}}\"\n        }\n    }\n}"
+						},
+						"url": {
+							"raw": "{{url}}/agent-access-tokens",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"agent-access-tokens"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "ff089b23-8abe-4b84-adfc-15328f0b91c9",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "542b9479-0827-4e82-9f5a-b498c688f49d",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"id": "a3ce5ecf-b665-447c-ba8a-31ec26b0480a",
+			"key": "email",
+			"value": "admin@spryker.com"
+		},
+		{
+			"id": "fa5c437d-bad5-4f97-904b-0d72b0c9d285",
+			"key": "password",
+			"value": "change123"
+		},
+		{
+			"id": "f9b64183-2d93-4866-bed1-3aa566eee647",
+			"key": "wrongEmail",
+			"value": "spencor.hopkin@spryker.com"
+		}
+	],
+	"protocolProfileBehavior": {}
+}

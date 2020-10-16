@@ -1,0 +1,914 @@
+{
+	"info": {
+		"_postman_id": "71c1befc-b179-45c3-a845-c1d2e1edf36b",
+		"name": "agent-customer-impersonation-tokens",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Positive",
+			"item": [
+				{
+					"name": "Login as agent (helper)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "295c2853-21c6-4ea0-8628-3122c9b656ee",
+								"exec": [
+									"var responseData = pm.response.json().data;",
+									"",
+									"pm.collectionVariables.set(\"token\", responseData.attributes.accessToken)",
+									"",
+									"pm.test(\"Status code is 201\", function () {",
+									"    pm.response.to.have.status(201);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"data\": {\n        \"type\": \"agent-access-tokens\",\n        \"attributes\": {\n            \"username\": \"{{email}}\",\n            \"password\": \"{{password}}\"\n        }\n    }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/agent-access-tokens",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"agent-access-tokens"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Find a customer for login (helper)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "588ed007-e9cb-4489-8eba-fa5b536a41e6",
+								"exec": [
+									"var responseData = pm.response.json().data;",
+									"",
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.collectionVariables.set(\"customerReference\", responseData[0].attributes.customers[0].customerReference);",
+									"pm.collectionVariables.set(\"customerReference2\", responseData[0].attributes.customers[1].customerReference);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-Agent-Authorization",
+								"value": "",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"url": {
+							"raw": "{{url}}/agent-customer-search?q=s",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"agent-customer-search"
+							],
+							"query": [
+								{
+									"key": "q",
+									"value": "s"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Impersonate as a customer",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "2eabc0e2-913b-4b66-a9f9-24dd21318d10",
+								"exec": [
+									"var responseData = pm.response.json().data;",
+									"",
+									"pm.collectionVariables.set(\"customerToken\", responseData.attributes.accessToken)",
+									"",
+									"pm.test(\"Status code is 201\", function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"pm.test(\"Response has proper content\", function() {",
+									"    pm.expect(responseData).to.have.property(\"type\").that.is.eql(\"agent-customer-impersonation-access-tokens\");",
+									"    pm.expect(responseData).to.have.property(\"attributes\").that.is.not.eql(null);",
+									"    pm.expect(responseData.attributes).to.have.property(\"tokenType\").that.is.eql(\"Bearer\");",
+									"    pm.expect(responseData.attributes).to.have.property(\"accessToken\").that.is.not.eql(null);",
+									"    pm.expect(responseData.attributes).to.have.property(\"refreshToken\").that.is.not.eql(null);",
+									"    pm.expect(responseData).to.have.property(\"links\").that.is.not.eql(null);",
+									"    pm.expect(responseData.links).to.have.property(\"self\").that.have.string(\"agent-customer-impersonation-access-tokens\");",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"data\": {\n        \"type\": \"agent-customer-impersonation-access-tokens\",\n        \"attributes\": {\n            \"customerReference\": \"{{customerReference}}\"\n        }\n    }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/agent-customer-impersonation-access-tokens",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"agent-customer-impersonation-access-tokens"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Impersonate as another customer",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "3d8352ff-9717-43a4-96dd-c84c7de2050b",
+								"exec": [
+									"var responseData = pm.response.json().data;",
+									"",
+									"pm.collectionVariables.set(\"customerToken2\", responseData.attributes.accessToken)",
+									"",
+									"pm.test(\"Status code is 201\", function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"pm.test(\"Response has proper content\", function() {",
+									"    pm.expect(responseData).to.have.property(\"type\").that.is.eql(\"agent-customer-impersonation-access-tokens\");",
+									"    pm.expect(responseData).to.have.property(\"attributes\").that.is.not.eql(null);",
+									"    pm.expect(responseData.attributes).to.have.property(\"tokenType\").that.is.eql(\"Bearer\");",
+									"    pm.expect(responseData.attributes).to.have.property(\"accessToken\").that.is.not.eql(null);",
+									"    pm.expect(responseData.attributes).to.have.property(\"refreshToken\").that.is.not.eql(null);",
+									"    pm.expect(responseData).to.have.property(\"links\").that.is.not.eql(null);",
+									"    pm.expect(responseData.links).to.have.property(\"self\").that.have.string(\"agent-customer-impersonation-access-tokens\");",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"data\": {\n        \"type\": \"agent-customer-impersonation-access-tokens\",\n        \"attributes\": {\n            \"customerReference\": \"{{customerReference2}}\"\n        }\n    }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/agent-customer-impersonation-access-tokens",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"agent-customer-impersonation-access-tokens"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create a cart as impersonated agent",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "b8ffc4e7-d073-4ee9-9a67-40393d419378",
+								"exec": [
+									"var responseData = pm.response.json().data;",
+									"",
+									"pm.collectionVariables.set(\"cart_uuid\", responseData.id);",
+									"",
+									"pm.test(\"Status code is 201\", function () {",
+									"    pm.response.to.have.status(201);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{customerToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"data\": {\n        \"type\": \"carts\",\n        \"attributes\": {\n        \t\"name\": \"{{cartName}}\",\n            \"priceMode\": \"{{cartMode}}\",\n            \"currency\": \"{{currency}}\",\n            \"store\": \"{{store}}\"\n        }\n    }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/carts",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"carts"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Add items to the cart as impersonated agent",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "8f869f08-69b4-48fa-8e64-f0191b7b33aa",
+								"exec": [
+									"pm.test(\"Status code is 201\", function () {",
+									"    pm.response.to.have.status(201);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{customerToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"data\": {\n        \"type\": \"items\",\n        \"attributes\": {\n            \"sku\": \"{{sku}}\",\n            \"quantity\": {{quantity}},\n            \"productOptions\": [\n                {\n                    \"sku\": \"{{product_option_sku}}\"\n                }\n            ]\n        }\n    }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/carts/{{cart_uuid}}/items",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"carts",
+								"{{cart_uuid}}",
+								"items"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Checkout the cart as impersonated agent",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "f5935a97-e322-4885-a880-8a0a0a5c138f",
+								"exec": [
+									"var responseData = pm.response.json().data;",
+									"",
+									"pm.collectionVariables.set(\"order_reference\", responseData.attributes.orderReference);",
+									"",
+									"pm.test(\"Status code is 201\", function () {",
+									"    pm.response.to.have.status(201);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{customerToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"data\": {\n        \"type\": \"checkout\",\n        \"attributes\": {\n            \"customer\": {\n                \"salutation\": \"Ms\",\n                \"email\": \"{{email}}\",\n                \"firstName\": \"{{firstName}}\",\n                \"lastName\": \"{{lastName}}\"\n            },\n            \"idCart\": \"{{cart_uuid}}\",\n            \"billingAddress\": {\n                \"id\": null,\n                \"salutation\": \"Mr\",\n                \"firstName\": \"{{firstName}}\",\n                \"lastName\": \"{{lastName}}\",\n                \"address1\": \"Julie-Wolfthorn-Straße\",\n                \"address2\": \"1\",\n                \"address3\": \"new address\",\n                \"zipCode\": \"10115\",\n                \"city\": \"Berlin\",\n                \"iso2Code\": \"DE\",\n                \"company\": \"spryker\",\n                \"phone\": \"+49 (30) 2084 98350\"\n            },\n            \"shippingAddress\": {\n                \"id\": null,\n                \"salutation\": \"Ms\",\n                \"firstName\": \"{{firstName}}\",\n                \"lastName\": \"{{lastName}}\",\n                \"address1\": \"Julie-Wolfthorn-Straße\",\n                \"address2\": \"1\",\n                \"address3\": \"new one\",\n                \"zipCode\": \"10115\",\n                \"city\": \"Berlin\",\n                \"iso2Code\": \"DE\",\n                \"company\": \"spryker\",\n                \"phone\": \"+49 (30) 2084 98350\"\n            },\n            \"payments\": [\n                {\n                    \"paymentMethodName\": \"Invoice\",\n                    \"paymentProviderName\": \"DummyPayment\"\n                }\n            ],\n            \"shipment\": {\n                \"idShipmentMethod\": 1\n            }\n        }\n    }\n}"
+						},
+						"url": {
+							"raw": "{{url}}/checkout",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"checkout"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "Negative",
+			"item": [
+				{
+					"name": "Login as agent (helper)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "75b0bbfe-c0b8-4181-b538-e7f2b4d83947",
+								"exec": [
+									"var responseData = pm.response.json().data;",
+									"",
+									"pm.collectionVariables.set(\"token\", responseData.attributes.accessToken)",
+									"",
+									"pm.test(\"Status code is 201\", function () {",
+									"    pm.response.to.have.status(201);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"data\": {\n        \"type\": \"agent-access-tokens\",\n        \"attributes\": {\n            \"username\": \"{{email}}\",\n            \"password\": \"{{password}}\"\n        }\n    }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/agent-access-tokens",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"agent-access-tokens"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Find a customer for login (helper)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "262e5783-c2cf-4092-bd1e-63a16956a655",
+								"exec": [
+									"var responseData = pm.response.json().data;",
+									"",
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.collectionVariables.set(\"customerReference\", responseData[0].attributes.customers[0].customerReference);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-Agent-Authorization",
+								"value": "",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"url": {
+							"raw": "{{url}}/agent-customer-search?q=sonia@spryker.com",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"agent-customer-search"
+							],
+							"query": [
+								{
+									"key": "q",
+									"value": "sonia@spryker.com"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Impersonage as a customer - invalid request type",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "fe76c706-b424-4d98-8ea9-79e32de54359",
+								"exec": [
+									"var responseData = pm.response.json().errors;",
+									"",
+									"pm.test(\"Status code is 404\", function () {",
+									"    pm.response.to.have.status(404);",
+									"});",
+									"",
+									"pm.test(\"Login with wrong request type\", function() {",
+									"    pm.expect(responseData[0].detail).to.be.eql(\"Not Found\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"data\": {\n        \"type\": \"agent-customer-impersonation-access-tokens\",\n        \"attributes\": {\n            \"customerReference\": \"{{customerReference}}\"\n        }\n    }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/agent-customer-impersonation-access-tokens",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"agent-customer-impersonation-access-tokens"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Impersonage as a customer - error in request type",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "75d9ba14-160b-4cce-b3fe-f9c2ff610640",
+								"exec": [
+									"var responseData = pm.response.json().errors;",
+									"",
+									"pm.test(\"Status code is 400\", function () {",
+									"    pm.response.to.have.status(400);",
+									"});",
+									"",
+									"pm.test(\"Login with wrong request type\", function() {",
+									"    pm.expect(responseData[0].detail).to.be.eql(\"Invalid type.\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"data\": {\n        \"type\": \"agent-customer-impersonation-access-token\",\n        \"attributes\": {\n            \"customerReference\": \"{{customerReference}}\"\n        }\n    }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/agent-customer-impersonation-access-tokens",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"agent-customer-impersonation-access-tokens"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Impersonage as a customer - invalid customer reference",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "cd0ee2dc-ca16-416b-99a1-27bfb7f2f3e9",
+								"exec": [
+									"var responseData = pm.response.json().errors;",
+									"",
+									"pm.test(\"Status code is 401\", function () {",
+									"    pm.response.to.have.status(401);",
+									"});",
+									"",
+									"pm.test(\"Login with wrong request type\", function() {",
+									"    pm.expect(responseData[0].detail).to.be.eql(\"Failed to impersonate a customer.\");",
+									"    pm.expect(responseData[0].code).to.be.eql(\"4104\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"data\": {\n        \"type\": \"agent-customer-impersonation-access-tokens\",\n        \"attributes\": {\n            \"customerReference\": \"test\"\n        }\n    }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/agent-customer-impersonation-access-tokens",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"agent-customer-impersonation-access-tokens"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Impersonage as a customer - empty customer reference",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "e6fc6a45-9d10-4920-a550-5785154043a4",
+								"exec": [
+									"var responseData = pm.response.json().errors;",
+									"",
+									"pm.test(\"Status code is 401\", function () {",
+									"    pm.response.to.have.status(401);",
+									"});",
+									"",
+									"pm.test(\"Login with wrong request type\", function() {",
+									"    pm.expect(responseData[0].detail).to.be.eql(\"Failed to impersonate a customer.\");",
+									"    pm.expect(responseData[0].code).to.be.eql(\"4104\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"data\": {\n        \"type\": \"agent-customer-impersonation-access-tokens\",\n        \"attributes\": {\n            \"customerReference\": \"\"\n        }\n    }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/agent-customer-impersonation-access-tokens",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"agent-customer-impersonation-access-tokens"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Impersonage as a customer - invalid token",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "5ed55a75-ddba-429c-8e82-ca3617ba592a",
+								"exec": [
+									"var responseData = pm.response.json().errors;",
+									"",
+									"pm.test(\"Status code is 401\", function () {",
+									"    pm.response.to.have.status(401);",
+									"});",
+									"",
+									"pm.test(\"Login with wrong request type\", function() {",
+									"    pm.expect(responseData[0].detail).to.be.eql(\"Invalid access token.\");",
+									"    pm.expect(responseData[0].code).to.be.eql(\"001\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "testtest",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"data\": {\n        \"type\": \"agent-customer-impersonation-access-tokens\",\n        \"attributes\": {\n            \"customerReference\": \"{{customerReference}}\"\n        }\n    }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/agent-customer-impersonation-access-tokens",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"agent-customer-impersonation-access-tokens"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "68fd222e-5efa-42c6-bd7c-e3d6eaf59a31",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "37f595a0-e402-49b9-a19d-2910899c1011",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"id": "4424ca95-b627-4004-8238-99d0e710c2ea",
+			"key": "email",
+			"value": "admin@spryker.com"
+		},
+		{
+			"id": "052b665f-10d0-4c2d-b80e-40d8a2119363",
+			"key": "password",
+			"value": "change123"
+		},
+		{
+			"id": "135ace28-69d1-4fbe-90ba-60f2cac85a79",
+			"key": "customerReference",
+			"value": "DE--1"
+		},
+		{
+			"id": "c124a175-3a1d-4381-a74c-b14c23505a07",
+			"key": "customerReference2",
+			"value": "DE--2"
+		},
+		{
+			"id": "d9f4dbb4-4fe0-4270-b587-523d7cfa0b93",
+			"key": "token",
+			"value": ""
+		},
+		{
+			"id": "1873bb4f-d22d-4aaf-957d-4b00f705d006",
+			"key": "customerToken",
+			"value": ""
+		},
+		{
+			"id": "288e2aff-a5b9-4488-9cd8-d08def2239cf",
+			"key": "cartName",
+			"value": "Test Cart"
+		},
+		{
+			"id": "40908ed6-122b-48b3-8af6-2841fb3fa1ba",
+			"key": "cartMode",
+			"value": "GROSS_MODE"
+		},
+		{
+			"id": "0c421b9e-5dd8-40ec-832d-c55ec3d6bed4",
+			"key": "currency",
+			"value": "EUR"
+		},
+		{
+			"id": "109866c0-9fa0-468f-b59a-1c216307b4ab",
+			"key": "store",
+			"value": "DE"
+		},
+		{
+			"id": "f0393ce6-afdc-4ce1-9fdd-1d48784c9806",
+			"key": "cart_uuid",
+			"value": ""
+		},
+		{
+			"id": "372d97e5-8759-4f67-a334-4962d792adca",
+			"key": "sku",
+			"value": "102917"
+		},
+		{
+			"id": "77317308-f9eb-49a1-87ae-c5f37df42b68",
+			"key": "product_option_sku",
+			"value": "OP_insurance"
+		},
+		{
+			"id": "4ca0b975-d74f-4daf-8535-8170073d54ec",
+			"key": "quantity",
+			"value": "2"
+		},
+		{
+			"id": "a948e21b-03b0-41cf-b981-2aa53f8a76b3",
+			"key": "firstName",
+			"value": "Test"
+		},
+		{
+			"id": "d283075c-23c4-4446-977a-9de455e83f24",
+			"key": "lastName",
+			"value": "User"
+		},
+		{
+			"id": "c1cf531f-a261-450b-b626-e5b70c98cac2",
+			"key": "order_reference",
+			"value": ""
+		},
+		{
+			"id": "20ee404d-1da9-423b-bb71-14152b1a7acd",
+			"key": "customerToken2",
+			"value": ""
+		}
+	],
+	"protocolProfileBehavior": {}
+}

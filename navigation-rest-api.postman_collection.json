@@ -1,0 +1,1021 @@
+{
+	"info": {
+		"_postman_id": "cbc45de5-d467-4bbf-8f8e-62a6a050895c",
+		"name": "navigation-rest-api",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Positive",
+			"item": [
+				{
+					"name": "GET /navigation-trees/main_navigation",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "066db25c-34cb-4c06-925f-abb868333ef4",
+								"exec": [
+									"var jsonData = pm.response.json();",
+									"",
+									"pm.test(\"Correct id\", function() {",
+									"    pm.expect(jsonData.data.id).to.eql(\"MAIN_NAVIGATION\");",
+									"});",
+									"",
+									"pm.test(\"Correct name\", function() {",
+									"    pm.expect(jsonData.data.attributes.name).to.eql(\"Top Navigation\");",
+									"});",
+									"",
+									"pm.test(\"Correct amount of nodes\", function() {",
+									"    pm.expect(jsonData.data.attributes.nodes).to.have.lengthOf(7);",
+									"});",
+									"",
+									"pm.test(\"Has self link\", function() {",
+									"    pm.expect(jsonData.data.links.self).to.eql(pm.environment.get(\"url\") + \"/navigations/MAIN_NAVIGATION\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/vnd.api+json"
+							},
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/vnd.api+json"
+							},
+							{
+								"key": "Accept-Language",
+								"type": "text",
+								"value": "de-DE, de;q=0.9"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/navigations/main_navigation",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"navigations",
+								"main_navigation"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET /navigation-trees/footer_navigation",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "066db25c-34cb-4c06-925f-abb868333ef4",
+								"exec": [
+									"var jsonData = pm.response.json();",
+									"",
+									"pm.test(\"Correct id\", function() {",
+									"    pm.expect(jsonData.data.id).to.eql(\"FOOTER_NAVIGATION\");",
+									"});",
+									"",
+									"pm.test(\"Correct name\", function() {",
+									"    pm.expect(jsonData.data.attributes.name).to.eql(\"Footer\");",
+									"});",
+									"",
+									"pm.test(\"Correct amount of nodes\", function() {",
+									"    pm.expect(jsonData.data.attributes.nodes).to.have.lengthOf(3);",
+									"});",
+									"",
+									"pm.test(\"Has self link\", function() {",
+									"    pm.expect(jsonData.data.links.self).to.eql(pm.environment.get(\"url\") + \"/navigations/FOOTER_NAVIGATION\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/vnd.api+json"
+							},
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/vnd.api+json"
+							},
+							{
+								"key": "Accept-Language",
+								"type": "text",
+								"value": "de-DE, de;q=0.9"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/navigations/footer_navigation",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"navigations",
+								"footer_navigation"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET /navigation-trees/payment_providers",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "066db25c-34cb-4c06-925f-abb868333ef4",
+								"exec": [
+									"var jsonData = pm.response.json();",
+									"",
+									"pm.test(\"Correct id\", function() {",
+									"    pm.expect(jsonData.data.id).to.eql(\"PAYMENT_PROVIDERS\");",
+									"});",
+									"",
+									"pm.test(\"Correct name\", function() {",
+									"    pm.expect(jsonData.data.attributes.name).to.eql(\"Payment providers\");",
+									"});",
+									"",
+									"pm.test(\"Correct amount of nodes\", function() {",
+									"    pm.expect(jsonData.data.attributes.nodes).to.have.lengthOf(2);",
+									"});",
+									"",
+									"pm.test(\"Has self link\", function() {",
+									"    pm.expect(jsonData.data.links.self).to.eql(pm.environment.get(\"url\") + \"/navigations/PAYMENT_PROVIDERS\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/vnd.api+json"
+							},
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/vnd.api+json"
+							},
+							{
+								"key": "Accept-Language",
+								"type": "text",
+								"value": "de-DE, de;q=0.9"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/navigations/payment_providers",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"navigations",
+								"payment_providers"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET /navigation-trees/shipment_providers",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "066db25c-34cb-4c06-925f-abb868333ef4",
+								"exec": [
+									"var jsonData = pm.response.json();",
+									"",
+									"pm.test(\"Correct id\", function() {",
+									"    pm.expect(jsonData.data.id).to.eql(\"SHIPMENT_PROVIDERS\");",
+									"});",
+									"",
+									"pm.test(\"Correct name\", function() {",
+									"    pm.expect(jsonData.data.attributes.name).to.eql(\"Shipment providers\");",
+									"});",
+									"",
+									"pm.test(\"Correct amount of nodes\", function() {",
+									"    pm.expect(jsonData.data.attributes.nodes).to.have.lengthOf(4);",
+									"});",
+									"",
+									"pm.test(\"Has self link\", function() {",
+									"    pm.expect(jsonData.data.links.self).to.eql(pm.environment.get(\"url\") + \"/navigations/SHIPMENT_PROVIDERS\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/vnd.api+json"
+							},
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/vnd.api+json"
+							},
+							{
+								"key": "Accept-Language",
+								"type": "text",
+								"value": "de-DE, de;q=0.9"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/navigations/shipment_providers",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"navigations",
+								"shipment_providers"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET /navigation-trees/social_links",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "066db25c-34cb-4c06-925f-abb868333ef4",
+								"exec": [
+									"var jsonData = pm.response.json();",
+									"",
+									"pm.test(\"Correct id\", function() {",
+									"    pm.expect(jsonData.data.id).to.eql(\"SOCIAL_LINKS\");",
+									"});",
+									"",
+									"pm.test(\"Correct name\", function() {",
+									"    pm.expect(jsonData.data.attributes.name).to.eql(\"Social links\");",
+									"});",
+									"",
+									"pm.test(\"Correct amount of nodes\", function() {",
+									"    pm.expect(jsonData.data.attributes.nodes).to.have.lengthOf(4);",
+									"});",
+									"",
+									"pm.test(\"Has self link\", function() {",
+									"    pm.expect(jsonData.data.links.self).to.eql(pm.environment.get(\"url\") + \"/navigations/SOCIAL_LINKS\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/vnd.api+json"
+							},
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/vnd.api+json"
+							},
+							{
+								"key": "Accept-Language",
+								"type": "text",
+								"value": "de-DE, de;q=0.9"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/navigations/social_links",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"navigations",
+								"social_links"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "e5adc571-73cf-47f7-ad13-a73818f9a7b7",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "3860782a-0b58-49b2-bb38-e619540298c7",
+						"type": "text/javascript",
+						"exec": [
+							"var jsonData = pm.response.json();",
+							"",
+							"pm.test(\"Correct type\", function() {",
+							"    pm.expect(jsonData.data.type).to.eql(\"navigations\");",
+							"});",
+							"",
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Correct is_active\", function() {",
+							"    pm.expect(jsonData.data.attributes.isActive).to.be.true;",
+							"});",
+							"",
+							"pm.test(\"Contains correct fields in nodes arrays\", function () {",
+							"    pm.expect(jsonData.data.attributes.nodes[0]).to.include.keys('isActive', 'nodeType', 'title', 'url', 'cssClass', 'validFrom', 'validTo', 'children');",
+							"});"
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "Positive with includes",
+			"item": [
+				{
+					"name": "GET /navigation-trees/main_navigation",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "066db25c-34cb-4c06-925f-abb868333ef4",
+								"exec": [
+									"",
+									"var jsonData = pm.response.json();",
+									"var nodes_sum = jsonData.data.attributes.nodes.length;",
+									"var nodes = jsonData.data.attributes.nodes;",
+									"const result = nodes.filter(node => node.nodeType === \"category\")",
+									"// console.log(result)",
+									"for (var i=0; i< nodes_sum; i++){",
+									"    if (nodes[i].nodeType == \"category\"){",
+									"         //console.log(nodes[i].resourceId);",
+									"         //pm.environment.set(\"resourceid\"+i,(nodes[i].resourceId));",
+									"         var resourceId = String(nodes[i].resourceId);",
+									"         var obj = {",
+									"             id: resourceId,",
+									"             type: \"category-nodes\"",
+									"         };",
+									"         console.log(jsonData.data.relationships['category-nodes'].data);",
+									"         console.log(obj);",
+									"         pm.expect(jsonData.data.relationships['category-nodes'].data).to.include(obj);",
+									"    }",
+									"}",
+									"",
+									"pm.test(\"Correct nodeid\", function() {",
+									"    pm.expect(jsonData.data.relationships['category-nodes'].data[0].id).to.eql(String(pm.environment.get(\"resourceid1\")));",
+									"    pm.expect(jsonData.data.relationships['category-nodes'].data[1].id).to.eql(String(pm.environment.get(\"resourceid2\")));",
+									"});",
+									"",
+									"pm.test(\"Correct id\", function() {",
+									"    pm.expect(jsonData.data.id).to.eql(\"MAIN_NAVIGATION\");",
+									"});",
+									"",
+									"pm.test(\"Correct name\", function() {",
+									"    pm.expect(jsonData.data.attributes.name).to.eql(\"Top Navigation\");",
+									"});",
+									"",
+									"pm.test(\"Correct amount of nodes\", function() {",
+									"    pm.expect(jsonData.data.attributes.nodes).to.have.lengthOf(7);",
+									"});",
+									"",
+									"pm.test(\"Has self link\", function() {",
+									"    pm.expect(jsonData.data.links.self).to.eql(pm.environment.get(\"url\") + \"/navigations/MAIN_NAVIGATION\");",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/vnd.api+json"
+							},
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/vnd.api+json"
+							},
+							{
+								"key": "Accept-Language",
+								"type": "text",
+								"value": "de-DE, de;q=0.9"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/navigations/main_navigation?include=category-nodes",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"navigations",
+								"main_navigation"
+							],
+							"query": [
+								{
+									"key": "include",
+									"value": "category-nodes"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET /navigation-trees/footer_navigation",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "066db25c-34cb-4c06-925f-abb868333ef4",
+								"exec": [
+									"var jsonData = pm.response.json();",
+									"",
+									"pm.test(\"Correct id\", function() {",
+									"    pm.expect(jsonData.data.id).to.eql(\"FOOTER_NAVIGATION\");",
+									"});",
+									"",
+									"pm.test(\"Correct name\", function() {",
+									"    pm.expect(jsonData.data.attributes.name).to.eql(\"Footer\");",
+									"});",
+									"",
+									"pm.test(\"Correct amount of nodes\", function() {",
+									"    pm.expect(jsonData.data.attributes.nodes).to.have.lengthOf(3);",
+									"});",
+									"",
+									"pm.test(\"Has self link\", function() {",
+									"    pm.expect(jsonData.data.links.self).to.eql(pm.environment.get(\"url\") + \"/navigations/FOOTER_NAVIGATION\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/vnd.api+json"
+							},
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/vnd.api+json"
+							},
+							{
+								"key": "Accept-Language",
+								"type": "text",
+								"value": "de-DE, de;q=0.9"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/navigations/footer_navigation?include=category-nodes",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"navigations",
+								"footer_navigation"
+							],
+							"query": [
+								{
+									"key": "include",
+									"value": "category-nodes"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET /navigation-trees/social_links",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "066db25c-34cb-4c06-925f-abb868333ef4",
+								"exec": [
+									"var jsonData = pm.response.json();",
+									"",
+									"pm.test(\"Correct id\", function() {",
+									"    pm.expect(jsonData.data.id).to.eql(\"SOCIAL_LINKS\");",
+									"});",
+									"",
+									"pm.test(\"Correct name\", function() {",
+									"    pm.expect(jsonData.data.attributes.name).to.eql(\"Social links\");",
+									"});",
+									"",
+									"pm.test(\"Correct amount of nodes\", function() {",
+									"    pm.expect(jsonData.data.attributes.nodes).to.have.lengthOf(4);",
+									"});",
+									"",
+									"pm.test(\"Has self link\", function() {",
+									"    pm.expect(jsonData.data.links.self).to.eql(pm.environment.get(\"url\") + \"/navigations/SOCIAL_LINKS\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/vnd.api+json"
+							},
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/vnd.api+json"
+							},
+							{
+								"key": "Accept-Language",
+								"type": "text",
+								"value": "de-DE, de;q=0.9"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/navigations/social_links?include=category-nodes",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"navigations",
+								"social_links"
+							],
+							"query": [
+								{
+									"key": "include",
+									"value": "category-nodes"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "e5adc571-73cf-47f7-ad13-a73818f9a7b7",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "3860782a-0b58-49b2-bb38-e619540298c7",
+						"type": "text/javascript",
+						"exec": [
+							"var jsonData = pm.response.json();",
+							"",
+							"pm.test(\"Correct type\", function() {",
+							"    pm.expect(jsonData.data.type).to.eql(\"navigations\");",
+							"});",
+							"",
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Correct is_active\", function() {",
+							"    pm.expect(jsonData.data.attributes.isActive).to.be.true;",
+							"});",
+							"",
+							"pm.test(\"Contains correct fields in nodes arrays\", function () {",
+							"    pm.expect(jsonData.data.attributes.nodes[0]).to.include.keys('isActive', 'nodeType', 'title', 'url', 'cssClass', 'validFrom', 'validTo', 'children');",
+							"});"
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "Negative",
+			"item": [
+				{
+					"name": "OPTIONS /navigation-trees/",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "8a92b564-8d1e-4416-bc32-aaabdd2183a5",
+								"exec": [
+									"pm.test(\"Content-Type is present\", function () {",
+									"    pm.response.to.have.header(\"Content-Type\");",
+									"});",
+									"",
+									"pm.test(\"access-control-allow-methods is present\", function () {",
+									"    pm.response.to.have.header(\"access-control-allow-methods\");",
+									"});",
+									"",
+									"pm.test(\"access-control-allow-origin is present\", function () {",
+									"    pm.response.to.have.header(\"access-control-allow-origin\");",
+									"});",
+									"",
+									"pm.test(\"access-control-allow-headers is present\", function () {",
+									"    pm.response.to.have.header(\"access-control-allow-headers\");",
+									"});",
+									"",
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "OPTIONS",
+						"header": [
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/vnd.api+json"
+							},
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/vnd.api+json"
+							},
+							{
+								"key": "Accept-Language",
+								"type": "text",
+								"value": "de-DE, en;q=0.9"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/navigations",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"navigations"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET /navigation-trees/ without id",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "066db25c-34cb-4c06-925f-abb868333ef4",
+								"exec": [
+									"var jsonData = pm.response.json();",
+									"",
+									"pm.test(\"Status code is 400\", function () {",
+									"    pm.response.to.have.status(400);",
+									"});",
+									"",
+									"pm.test(\"Correct error code\", function() {",
+									"    pm.expect(jsonData.errors[0].code).to.eql(\"1602\");",
+									"});",
+									"",
+									"pm.test(\"Correct status code\", function() {",
+									"    pm.expect(jsonData.errors[0].status).to.eql(400);",
+									"});",
+									"",
+									"pm.test(\"Correct detail description\", function() {",
+									"    pm.expect(jsonData.errors[0].detail).to.eql(\"Navigation id not specified.\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/vnd.api+json"
+							},
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/vnd.api+json"
+							},
+							{
+								"key": "Accept-Language",
+								"type": "text",
+								"value": "de-DE, en;q=0.9"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/navigations",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"navigations"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET /navigation-trees/ with incorrect id",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "066db25c-34cb-4c06-925f-abb868333ef4",
+								"exec": [
+									"var jsonData = pm.response.json();",
+									"",
+									"pm.test(\"Status code is 404\", function () {",
+									"    pm.response.to.have.status(404);",
+									"});",
+									"",
+									"pm.test(\"Correct error code\", function() {",
+									"    pm.expect(jsonData.errors[0].code).to.eql(\"1601\");",
+									"});",
+									"",
+									"pm.test(\"Correct status code\", function() {",
+									"    pm.expect(jsonData.errors[0].status).to.eql(404);",
+									"});",
+									"",
+									"pm.test(\"Correct detail description\", function() {",
+									"    pm.expect(jsonData.errors[0].detail).to.eql(\"Navigation not found.\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/vnd.api+json"
+							},
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/vnd.api+json"
+							},
+							{
+								"key": "Accept-Language",
+								"type": "text",
+								"value": "de-DE, en;q=0.9"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/navigations/12",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"navigations",
+								"12"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "POST /navigation-trees/main_navigation",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "066db25c-34cb-4c06-925f-abb868333ef4",
+								"exec": [
+									"var jsonData = pm.response.json();",
+									"",
+									"pm.test(\"Status code is 404\", function () {",
+									"    pm.response.to.have.status(404);",
+									"});",
+									"",
+									"pm.test(\"Correct status code\", function() {",
+									"    pm.expect(jsonData.errors[0].status).to.eql(404);",
+									"});",
+									"",
+									"pm.test(\"Correct detail description\", function() {",
+									"    pm.expect(jsonData.errors[0].detail).to.eql(\"Not Found\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/vnd.api+json"
+							},
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/vnd.api+json"
+							},
+							{
+								"key": "Accept-Language",
+								"type": "text",
+								"value": "de-DE, en;q=0.9"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/navigations/MAIN_NAVIGATION",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"navigations",
+								"MAIN_NAVIGATION"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "DELETE /navigation-trees/main_navigation",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "066db25c-34cb-4c06-925f-abb868333ef4",
+								"exec": [
+									"var jsonData = pm.response.json();",
+									"",
+									"pm.test(\"Status code is 404\", function () {",
+									"    pm.response.to.have.status(404);",
+									"});",
+									"",
+									"pm.test(\"Correct status code\", function() {",
+									"    pm.expect(jsonData.errors[0].status).to.eql(404);",
+									"});",
+									"",
+									"pm.test(\"Correct detail description\", function() {",
+									"    pm.expect(jsonData.errors[0].detail).to.eql(\"Not Found\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/vnd.api+json"
+							},
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/vnd.api+json"
+							},
+							{
+								"key": "Accept-Language",
+								"type": "text",
+								"value": "de-DE, en;q=0.9"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/navigations/MAIN_NAVIGATION",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"navigations",
+								"MAIN_NAVIGATION"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "cecb026c-c073-4d32-8f3d-82910f172def",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "cc2ee4c7-5f3b-49b3-ae1e-6161210789bc",
+				"type": "text/javascript",
+				"exec": [
+					"pm.test(\"Content-Type is present\", function () {",
+					"    pm.response.to.have.header(\"Content-Type\");",
+					"});",
+					"",
+					"pm.test(\"access-control-allow-origin is present\", function () {",
+					"    pm.response.to.have.header(\"access-control-allow-origin\");",
+					"});"
+				]
+			}
+		}
+	]
+}

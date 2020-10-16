@@ -1,0 +1,677 @@
+{
+	"info": {
+		"_postman_id": "bc9e5989-4d12-419d-83b9-08e6d4cc40de",
+		"name": "GLUE-5115-Quote-permission-group",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Positive",
+			"item": [
+				{
+					"name": "Request access token",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "aeeed29a-6980-40b7-99cb-28c3b5b45727",
+								"exec": [
+									"var responseData = pm.response.json().data;",
+									"",
+									"pm.variables.set(\"token\", responseData.attributes.accessToken);",
+									"pm.variables.set(\"refresh-token\", responseData.attributes.refreshToken);",
+									"",
+									"pm.test(\"Has correct type\", function() {",
+									"    pm.expect(responseData.type).to.eql(\"access-tokens\");",
+									"});",
+									"",
+									"pm.test(\"Has id null\", function() {",
+									"    pm.expect(responseData.id).to.eql(null);",
+									"});",
+									"",
+									"pm.test(\"Has token type Bearer\", function(){",
+									"    pm.expect(responseData.attributes.tokenType).to.eql(\"Bearer\");",
+									"});",
+									"",
+									"pm.test(\"Has expiration time\", function() {",
+									"    pm.expect(responseData.attributes.expiresIn).to.eql(28800);",
+									"});",
+									"",
+									"pm.test(\"Has access token returned\", function() {",
+									"    pm.expect(responseData.attributes.accessToken).to.not.be.empty;",
+									"});",
+									"",
+									"pm.test(\"Has refresh token returned\", function() {",
+									"    pm.expect(responseData.attributes.refreshToken).to.not.be.empty;",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"data\":{\"type\":\"access-tokens\",\"attributes\":{\"username\":\"{{email}}\", \"password\": \"change123\"}}}"
+						},
+						"url": {
+							"raw": "{{url}}/access-tokens",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"access-tokens"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Request GET quote permission group with id",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "facba5ca-9a58-4d9e-9d29-12e125390f23",
+								"exec": [
+									"let jsonResponse = pm.response.json(),",
+									"    response = jsonResponse.data,",
+									"    links = jsonResponse.links,",
+									"    selfLink = pm.variables.get(\"url\") + \"/cart-permission-groups/1\";",
+									"",
+									"const resourceType = \"cart-permission-groups\";",
+									"",
+									"pm.test(\"Status code is 200\", function() {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Has correct type returned\", function() {",
+									"    pm.expect(response.type).to.eql(resourceType);",
+									"    pm.expect(response.type).to.be.a(\"string\");",
+									"});",
+									"",
+									"pm.test(\"Has id returned\", function() {",
+									"    pm.expect(response.id).to.be.a(\"string\");",
+									"    pm.expect(response.id).to.not.be.empty;",
+									"});",
+									"",
+									"pm.test(\"Has name returned\", function() {",
+									"    pm.expect(response.attributes.name).to.be.a(\"string\");",
+									"    pm.expect(response.attributes.name).to.not.be.empty;",
+									"});",
+									"",
+									"pm.test(\"Has correct default attribute\", function() {",
+									"    pm.expect(response.attributes.isDefault).to.be.eql(true);",
+									"});",
+									"",
+									"pm.test(\"Has self link\", function() {",
+									"    pm.expect(response.links.self).to.eql(selfLink);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/cart-permission-groups/1",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"cart-permission-groups",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Request GET quote permission group without id",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "95ff9b5b-9c3d-4e31-99eb-17734c22f2c0",
+								"exec": [
+									"let jsonResponse = pm.response.json(),",
+									"    response = jsonResponse,",
+									"    links = jsonResponse.links,",
+									"    selfLinkFirst = pm.variables.get(\"url\") + \"/cart-permission-groups/1\",",
+									"    selfLinkSecond = pm.variables.get(\"url\") + \"/cart-permission-groups/2\",",
+									"    selfLinkThird = pm.variables.get(\"url\") + \"/cart-permission-groups\";",
+									"",
+									"const resourceType = \"cart-permission-groups\";",
+									"",
+									"pm.test(\"Status code is 200\", function() {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Has correct type returned\", function() {",
+									"    pm.expect(response.data[0].type).to.eql(resourceType);",
+									"    pm.expect(response.data[0].type).to.be.a(\"string\");",
+									"});",
+									"",
+									"pm.test(\"Has id returned\", function() {",
+									"    pm.expect(response.data[0].id).to.be.a(\"string\");",
+									"    pm.expect(response.data[0].id).to.not.be.empty;",
+									"});",
+									"",
+									"pm.test(\"Has name returned\", function() {",
+									"    pm.expect(response.data[0].attributes.name).to.be.a(\"string\");",
+									"    pm.expect(response.data[0].attributes.name).to.not.be.empty;",
+									"});",
+									"",
+									"pm.test(\"Has correct default attribute\", function() {",
+									"    pm.expect(response.data[0].attributes.isDefault).to.be.eql(true);",
+									"});",
+									"",
+									"pm.test(\"Has self link first\", function() {",
+									"    pm.expect(response.data[0].links.self).to.eql(selfLinkFirst);",
+									"});",
+									"",
+									"pm.test(\"Has correct type returned\", function() {",
+									"    pm.expect(response.data[1].type).to.eql(resourceType);",
+									"    pm.expect(response.data[1].type).to.be.a(\"string\");",
+									"});",
+									"",
+									"pm.test(\"Has id returned\", function() {",
+									"    pm.expect(response.data[1].id).to.be.a(\"string\");",
+									"    pm.expect(response.data[1].id).to.not.be.empty;",
+									"});",
+									"",
+									"pm.test(\"Has name returned\", function() {",
+									"    pm.expect(response.data[1].attributes.name).to.be.a(\"string\");",
+									"    pm.expect(response.data[1].attributes.name).to.not.be.empty;",
+									"});",
+									"",
+									"pm.test(\"Has correct default attribute\", function() {",
+									"    pm.expect(response.data[1].attributes.isDefault).to.be.eql(false);",
+									"});",
+									"",
+									"pm.test(\"Has self link second\", function() {",
+									"    pm.expect(response.data[1].links.self).to.eql(selfLinkSecond);",
+									"});",
+									"",
+									"pm.test(\"Has self link third\", function() {",
+									"    pm.expect(response.links.self).to.eql(selfLinkThird);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/cart-permission-groups",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"cart-permission-groups"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Negative",
+			"item": [
+				{
+					"name": "Request incorrect method POST quote permission group",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "c63d1f65-1395-4aa0-b0b9-4b36d624e20b",
+								"exec": [
+									"pm.test(\"Status code is 404\", function() {",
+									"    pm.response.to.have.status(404);",
+									"});",
+									"",
+									"pm.test(\"Has correct type returned\", function() {",
+									"    var jsonData = pm.response.json(),",
+									"        error = _.first(jsonData.errors);",
+									"",
+									"    pm.expect(error.detail).to.eql(\"Not Found\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsImp0aSI6ImI5ZGU0ZTBhNTU0MDk1YzY5Nzg4ZWM5ZTJmMjczYjk5NDcyNTk0OWVlODliMTdjYzU5ZDUxMjUzYTQwZjkxZDFmZmNlNzI4NGJiYWY3MmI4In0.eyJhdWQiOiJmcm9udGVuZCIsImp0aSI6ImI5ZGU0ZTBhNTU0MDk1YzY5Nzg4ZWM5ZTJmMjczYjk5NDcyNTk0OWVlODliMTdjYzU5ZDUxMjUzYTQwZjkxZDFmZmNlNzI4NGJiYWY3MmI4IiwiaWF0IjoxNTU0NDY0NDY2LCJuYmYiOjE1NTQ0NjQ0NjYsImV4cCI6MTU1NDQ5MzI2Niwic3ViIjoie1wiaWRfY29tcGFueV91c2VyXCI6XCI5NGQ1ODY5Mi1jMTE3LTU0NjYtOGI5Zi0yYmEzMmRkODdjNDNcIixcImN1c3RvbWVyX3JlZmVyZW5jZVwiOlwiREUtLTFcIixcImlkX2N1c3RvbWVyXCI6MX0iLCJzY29wZXMiOlsiY3VzdG9tZXIiXX0.aNVL-EGL7Wk9c-P_UGt9JfgVuc6-G0C5kGOttR02utvchnXRyB6aMhK2fwnOrXCYmE1GFq4nHHzCyivtISP0Xbtn_Zb8-8Q9LINAeKU9ljHVSeJYK1wqLV0qmp8QJikcS9lqzw-jK27OzuUVFZi3os1WSVUYnoq9yUerdzWMv3OvEX-LsCfoYFkXY0jAQ4-E5B8EVhWyeKYeG9OJzPO5u8SDvr84JdfiA733OKD4sVm1UPAcles1VOV-GXsNXAmyIEp-uLQr2b1Mm-9jiKGJho7cxfopzh8iOmAP6rfno0s5WotOfPj5AQzqiX2jGTnqN1ur4NBES0IoFJn6FkLo_w",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/cart-permission-groups",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"cart-permission-groups"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Request incorrect method PATCH quote permission group",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "cf8a682f-9c71-41b7-8edc-3420ef6b6641",
+								"exec": [
+									"pm.test(\"Status code is 404\", function() {",
+									"    pm.response.to.have.status(404);",
+									"});",
+									"",
+									"pm.test(\"Has correct type returned\", function() {",
+									"    var jsonData = pm.response.json(),",
+									"        error = _.first(jsonData.errors);",
+									"",
+									"    pm.expect(error.detail).to.eql(\"Not Found\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/cart-permission-groups",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"cart-permission-groups"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Request incorrect method PUT quote permission group",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "18dcf33e-c1e8-464c-94fc-b8989a0f8e5f",
+								"exec": [
+									"pm.test(\"Status code is 404\", function() {",
+									"    pm.response.to.have.status(404);",
+									"});",
+									"",
+									"pm.test(\"Has correct type returned\", function() {",
+									"    var jsonData = pm.response.json(),",
+									"        error = _.first(jsonData.errors);",
+									"",
+									"    pm.expect(error.detail).to.eql(\"Not Found\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/cart-permission-groups",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"cart-permission-groups"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Request incorrect method DELETE quote permission group",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "1424dca5-fd54-4a16-820f-cfd4025a10e8",
+								"exec": [
+									"pm.test(\"Status code is 404\", function() {",
+									"    pm.response.to.have.status(404);",
+									"});",
+									"",
+									"pm.test(\"Has correct type returned\", function() {",
+									"    var jsonData = pm.response.json(),",
+									"        error = _.first(jsonData.errors);",
+									"",
+									"    pm.expect(error.detail).to.eql(\"Not Found\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/cart-permission-groups",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"cart-permission-groups"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Request GET quote permission group without without authorization",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "5be7b6d2-f806-4096-81ef-2c23680498ab",
+								"exec": [
+									"pm.test(\"Status code is 403\", function() {",
+									"    pm.response.to.have.status(403);",
+									"});",
+									"",
+									"pm.test(\"Has correct type returned\", function() {",
+									"    var jsonData = pm.response.json(),",
+									"        error = _.first(jsonData.errors);",
+									"",
+									"    pm.expect(error.detail).to.eql(\"Missing access token.\");",
+									"    pm.expect(error.code).to.eql(\"002\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/cart-permission-groups",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"cart-permission-groups"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Request GET quote permission group without with invalid url",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "bbcc8a28-c144-425e-b45e-6bf2bb75cab1",
+								"exec": [
+									"pm.test(\"Status code is 404\", function() {",
+									"    pm.response.to.have.status(404);",
+									"});",
+									"",
+									"pm.test(\"Has correct type returned\", function() {",
+									"    var jsonData = pm.response.json(),",
+									"        error = _.first(jsonData.errors);",
+									"",
+									"    pm.expect(error.detail).to.eql(\"Not Found\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/cart-permission-group",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"cart-permission-group"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Request GET quote permission group without with invalid id",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "bc0c3eed-740b-4450-8037-e3f70af3b7d8",
+								"exec": [
+									"pm.test(\"Status code is 404\", function() {",
+									"    pm.response.to.have.status(404);",
+									"});",
+									"",
+									"pm.test(\"Has correct type returned\", function() {",
+									"    var jsonData = pm.response.json(),",
+									"        error = _.first(jsonData.errors);",
+									"",
+									"    pm.expect(error.code).to.eql(\"2501\"),",
+									"    pm.expect(error.detail).to.eql(\"Cart permission group not found.\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/cart-permission-groups/10",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"cart-permission-groups",
+								"10"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "cb23e406-1cc0-49a5-915e-3de1de3ec9e8",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "ef149a86-1bd3-45ee-8e1f-6250f1198e36",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"id": "2f2844c9-8ad4-4ce0-9e7a-2554da7d0139",
+			"key": "email",
+			"value": "spencor.hopkin@spryker.com",
+			"type": "string"
+		},
+		{
+			"id": "20652351-a79f-4ede-94d3-17fd0ddd0c43",
+			"key": "token",
+			"value": "string",
+			"type": "string"
+		}
+	]
+}

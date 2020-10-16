@@ -1,0 +1,989 @@
+{
+	"info": {
+		"_postman_id": "1291a6df-911b-4b7f-ad73-28a534182a3e",
+		"name": "GLUE-5002-Using-shared-cart",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Read only access",
+			"item": [
+				{
+					"name": "Request access token (helper)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "871764df-f1ad-4e0a-b326-d129ce255d6d",
+								"exec": [
+									"var responseData = pm.response.json().data;",
+									"",
+									"pm.environment.set(\"token\", responseData.attributes.accessToken);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"data\": {\n        \"type\": \"access-tokens\",\n        \"attributes\": {\n            \"username\": \"Sarah@spryker.com\",\n            \"password\": \"change123\"\n        }\n    }\n}"
+						},
+						"url": {
+							"raw": "{{url}}/access-tokens",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"access-tokens"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Retrieve cart",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "2ffeee23-53da-43c0-be23-ebb8b890c9e2",
+								"exec": [
+									"var responseData = pm.response.json().data;",
+									"",
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Has correct type\", function() {",
+									"    pm.expect(responseData.type).to.eql(\"carts\");",
+									"});",
+									"",
+									"pm.test(\"Has id returned\", function() {",
+									"    pm.expect(responseData.id).to.not.eql(null);",
+									"    pm.expect(responseData.id).to.be.a(\"string\");",
+									"});",
+									"",
+									"pm.test(\"Has priceMode returned\", function() {",
+									"    pm.expect(responseData.attributes.priceMode).not.eql(null);",
+									"    pm.expect(responseData.attributes.priceMode).to.be.a(\"string\");",
+									"});",
+									"",
+									"pm.test(\"Has currency returned\", function() {",
+									"    pm.expect(responseData.attributes.currency).not.eql(null);",
+									"    pm.expect(responseData.attributes.currency).to.be.a(\"string\");",
+									"});",
+									"",
+									"pm.test(\"Has store returned\", function() {",
+									"    pm.expect(responseData.attributes.store).not.eql(null);",
+									"    pm.expect(responseData.attributes.store).to.be.a(\"string\");",
+									"});",
+									"",
+									"pm.test(\"Has discounts returned\", function() {",
+									"    pm.expect(responseData.attributes.discounts.length).not.eql(null);",
+									"});",
+									"",
+									"pm.test(\"Has totals returned\", function() {",
+									"    pm.expect(responseData.attributes.totals.length).not.eql(null);",
+									"    ",
+									"    pm.expect(responseData.attributes.totals.expenseTotal).not.eql(null);",
+									"    pm.expect(responseData.attributes.totals.discountTotal).not.eql(null);",
+									"    pm.expect(responseData.attributes.totals.taxTotal).not.eql(null);",
+									"    pm.expect(responseData.attributes.totals.subtotal).not.eql(null);",
+									"    pm.expect(responseData.attributes.totals.grandTotal).not.eql(null);",
+									"});",
+									"",
+									"pm.test(\"Has name returned\", function() {",
+									"    pm.expect(responseData.attributes.name).to.be.a(\"string\");",
+									"});",
+									"",
+									"pm.test(\"Has isDefault returned\", function() {",
+									"    pm.expect(responseData.attributes.isDefault).to.be.a(\"boolean\");",
+									"});",
+									"",
+									"pm.test(\"Has self link\", function() {",
+									"    pm.expect(responseData.links.self).to.not.be.empty;",
+									"    pm.expect(responseData.links.self).to.eql(pm.variables.get(\"url\") + \"/carts/0c3ec260-694a-5cec-b78c-d37d32f92ee9\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/carts/0c3ec260-694a-5cec-b78c-d37d32f92ee9",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"carts",
+								"0c3ec260-694a-5cec-b78c-d37d32f92ee9"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Add item to cart",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "e9eddec1-e86b-4b8f-8f0e-9bc972614fe4",
+								"exec": [
+									"var responseJson = pm.response.json();",
+									"",
+									"pm.test(\"Status code is 403\", function () {",
+									"    pm.response.to.have.status(403);",
+									"});",
+									"",
+									"pm.test(\"Correct error status\", function() {",
+									"    pm.expect(responseJson.errors[0].status).to.eql(403);",
+									"});",
+									"",
+									"pm.test(\"Correct error message\", function() {",
+									"    pm.expect(responseJson.errors[0].code).to.eql(\"115\");",
+									"});",
+									"",
+									"pm.test(\"Correct error message\", function() {",
+									"    pm.expect(responseJson.errors[0].detail).to.eql(\"Unauthorized cart action.\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"data\": {\n        \"type\": \"items\",\n        \"attributes\": {\n            \"sku\": \"005_30663301\",\n            \"quantity\": 1\n        }\n    }\n}"
+						},
+						"url": {
+							"raw": "{{url}}/carts/0c3ec260-694a-5cec-b78c-d37d32f92ee9/items",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"carts",
+								"0c3ec260-694a-5cec-b78c-d37d32f92ee9",
+								"items"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Change item qty",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "df8404aa-d14b-4e11-8057-9184333d0bf9",
+								"exec": [
+									"var responseJson = pm.response.json();",
+									"",
+									"pm.test(\"Status code is 403\", function () {",
+									"    pm.response.to.have.status(403);",
+									"});",
+									"",
+									"pm.test(\"Correct error status\", function() {",
+									"    pm.expect(responseJson.errors[0].status).to.eql(403);",
+									"});",
+									"",
+									"pm.test(\"Correct error message\", function() {",
+									"    pm.expect(responseJson.errors[0].code).to.eql(\"115\");",
+									"});",
+									"",
+									"pm.test(\"Correct error message\", function() {",
+									"    pm.expect(responseJson.errors[0].detail).to.eql(\"Unauthorized cart action.\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"data\": {\n        \"type\": \"items\",\n        \"attributes\": {\n            \"quantity\": 5\n        }\n    }\n}"
+						},
+						"url": {
+							"raw": "{{url}}/carts/0c3ec260-694a-5cec-b78c-d37d32f92ee9/items/001_25904006",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"carts",
+								"0c3ec260-694a-5cec-b78c-d37d32f92ee9",
+								"items",
+								"001_25904006"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Change cart name",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "cce74426-1429-4775-a7d5-471919f98a26",
+								"exec": [
+									"var responseJson = pm.response.json();",
+									"",
+									"pm.test(\"Status code is 403\", function () {",
+									"    pm.response.to.have.status(403);",
+									"});",
+									"",
+									"pm.test(\"Correct error status\", function() {",
+									"    pm.expect(responseJson.errors[0].status).to.eql(403);",
+									"});",
+									"",
+									"pm.test(\"Correct error message\", function() {",
+									"    pm.expect(responseJson.errors[0].code).to.eql(\"115\");",
+									"});",
+									"",
+									"pm.test(\"Correct error message\", function() {",
+									"    pm.expect(responseJson.errors[0].detail).to.eql(\"Unauthorized cart action.\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"data\": {\n        \"type\": \"carts\",\n        \"attributes\": {\n            \"name\": \"Test\"\n        }\n    }\n}"
+						},
+						"url": {
+							"raw": "{{url}}/carts/0c3ec260-694a-5cec-b78c-d37d32f92ee9",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"carts",
+								"0c3ec260-694a-5cec-b78c-d37d32f92ee9"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete item",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "e1d48fc1-10df-4607-a432-839f25158f97",
+								"exec": [
+									"var responseJson = pm.response.json();",
+									"",
+									"pm.test(\"Status code is 403\", function () {",
+									"    pm.response.to.have.status(403);",
+									"});",
+									"",
+									"pm.test(\"Correct error status\", function() {",
+									"    pm.expect(responseJson.errors[0].status).to.eql(403);",
+									"});",
+									"",
+									"pm.test(\"Correct error message\", function() {",
+									"    pm.expect(responseJson.errors[0].code).to.eql(\"115\");",
+									"});",
+									"",
+									"pm.test(\"Correct error message\", function() {",
+									"    pm.expect(responseJson.errors[0].detail).to.eql(\"Unauthorized cart action.\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/carts/0c3ec260-694a-5cec-b78c-d37d32f92ee9/items/001_25904006",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"carts",
+								"0c3ec260-694a-5cec-b78c-d37d32f92ee9",
+								"items",
+								"001_25904006"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete cart",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "690814fc-a960-4627-adfa-4b46a5aff032",
+								"exec": [
+									"var responseJson = pm.response.json();",
+									"",
+									"pm.test(\"Status code is 403\", function () {",
+									"    pm.response.to.have.status(403);",
+									"});",
+									"",
+									"pm.test(\"Correct error status\", function() {",
+									"    pm.expect(responseJson.errors[0].status).to.eql(403);",
+									"});",
+									"",
+									"pm.test(\"Correct error message\", function() {",
+									"    pm.expect(responseJson.errors[0].code).to.eql(\"115\");",
+									"});",
+									"",
+									"pm.test(\"Correct error message\", function() {",
+									"    pm.expect(responseJson.errors[0].detail).to.eql(\"Unauthorized cart action.\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/carts/0c3ec260-694a-5cec-b78c-d37d32f92ee9",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"carts",
+								"0c3ec260-694a-5cec-b78c-d37d32f92ee9"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Full access",
+			"item": [
+				{
+					"name": "Request access token (helper)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "871764df-f1ad-4e0a-b326-d129ce255d6d",
+								"exec": [
+									"var responseData = pm.response.json().data;",
+									"",
+									"pm.environment.set(\"token\", responseData.attributes.accessToken);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"data\": {\n        \"type\": \"access-tokens\",\n        \"attributes\": {\n            \"username\": \"Solomon@spryker.com\",\n            \"password\": \"change123\"\n        }\n    }\n}"
+						},
+						"url": {
+							"raw": "{{url}}/access-tokens",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"access-tokens"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Retrieve cart",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "2ffeee23-53da-43c0-be23-ebb8b890c9e2",
+								"exec": [
+									"var responseData = pm.response.json().data;",
+									"",
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Has correct type\", function() {",
+									"    pm.expect(responseData.type).to.eql(\"carts\");",
+									"});",
+									"",
+									"pm.test(\"Has id returned\", function() {",
+									"    pm.expect(responseData.id).to.not.eql(null);",
+									"    pm.expect(responseData.id).to.be.a(\"string\");",
+									"});",
+									"",
+									"pm.test(\"Has priceMode returned\", function() {",
+									"    pm.expect(responseData.attributes.priceMode).not.eql(null);",
+									"    pm.expect(responseData.attributes.priceMode).to.be.a(\"string\");",
+									"});",
+									"",
+									"pm.test(\"Has currency returned\", function() {",
+									"    pm.expect(responseData.attributes.currency).not.eql(null);",
+									"    pm.expect(responseData.attributes.currency).to.be.a(\"string\");",
+									"});",
+									"",
+									"pm.test(\"Has store returned\", function() {",
+									"    pm.expect(responseData.attributes.store).not.eql(null);",
+									"    pm.expect(responseData.attributes.store).to.be.a(\"string\");",
+									"});",
+									"",
+									"pm.test(\"Has discounts returned\", function() {",
+									"    pm.expect(responseData.attributes.discounts.length).not.eql(null);",
+									"});",
+									"",
+									"pm.test(\"Has totals returned\", function() {",
+									"    pm.expect(responseData.attributes.totals.length).not.eql(null);",
+									"    ",
+									"    pm.expect(responseData.attributes.totals.expenseTotal).not.eql(null);",
+									"    pm.expect(responseData.attributes.totals.discountTotal).not.eql(null);",
+									"    pm.expect(responseData.attributes.totals.taxTotal).not.eql(null);",
+									"    pm.expect(responseData.attributes.totals.subtotal).not.eql(null);",
+									"    pm.expect(responseData.attributes.totals.grandTotal).not.eql(null);",
+									"});",
+									"",
+									"pm.test(\"Has name returned\", function() {",
+									"    pm.expect(responseData.attributes.name).to.be.a(\"string\");",
+									"});",
+									"",
+									"pm.test(\"Has isDefault returned\", function() {",
+									"    pm.expect(responseData.attributes.isDefault).to.be.a(\"boolean\");",
+									"});",
+									"",
+									"pm.test(\"Has self link\", function() {",
+									"    pm.expect(responseData.links.self).to.not.be.empty;",
+									"    pm.expect(responseData.links.self).to.eql(pm.variables.get(\"url\") + \"/carts/0c3ec260-694a-5cec-b78c-d37d32f92ee9\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/carts/0c3ec260-694a-5cec-b78c-d37d32f92ee9",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"carts",
+								"0c3ec260-694a-5cec-b78c-d37d32f92ee9"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Add item to cart",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "e9eddec1-e86b-4b8f-8f0e-9bc972614fe4",
+								"exec": [
+									"var responseData = pm.response.json().data;",
+									"",
+									"pm.variables.set(\"cart_id\", responseData.id);",
+									"",
+									"pm.test(\"Status code is 201\", function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"pm.test(\"Has correct type\", function() {",
+									"    pm.expect(responseData.type).to.eql(\"carts\");",
+									"});",
+									"",
+									"pm.test(\"Has id returned\", function() {",
+									"    pm.expect(responseData.id).not.eql(null);",
+									"    pm.expect(responseData.id).to.be.a(\"string\");",
+									"});",
+									"",
+									"pm.test(\"Has priceMode returned\", function() {",
+									"    pm.expect(responseData.attributes.priceMode).not.eql(null);",
+									"    pm.expect(responseData.attributes.priceMode).to.be.a(\"string\");",
+									"});",
+									"",
+									"pm.test(\"Has currency returned\", function() {",
+									"    pm.expect(responseData.attributes.currency).not.eql(null);",
+									"    pm.expect(responseData.attributes.currency).to.be.a(\"string\");",
+									"});",
+									"",
+									"pm.test(\"Has store returned\", function() {",
+									"    pm.expect(responseData.attributes.store).not.eql(null);",
+									"    pm.expect(responseData.attributes.store).to.be.a(\"string\");",
+									"});",
+									"",
+									"pm.test(\"Has discounts returned\", function() {",
+									"    pm.expect(responseData.attributes.discounts.length).not.eql(null);",
+									"});",
+									"",
+									"pm.test(\"Has totals returned\", function() {",
+									"    pm.expect(responseData.attributes.totals.length).not.eql(null);",
+									"    ",
+									"    pm.expect(responseData.attributes.totals.expenseTotal).not.eql(null);",
+									"    pm.expect(responseData.attributes.totals.discountTotal).not.eql(null);",
+									"    pm.expect(responseData.attributes.totals.taxTotal).not.eql(null);",
+									"    pm.expect(responseData.attributes.totals.subtotal).not.eql(null);",
+									"    pm.expect(responseData.attributes.totals.grandTotal).not.eql(null);",
+									"});",
+									"",
+									"pm.test(\"Has self link\", function() {",
+									"    pm.expect(responseData.links.self).to.not.be.empty;",
+									"    pm.expect(responseData.links.self).to.eql(pm.variables.get(\"url\") + \"/carts/\" + pm.variables.get(\"cart_id\"));",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"data\": {\n        \"type\": \"items\",\n        \"attributes\": {\n            \"sku\": \"005_30663301\",\n            \"quantity\": 1\n        }\n    }\n}"
+						},
+						"url": {
+							"raw": "{{url}}/carts/0c3ec260-694a-5cec-b78c-d37d32f92ee9/items",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"carts",
+								"0c3ec260-694a-5cec-b78c-d37d32f92ee9",
+								"items"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Change item qty",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "df8404aa-d14b-4e11-8057-9184333d0bf9",
+								"exec": [
+									"var responseData = pm.response.json().data;",
+									"var includedData = pm.response.json().included;",
+									"",
+									"pm.variables.set(\"cart_id\", responseData.id);",
+									"",
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Has correct type\", function() {",
+									"    pm.expect(responseData.type).to.eql(\"carts\");",
+									"});",
+									"",
+									"pm.test(\"Has id returned\", function() {",
+									"    pm.expect(responseData.id).not.eql(null);",
+									"    pm.expect(responseData.id).to.be.a(\"string\");",
+									"});",
+									"",
+									"pm.test(\"Has product with updated quantity\", function() {",
+									"    pm.expect(includedData[12].attributes.sku).to.eql(\"005_30663301\");",
+									"    pm.expect(includedData[12].attributes.quantity).to.eql(5);",
+									"});",
+									"",
+									"pm.test(\"Has self link\", function() {",
+									"    pm.expect(responseData.links.self).to.not.be.empty;",
+									"    pm.expect(responseData.links.self).to.eql(pm.variables.get(\"url\") + \"/carts/\" + pm.variables.get(\"cart_id\"));",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"data\": {\n        \"type\": \"items\",\n        \"attributes\": {\n            \"quantity\": 5\n        }\n    }\n}"
+						},
+						"url": {
+							"raw": "{{url}}/carts/0c3ec260-694a-5cec-b78c-d37d32f92ee9/items/005_30663301",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"carts",
+								"0c3ec260-694a-5cec-b78c-d37d32f92ee9",
+								"items",
+								"005_30663301"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Change cart name",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "cce74426-1429-4775-a7d5-471919f98a26",
+								"exec": [
+									"var responseData = pm.response.json().data;",
+									"var includedData = pm.response.json().included;",
+									"",
+									"pm.variables.set(\"cart_id\", responseData.id);",
+									"",
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Has correct type\", function() {",
+									"    pm.expect(responseData.type).to.eql(\"carts\");",
+									"});",
+									"",
+									"pm.test(\"Has id returned\", function() {",
+									"    pm.expect(responseData.id).not.eql(null);",
+									"    pm.expect(responseData.id).to.be.a(\"string\");",
+									"});",
+									"",
+									"pm.test(\"Has name returned\", function() {",
+									"    pm.expect(responseData.attributes.name).to.eql(\"Test\");",
+									"});",
+									"",
+									"pm.test(\"Has self link\", function() {",
+									"    pm.expect(responseData.links.self).to.not.be.empty;",
+									"    pm.expect(responseData.links.self).to.eql(pm.variables.get(\"url\") + \"/carts/\" + pm.variables.get(\"cart_id\"));",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"data\": {\n        \"type\": \"carts\",\n        \"attributes\": {\n            \"name\": \"Test\"\n        }\n    }\n}"
+						},
+						"url": {
+							"raw": "{{url}}/carts/0c3ec260-694a-5cec-b78c-d37d32f92ee9",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"carts",
+								"0c3ec260-694a-5cec-b78c-d37d32f92ee9"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete item",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "e1d48fc1-10df-4607-a432-839f25158f97",
+								"exec": [
+									"pm.test(\"Status code is 204\", function () {",
+									"    pm.response.to.have.status(204);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/carts/0c3ec260-694a-5cec-b78c-d37d32f92ee9/items/005_30663301",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"carts",
+								"0c3ec260-694a-5cec-b78c-d37d32f92ee9",
+								"items",
+								"005_30663301"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete cart",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "690814fc-a960-4627-adfa-4b46a5aff032",
+								"exec": [
+									"pm.test(\"Status code is 204\", function () {",
+									"    pm.response.to.have.status(204);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/carts/0c3ec260-694a-5cec-b78c-d37d32f92ee9",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"carts",
+								"0c3ec260-694a-5cec-b78c-d37d32f92ee9"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "04ca8636-1c08-4fd4-bf99-4e86c53b896e",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "8b913b5e-8861-4709-b96d-42063c54aba5",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"id": "50de228d-a04e-461e-9b04-2cf6ed242763",
+			"key": "email",
+			"value": "sonia@spryker.com",
+			"type": "string"
+		},
+		{
+			"id": "8e8ec3aa-cb64-4721-a3e8-7c25d38353d1",
+			"key": "cart_id",
+			"value": "string",
+			"type": "string"
+		}
+	]
+}

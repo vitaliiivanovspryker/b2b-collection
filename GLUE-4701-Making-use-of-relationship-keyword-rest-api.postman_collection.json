@@ -1,0 +1,351 @@
+{
+	"info": {
+		"_postman_id": "4e9d2c62-45d7-4a88-8beb-df6a2a0d61fa",
+		"name": "GLUE-4701-Making-use-of-relationship-keyword-rest-api",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Positive",
+			"item": [
+				{
+					"name": "Request PATCH with valid url",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "3dddecf3-6e09-4c46-a593-e21540c3c444",
+								"exec": [
+									"var jsonData = pm.response.json();",
+									"console.log(jsonData);",
+									"",
+									"pm.test (\"Response data field is not empty when valid method PATCH is used\", function(){",
+									"    pm.expect(jsonData.data).to.not.eql(\"\");",
+									"});",
+									"",
+									"pm.test (\"Response links field is not empty when valid method PATCH is used\", function(){",
+									"    pm.expect(jsonData.links).to.not.eql(\"\");",
+									"});",
+									"",
+									"pm.test (\"Response status is 200 when valid method PATCH is used\", function(){",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"data\": [\n        {\n            \"type\": \"wishlists\",\n            \"id\": \"1\",\n            \"attributes\": {\n                \"name\": \"test name\"\n            }\n        },\n        {\n            \"type\": \"wishlists\",\n            \"id\": \"2\",\n            \"attributes\": {\n                \"name\": \"test name 2\"\n            }\n        }\n    ]\n}"
+						},
+						"url": {
+							"raw": "{{url}}/customers/1/relationships/wishlists",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"customers",
+								"1",
+								"relationships",
+								"wishlists"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Negative",
+			"item": [
+				{
+					"name": "Request GET with valid url",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "a374c7e2-2f27-41e5-b8e3-131363775752",
+								"exec": [
+									"var jsonData = pm.response.json();",
+									"console.log(jsonData);",
+									"",
+									"pm.test (\"Response status is 404 when invalid method GET is used\", function(){",
+									"    pm.response.to.have.status(404);",
+									"});",
+									"",
+									"pm.test (\"Response detail field is not empty when invalid method GET is used\", function(){",
+									"    pm.expect(jsonData.errors[0].detail).to.eql(\"Not Found\");",
+									"});",
+									"",
+									"pm.test (\"Response status field is not empty when invalid method GET is used\", function(){",
+									"    pm.expect(jsonData.errors[0].status).to.eql(404);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"data\": [\n        {\n            \"type\": \"wishlists\",\n            \"id\": \"1\",\n            \"attributes\": {\n                \"name\": \"test name\"\n            }\n        },\n        {\n            \"type\": \"wishlists\",\n            \"id\": \"2\",\n            \"attributes\": {\n                \"name\": \"test name 2\"\n            }\n        }\n    ]\n}"
+						},
+						"url": {
+							"raw": "{{url}}/customers/1/relationships/wishlists",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"customers",
+								"1",
+								"relationships",
+								"wishlists"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Request POST with valid url",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "462ce1f7-cfcc-4b79-98e4-1c227de7d273",
+								"exec": [
+									"var jsonData = pm.response.json();",
+									"console.log(jsonData);",
+									"",
+									"pm.test (\"Response status is 404 when invalid method POST is used\", function(){",
+									"    pm.response.to.have.status(404);",
+									"});",
+									"",
+									"pm.test (\"Response detail field is not empty when invalid method POST is used\", function(){",
+									"    pm.expect(jsonData.errors[0].detail).to.eql(\"Not Found\");",
+									"});",
+									"",
+									"pm.test (\"Response status field is not empty when invalid method POST is used\", function(){",
+									"    pm.expect(jsonData.errors[0].status).to.eql(404);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"data\": [\n        {\n            \"type\": \"wishlists\",\n            \"id\": \"1\",\n            \"attributes\": {\n                \"name\": \"test name\"\n            }\n        },\n        {\n            \"type\": \"wishlists\",\n            \"id\": \"2\",\n            \"attributes\": {\n                \"name\": \"test name 2\"\n            }\n        }\n    ]\n}"
+						},
+						"url": {
+							"raw": "{{url}}/customers/1/relationships/wishlists",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"customers",
+								"1",
+								"relationships",
+								"wishlists"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Request PUT with valid url",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "a47372f1-c7fc-4cfa-acd1-9ddd8c4db2b1",
+								"exec": [
+									"var jsonData = pm.response.json();",
+									"console.log(jsonData);",
+									"",
+									"pm.test (\"Response status is 404 when invalid method PUT is used\", function(){",
+									"    pm.response.to.have.status(404);",
+									"});",
+									"",
+									"pm.test (\"Response detail field is not empty when invalid method PUT is used\", function(){",
+									"    pm.expect(jsonData.errors[0].detail).to.eql(\"Not Found\");",
+									"});",
+									"",
+									"pm.test (\"Response status field is not empty when invalid method PUT is used\", function(){",
+									"    pm.expect(jsonData.errors[0].status).to.eql(404);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"data\": [\n        {\n            \"type\": \"wishlists\",\n            \"id\": \"1\",\n            \"attributes\": {\n                \"name\": \"test name\"\n            }\n        },\n        {\n            \"type\": \"wishlists\",\n            \"id\": \"2\",\n            \"attributes\": {\n                \"name\": \"test name 2\"\n            }\n        }\n    ]\n}"
+						},
+						"url": {
+							"raw": "{{url}}/customers/1/relationships/wishlists",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"customers",
+								"1",
+								"relationships",
+								"wishlists"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Request DELETE with valid url",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "dc1f88c3-b9eb-4c27-913a-0aac42f86b2e",
+								"exec": [
+									"var jsonData = pm.response.json();",
+									"console.log(jsonData);",
+									"",
+									"pm.test (\"Response status is 404 when invalid method DELETE is used\", function(){",
+									"    pm.response.to.have.status(404);",
+									"});",
+									"",
+									"pm.test (\"Response detail field is not empty when invalid method DELETE is used\", function(){",
+									"    pm.expect(jsonData.errors[0].detail).to.eql(\"Not Found\");",
+									"});",
+									"",
+									"pm.test (\"Response status field is not empty when invalid method DELETE is used\", function(){",
+									"    pm.expect(jsonData.errors[0].status).to.eql(404);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"data\": [\n        {\n            \"type\": \"wishlists\",\n            \"id\": \"1\",\n            \"attributes\": {\n                \"name\": \"test name\"\n            }\n        },\n        {\n            \"type\": \"wishlists\",\n            \"id\": \"2\",\n            \"attributes\": {\n                \"name\": \"test name 2\"\n            }\n        }\n    ]\n}"
+						},
+						"url": {
+							"raw": "{{url}}/customers/1/relationships/wishlists",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"customers",
+								"1",
+								"relationships",
+								"wishlists"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Request PATCH with invalid url",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "18092fab-8d0c-4066-a239-597f634b1409",
+								"exec": [
+									"var jsonData = pm.response.json();",
+									"console.log(jsonData);",
+									"",
+									"pm.test (\"Response status is 404 when invalid url is used\", function(){",
+									"    pm.response.to.have.status(404);",
+									"});",
+									"",
+									"pm.test (\"Response detail field is not empty when invalid url is used\", function(){",
+									"    pm.expect(jsonData.errors[0].detail).to.eql(\"Not Found\");",
+									"});",
+									"",
+									"pm.test (\"Response status field is not empty when invalid url is used\", function(){",
+									"    pm.expect(jsonData.errors[0].status).to.eql(404);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"data\": [\n        {\n            \"type\": \"wishlists\",\n            \"id\": \"1\",\n            \"attributes\": {\n                \"name\": \"test name\"\n            }\n        },\n        {\n            \"type\": \"wishlists\",\n            \"id\": \"2\",\n            \"attributes\": {\n                \"name\": \"test name 2\"\n            }\n        }\n    ]\n}"
+						},
+						"url": {
+							"raw": "{{url}}/customer/1/relationships/wishlists",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"customer",
+								"1",
+								"relationships",
+								"wishlists"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
